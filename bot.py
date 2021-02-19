@@ -1,4 +1,5 @@
 import asyncio
+import os
 import random
 import re
 from pathlib import Path
@@ -170,4 +171,4 @@ async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 
-bot.run(TOKEN)
+bot.run(os.environ.get('TOKEN'))

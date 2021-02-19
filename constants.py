@@ -1,6 +1,3 @@
-TOKEN = 'ODEwNTM1ODk4NzAxNjI3NDUy.YClEYQ.WSksmpsIJSqVdLWfSHhAJ-LSl3o'
-
-
 class GetDict(dict):
     def __getattr__(self, item):
         return self.get(item)
