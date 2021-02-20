@@ -27,4 +27,6 @@ async def fanatik(ctx):
 
 @bot.command(help='ToT')
 async def tavern(ctx):
-    await ctx.send(tavern_emoji)
+    msg = await ctx.send(tavern_emoji)
+    for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
+        await msg.add_reaction(emoji)

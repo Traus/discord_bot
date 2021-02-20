@@ -13,8 +13,8 @@ except ImportError:
 
 
 @bot.command(pass_context=True)
-async def test(ctx, member: discord.Member):
-    await ctx.send(f"hello {member.display_name} {member.id}")
+async def test(ctx, *args):
+    print(args)
 
 
 @bot.command(pass_context=True, help='для решения споров')
