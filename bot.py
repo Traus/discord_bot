@@ -12,6 +12,11 @@ from discord.utils import get
 from constants import *
 from files import charter, rules
 
+try:
+    from loccal_settings import TOKEN
+except ImportError:
+    TOKEN = os.environ.get("TOKEN")
+
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
 bot = commands.Bot(command_prefix='!')
@@ -40,6 +45,11 @@ async def rule(ctx, par):
         await ctx.send(file=discord.File('files/34.jpg'))
     else:
         await ctx.send(get_rule(par))
+
+
+@bot.command(pass_context=True)
+async def test(ctx, member: discord.Member):
+    await ctx.send(f"hello {member.display_name} {member.id}")
 
 
 @bot.command(pass_context=True, help='для решения споров')
@@ -171,4 +181,4 @@ async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 
-bot.run(os.environ.get('TOKEN'))
+bot.run(TOKEN)
