@@ -25,8 +25,13 @@ async def roll(ctx, num=100):
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.channel.id not in (channels.REQUEST, channels.JOIN):
+    no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES)
+    if message.channel.id not in no_moderation:
         await automoderation(message)
+
+    if message.channel.id == channels.MEMES:
+        if message.content:
+            await message.delete()
 
     if message.channel.id == channels.JOIN:  # вступление-в-гильдию
         inv_gi_channel: discord.TextChannel = get(message.channel.guild.channels, id=channels.REQUEST)  # заявки-в-ги
