@@ -151,6 +151,11 @@ async def automoderation(message: discord.Message):
         await add_mute(message.author)
 
 
+@bot.command(help='fanatik')
+async def fanatik(ctx):
+    await ctx.send(f':regional_indicator_f: :regional_indicator_a: :regional_indicator_n: :regional_indicator_a: :regional_indicator_t: :regional_indicator_i: :regional_indicator_k:')
+
+
 @bot.command(help='rofl')
 async def rofl(ctx):
     await ctx.send(f'{ctx.author.display_name} <@{members.ROFL}>`ит')
