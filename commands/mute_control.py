@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path
+from random import randint
 from re import split
 
 import discord
@@ -37,7 +38,7 @@ async def unmute(ctx, user: discord.Member):
 
 async def automoderation(message: discord.Message):
     mute = False
-    pattern = r'[ !.,?]+'
+    pattern = r'[ !.,?;:-_@]+'
     for word in split(pattern, message.content):
         if word.lower() in BAD_WORDS:
             mute = True
@@ -47,5 +48,9 @@ async def automoderation(message: discord.Message):
             await message.delete()
         except discord.errors.NotFound:
             pass
-        await message.channel.send(f'{message.author.display_name} получил мут на 30 секунд')
-        await add_mute(message.author)
+        mute_time = randint(1, 60)
+        suffix = 'у' if str(mute_time).endswith('1') and mute_time != 11 \
+            else 'ы' if str(mute_time)[-1] in ('2', '3', '4') and mute_time not in [12, 13, 14] \
+            else ''
+        await message.channel.send(f'{message.author.display_name} получил мут на {mute_time} секунд{suffix}')
+        await add_mute(message.author, time=f"{mute_time}s")
