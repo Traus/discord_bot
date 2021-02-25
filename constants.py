@@ -1,3 +1,6 @@
+TENOR_API = 'WUUCF2M4J7H6'
+
+
 class GetDict(dict):
     def __getattr__(self, item):
         return self.get(item)

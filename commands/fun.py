@@ -1,5 +1,7 @@
 from init_bot import bot
 from constants import members
+from utils.tenor_gifs import find_gif
+
 
 tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_a: ' \
@@ -23,6 +25,13 @@ async def fanatik(ctx):
                    f':regional_indicator_t: '
                    f':regional_indicator_i: '
                    f':regional_indicator_k:')
+
+
+@bot.command(help='coycb')
+async def соус(ctx):  # en
+    search_term = 'sause'
+    limit = 10
+    await ctx.send(find_gif(search_term, limit))
 
 
 @bot.command(help='ToT')
