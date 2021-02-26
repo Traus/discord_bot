@@ -10,13 +10,13 @@ from files import charter, rules
 from init_bot import bot
 
 
-def get_charter(par):
+def _get_charter(par):
     text = charter.text
     res = re.findall(f'(?<![.]){par}.*', text)
     return '\n\t'.join(res)
 
 
-def get_rule(par):
+def _get_rule(par):
     text = rules.text
     res = re.findall(f'(?<![.]){par}.*', text)
     return '\n\t'.join(res)
@@ -24,7 +24,7 @@ def get_rule(par):
 
 @bot.command(pass_context=True, help='вывод глав устава')
 async def устав(ctx, par):
-    await ctx.send(get_charter(par))
+    await ctx.send(_get_charter(par))
 
 
 @bot.command(pass_context=True, help='вывод правил')
@@ -32,7 +32,7 @@ async def rule(ctx, par):
     if par == '34':
         await ctx.send(file=discord.File('files/34.jpg'))
     else:
-        await ctx.send(get_rule(par))
+        await ctx.send(_get_rule(par))
 
 
 @bot.command(help='+1 к наказанию')

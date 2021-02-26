@@ -12,7 +12,7 @@ from init_bot import bot
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
 
-async def add_mute(user: discord.Member, time: str = '30s'):
+async def _add_mute(user: discord.Member, time: str = '30s'):
     times = {'s': 1, 'm': 60, 'h': 60*60, 'd': 60*60*24}
     time_1, time_2 = int(time[:-1]), time[-1]
     role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
@@ -26,7 +26,7 @@ async def add_mute(user: discord.Member, time: str = '30s'):
 async def mute(ctx, user: discord.Member, time: str = '30s', *reason):
     reason = ' '.join(reason) or "заслужил"
     await ctx.send(f'{user.display_name} получил мут на {time} по причине: {reason}')
-    await add_mute(user, time)
+    await _add_mute(user, time)
 
 
 @bot.command(help='анмут')
@@ -54,4 +54,4 @@ async def automoderation(message: discord.Message):
             else 'ы' if str(mute_time)[-1] in ('2', '3', '4') and mute_time not in [12, 13, 14] \
             else ''
         await message.channel.send(f'{message.author.display_name} получил мут на {mute_time} секунд{suffix}')
-        await add_mute(message.author, time=f"{mute_time}s")
+        await _add_mute(message.author, time=f"{mute_time}s")

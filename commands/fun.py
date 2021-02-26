@@ -3,7 +3,7 @@ from constants import members
 from utils.tenor_gifs import find_gif
 
 
-tavern_emoji = f':regional_indicator_t: ' \
+_tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_a: ' \
                f':regional_indicator_v: ' \
                f':regional_indicator_e: ' \
@@ -36,6 +36,6 @@ async def соус(ctx):  # en
 
 @bot.command(help='ToT')
 async def tavern(ctx):
-    msg = await ctx.send(tavern_emoji)
+    msg = await ctx.send(_tavern_emoji)
     for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
         await msg.add_reaction(emoji)
