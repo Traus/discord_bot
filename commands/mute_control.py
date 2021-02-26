@@ -23,7 +23,8 @@ async def add_mute(user: discord.Member, time: str = '30s'):
 
 @bot.command(help='мут, время, причина')
 @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
-async def mute(ctx, user: discord.Member, time: str = '30s', reason='заслужил'):
+async def mute(ctx, user: discord.Member, time: str = '30s', *reason):
+    reason = ' '.join(reason) or "заслужил"
     await ctx.send(f'{user.display_name} получил мут на {time} по причине: {reason}')
     await add_mute(user, time)
 

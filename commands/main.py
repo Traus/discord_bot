@@ -1,3 +1,4 @@
+import random
 import re
 
 import discord
@@ -85,6 +86,12 @@ async def амнистия(ctx, member: discord.Member):
     if msg is not None:
         await ctx.send(msg)
         await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+
+
+@bot.command(pass_context=True, help='для решения споров')
+async def roll(ctx, num=100):
+    await ctx.message.delete()
+    await ctx.send(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}")
 
 
 @bot.command(help='описание команд')
