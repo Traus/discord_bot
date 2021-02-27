@@ -13,6 +13,7 @@ except ImportError:
 @bot.command(pass_context=True)
 async def test(ctx, *args):
     print(args)
+    print(ctx.channel.id)
 
 
 @bot.event

@@ -6,25 +6,27 @@ from discord.ext import commands
 from discord.utils import get
 
 from constants import channels
-from files import charter, rules
 from init_bot import bot
 
 
-def _get_charter(par):
-    text = charter.text
-    res = re.findall(f'(?<![.]){par}.*', text)
+def _get_paragraph(par, text):
+    pattern = f'(?<![.\d<]){par}.*'
+    res = re.findall(pattern, text)
     return '\n\t'.join(res)
 
 
-def _get_rule(par):
-    text = rules.text
-    res = re.findall(f'(?<![.]){par}.*', text)
-    return '\n\t'.join(res)
+def _get_principle(text):
+    pattern = r'Основные принципы гильдии.*'
+    res = re.findall(pattern, text)
+    return res[0]
 
 
 @bot.command(pass_context=True, help='вывод глав устава')
 async def устав(ctx, par):
-    await ctx.send(_get_charter(par))
+    channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.CHARTER)
+    messages = await channel.history().flatten()
+    text = '\n'.join(message.content for message in messages)
+    await ctx.send(_get_paragraph(par, text))
 
 
 @bot.command(pass_context=True, help='вывод правил')
@@ -32,7 +34,18 @@ async def rule(ctx, par):
     if par == '34':
         await ctx.send(file=discord.File('files/34.jpg'))
     else:
-        await ctx.send(_get_rule(par))
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
+        messages = await channel.history(limit=1, oldest_first=True).flatten()
+        text = '\n'.join(message.content for message in messages)
+        await ctx.send(_get_paragraph(par, text))
+
+
+@bot.command(pass_context=True, help='основные принципы')
+async def main(ctx):
+    channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.INFO)
+    messages = await channel.history(limit=1, oldest_first=True).flatten()
+    text = '\n'.join(message.content for message in messages)
+    await ctx.send(_get_principle(text))
 
 
 @bot.command(help='+1 к наказанию')
