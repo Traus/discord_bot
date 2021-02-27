@@ -34,6 +34,20 @@ async def соус(ctx):  # en
     await ctx.send(find_gif(search_term, limit))
 
 
+@bot.command(help='котик')
+async def котик(ctx):
+    search_term = 'meow'
+    limit = 10
+    await ctx.send(find_gif(search_term, limit))
+
+
+@bot.command(help='метеор')
+async def метеор(ctx):
+    search_term = 'nyan cat'
+    limit = 6
+    await ctx.send(find_gif(search_term, limit))
+
+
 @bot.command(help='ToT')
 async def tavern(ctx):
     msg = await ctx.send(_tavern_emoji)
