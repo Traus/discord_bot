@@ -1,5 +1,7 @@
 import os
+import discord
 from datetime import date
+from constants import *
 
 # commands
 from commands import *
@@ -13,7 +15,35 @@ except ImportError:
 @bot.command(pass_context=True)
 async def test(ctx, *args):
     print(args)
+    print(ctx.message.id)
+    print(ctx.guild.roles)
     print(ctx.channel.id)
+
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.message_id != PRIVATE_CHANNELS_MSG_ID:
+        return
+    emoji = payload.emoji
+    if emoji.name == '🇩':
+        user = await bot.fetch_user(payload.user_id)
+        domino_channel = bot.get_channel(channels.DOMINO)
+        await domino_channel.set_permissions(user, read_messages=True)
+    else:
+        channel = bot.get_channel(channels.PRIVATE_CHANNELS)
+        message = await channel.fetch_message(payload.message_id)
+        await message.clear_reaction(emoji)
+
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    if payload.message_id != PRIVATE_CHANNELS_MSG_ID:
+        return
+    emoji = payload.emoji
+    if emoji.name == '🇩':
+        user = await bot.fetch_user(payload.user_id)
+        domino_channel = bot.get_channel(channels.DOMINO)
+        await domino_channel.set_permissions(user, read_messages=False)
 
 
 @bot.event
