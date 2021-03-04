@@ -7,6 +7,7 @@ from discord.utils import get
 
 from constants import channels
 from init_bot import bot
+from utils.guild_utils import get_member_by_role
 
 
 def _get_paragraph(par, text):
@@ -99,6 +100,30 @@ async def амнистия(ctx, member: discord.Member):
     if msg is not None:
         await ctx.send(msg)
         await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+
+
+@bot.command(pass_context=True, help='Обновить список членов ги')
+@commands.has_role("Совет ги")
+async def список(ctx):
+    message = ''
+    uniq_users = set()
+    leader = get_member_by_role(ctx, name="Глава ги")
+    council = get_member_by_role(ctx, name="Совет ги")
+    tot = get_member_by_role(ctx, name="ToT")
+    recruit = get_member_by_role(ctx, name="Рекрут")
+    channel = bot.get_channel(channels.LIST)
+
+    count = 0
+    for group in (leader, council, tot, recruit):
+        message += f"-----------{group.role}-----------\n"
+        for i in range(len(group.members)):
+            if group.members[i] not in uniq_users:
+                count += 1
+                message += f'{count}. {group.members[i].display_name}\n'
+                uniq_users.add(group.members[i])
+    await ctx.message.delete()
+    await channel.purge(limit=1, oldest_first=True)
+    await channel.send(message)
 
 
 @bot.command(pass_context=True, help='для решения споров')
