@@ -84,7 +84,6 @@ async def амнистия(ctx, member: discord.Member):
     strike_1 = get(all_roles, name='Страйк 1-уровень')
     strike_2 = get(all_roles, name='Страйк 2-уровень')
     strike_3 = get(all_roles, name='Страйк 3-уровень')
-    msg = None
     if strike_1 in member.roles:
         await member.remove_roles(strike_1)
         msg = f"{member.display_name} прощен за хорошее поведение."
@@ -98,9 +97,8 @@ async def амнистия(ctx, member: discord.Member):
         msg = f"{member.display_name} частично прощен за хорошее поведение."
     else:
         msg = f"{member.display_name} и так молодец!"
-    if msg is not None:
-        await ctx.send(msg)
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+    await ctx.send(msg)
+    await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
 
 @bot.command(pass_context=True, help='Обновить список членов ги')
@@ -120,7 +118,10 @@ async def список(ctx):
         for i in range(len(group.members)):
             if group.members[i] not in uniq_users:
                 count += 1
-                message += f'{count}. {group.members[i].display_name}\n'
+                name = group.members[i].display_name
+                if '[tot]' in name.lower() or '[тот]' in name.lower():
+                    name = name[6:].strip()
+                message += f'{count}. {name}\n'
                 uniq_users.add(group.members[i])
     await ctx.message.delete()
     await channel.purge(limit=1, oldest_first=True)
