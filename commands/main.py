@@ -120,7 +120,7 @@ async def список(ctx):
                 count += 1
                 name = group.members[i].display_name
                 if '[tot]' in name.lower() or '[тот]' in name.lower():
-                    name = name[6:].strip()
+                    name = name[5:].strip()
                 message += f'{count}. {name}\n'
                 uniq_users.add(group.members[i])
     await ctx.message.delete()
