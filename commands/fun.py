@@ -2,6 +2,7 @@ import discord
 
 from init_bot import bot
 from constants import members
+from utils.guild_utils import get_member_by_role
 from utils.tenor_gifs import find_gif
 
 
@@ -82,6 +83,15 @@ async def кибермедведь(ctx):
 async def осуждаю(ctx):
     await ctx.message.delete()
     await ctx.send(file=discord.File('files/media/tom.jpg'))
+
+
+@bot.command(help='клуб любителей домино')
+async def секта(ctx):
+    sekta = get_member_by_role(ctx, name='Клуб любителей домино')
+    msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\nКультисты:\n"
+    for member in sekta.members:
+        msg += member.display_name + '\n'
+    await ctx.send(msg)
 
 
 @bot.command(help='ToT')
