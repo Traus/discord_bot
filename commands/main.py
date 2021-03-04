@@ -32,12 +32,13 @@ async def устав(ctx, par):
 
 @bot.command(pass_context=True, help='вывод правил')
 async def rule(ctx, par):
+    channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
+    messages = await channel.history(limit=1, oldest_first=True).flatten()
+    text = '\n'.join(message.content for message in messages)
     if par == '34':
-        await ctx.send(file=discord.File('files/34.jpg'))
+        await ctx.send(_get_paragraph(2, text))
+        await ctx.send(file=discord.File('files/media/34.jpg'))
     else:
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
-        messages = await channel.history(limit=1, oldest_first=True).flatten()
-        text = '\n'.join(message.content for message in messages)
         await ctx.send(_get_paragraph(par, text))
 
 
@@ -134,11 +135,12 @@ async def roll(ctx, num=100):
 
 @bot.command(help='описание команд')
 async def info(ctx):
-    msg = '**!устав [глава устава]** - для вывода главы устава\n'
+    msg = 'Основные команды:\n'
+    msg += '**!устав [глава устава]** - для вывода главы устава\n'
     msg += '**!rule [номер правила]** - для вывода правила из канала правил\n'
     msg += '**!roll [макс - опционально]** - для вывода целого числа от 1 до 100 (или макс)\n'
     msg += '**!страйк [Ник] [причина - опционально]** - даёт +1 уровень страйка\n'
-    msg += '**!амнистия [Ник]** - отнимает 1 уровень страйка\n'
+    msg += '**!амнистия [Ник]** - снимает 1 уровень страйка\n'
     msg += '**!mute [Ник] [время] [причина]** - мут. Время в формате [цифра][smhd]\n'
     msg += '**!unmute [Ник]** - снять мут\n'
     await ctx.send(msg)

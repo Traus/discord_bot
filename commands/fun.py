@@ -1,3 +1,5 @@
+import discord
+
 from init_bot import bot
 from constants import members
 from utils.tenor_gifs import find_gif
@@ -28,7 +30,7 @@ async def fanatik(ctx):
 
 
 @bot.command(help='coycb')
-async def соус(ctx):  # en
+async def соус(ctx):  # ru
     search_term = 'sause'
     limit = 10
     await ctx.send(find_gif(search_term, limit))
@@ -46,6 +48,40 @@ async def метеор(ctx):
     search_term = 'nyan cat'
     limit = 6
     await ctx.send(find_gif(search_term, limit))
+
+
+@bot.command(help='DeDuJI9I')
+async def дедуля(ctx):
+    search_term = 'old'
+    limit = 15
+    await ctx.send(find_gif(search_term, limit))
+
+
+@bot.command(help='walidor')
+async def walidor(ctx):
+    await ctx.send(file=discord.File('files/media/walidor.png'))
+
+
+@bot.command(help='dommag')
+async def dommag(ctx):
+    await ctx.send(file=discord.File('files/media/dommag.jpg'))
+
+
+@bot.command(help='domino')
+async def мыша(ctx):
+    domino = ctx.guild.get_member(members.DOMINO)
+    await ctx.send(domino.avatar_url)
+
+
+@bot.command(help='для соуса')
+async def кибермедведь(ctx):
+    await ctx.send(file=discord.File('files/media/cyber.jpg'))
+
+
+@bot.command(help='осуждение')
+async def осуждаю(ctx):
+    await ctx.message.delete()
+    await ctx.send(file=discord.File('files/media/tom.jpg'))
 
 
 @bot.command(help='ToT')
