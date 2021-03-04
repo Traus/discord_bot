@@ -28,7 +28,11 @@ async def on_raw_reaction_add(payload):
     if emoji.name == '🇩':
         user = await bot.fetch_user(payload.user_id)
         domino_channel = bot.get_channel(channels.DOMINO)
-        await domino_channel.set_permissions(user, read_messages=True)
+        perms_flag = False
+        for role in payload.member.roles:
+            if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Клуб любителей домино']:
+                perms_flag = True
+        await domino_channel.set_permissions(user, read_messages=True, send_messages=perms_flag)
     else:
         channel = bot.get_channel(channels.PRIVATE_CHANNELS)
         message = await channel.fetch_message(payload.message_id)
