@@ -31,7 +31,7 @@ async def on_raw_reaction_add(payload):
         domino_channel = bot.get_channel(channels.DOMINO)
         perms_flag = False
         for role in payload.member.roles:
-            if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Клуб любителей домино']:
+            if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Верный адепт']:
                 perms_flag = True
         await domino_channel.set_permissions(user, read_messages=True, send_messages=perms_flag)
     else:
