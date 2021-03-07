@@ -87,8 +87,10 @@ async def осуждаю(ctx):
 
 @bot.command(help='клуб любителей домино')
 async def секта(ctx):
-    sekta = get_member_by_role(ctx, name='Клуб любителей домино')
-    msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\nКультисты:\n"
+    holy = get_member_by_role(ctx, name='Первосвященник секты')
+    sekta = get_member_by_role(ctx, name='Верный адепт')
+    msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\n"
+    msg += f"{holy.role}:\n{holy.members[0].display_name}\n\nКультисты:\n"
     for member in sekta.members:
         msg += member.display_name + '\n'
     await ctx.send(msg)
