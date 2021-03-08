@@ -97,9 +97,11 @@ async def поздравляю(ctx):
 @bot.command(help='клуб любителей домино')
 async def секта(ctx):
     holy = get_member_by_role(ctx, name='Первосвященник секты')
+    zam = get_member_by_role(ctx, name='Просвящённый культист')
     sekta = get_member_by_role(ctx, name='Верный адепт')
     msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\n"
-    msg += f"{holy.role}:\n{holy.members[0].display_name}\n\nКультисты:\n"
+    msg += f"{holy.role}:\n{holy.members[0].display_name}\n"
+    msg += f"{zam.role}:\n{zam.members[0].display_name}\n\nКультисты:\n"
     for member in sekta.members:
         msg += member.display_name + '\n'
     await ctx.send(msg)
