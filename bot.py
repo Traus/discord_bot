@@ -7,7 +7,7 @@ from constants import *
 from commands import *
 
 try:
-    from loccal_settings import TOKEN
+    from local_settings import TOKEN
 except ImportError:
     TOKEN = os.environ.get("TOKEN")
 
@@ -19,8 +19,6 @@ async def test(ctx, *args):
     print(ctx.message.author.id)
     print(ctx.guild.roles)
     print(ctx.channel.id)
-    emoji = await ctx.guild.fetch_emoji(811516186453082133)
-    await ctx.channel.send(f'{ctx.message.author.mention} {emoji}')
 
 
 @bot.event

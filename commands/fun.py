@@ -1,9 +1,102 @@
 import discord
+from discord.ext import commands
 
 from init_bot import bot
 from constants import members
 from utils.guild_utils import get_member_by_role
 from utils.tenor_gifs import find_gif
+
+
+class FunCommands(commands.Cog, name='Для веселья'):
+    """Рофлы и пасхалки"""
+
+    @commands.command(help='рофлить')
+    async def rofl(self, ctx):
+        await ctx.send(f'{ctx.author.display_name} <@{members.ROFL}>`ит')
+
+    @commands.command(help='для fanatik')
+    async def fanatik(self, ctx):
+        await ctx.send(f':regional_indicator_f: '
+                       f':regional_indicator_a: '
+                       f':regional_indicator_n: '
+                       f':regional_indicator_a: '
+                       f':regional_indicator_t: '
+                       f':regional_indicator_i: '
+                       f':regional_indicator_k:')
+
+    @commands.command(name='соус', help='для соуса')  # ru
+    async def coyc(self, ctx):
+        search_term = 'sause'
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(name='котик', help='для котика')
+    async def cat(self, ctx):
+        search_term = 'meow'
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(name='метеор', help='для метеора')
+    async def meteor(self, ctx):
+        search_term = 'nyan cat'
+        limit = 6
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(name='дедуля', help='для DeDuJI9I')
+    async def ded(self, ctx):
+        search_term = 'old'
+        limit = 15
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(help='для варлока')
+    async def warlock(self, ctx):
+        search_term = 'warlock wow'
+        limit = 5
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(help='для walidor')
+    async def walidor(self, ctx):
+        await ctx.send(file=discord.File('files/media/walidor.png'))
+
+    @commands.command(help='для dommag')
+    async def dommag(self, ctx):
+        await ctx.send(file=discord.File('files/media/dommag.jpg'))
+
+    @commands.command(name='мыша', help='для domino')
+    async def domino(self, ctx):
+        domino = ctx.guild.get_member(members.DOMINO)
+        await ctx.send(domino.avatar_url)
+
+    @commands.command(name='кибермедведь', help='для соуса')
+    async def bear(self, ctx):
+        await ctx.send(file=discord.File('files/media/cyber.jpg'))
+
+    @commands.command(name='осуждаю', help='Осудить!')
+    async def blame(self, ctx):
+        await ctx.message.delete()
+        await ctx.send(file=discord.File('files/media/tom.jpg'))
+
+    @commands.command(name='аватар', help='помотреть аватарку')
+    async def avatar(self, ctx, member: discord.Member):
+        await ctx.send(member.avatar_url)
+
+    @commands.command(name='секта', help='список участников секты домино')
+    async def sekta(self, ctx):
+        holy = get_member_by_role(ctx, name='Первосвященник секты')
+        zam = get_member_by_role(ctx, name='Просвящённый культист')
+        sekta = get_member_by_role(ctx, name='Верный адепт')
+        msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\n"
+        msg += f"{holy.role}:\n{holy.members[0].display_name}\n"
+        msg += f"{zam.role}:\n{zam.members[0].display_name}\n\nКультисты:\n"
+        for member in sekta.members:
+            msg += member.display_name + '\n'
+        await ctx.send(msg)
+
+    @commands.command(help='ToT')
+    async def tavern(self, ctx):
+        msg = await ctx.send(_tavern_emoji)
+        for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
+            await msg.add_reaction(emoji)
 
 
 _tavern_emoji = f':regional_indicator_t: ' \
@@ -13,105 +106,4 @@ _tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_r: ' \
                f':regional_indicator_n:'
 
-
-@bot.command(help='rofl')
-async def rofl(ctx):
-    await ctx.send(f'{ctx.author.display_name} <@{members.ROFL}>`ит')
-
-
-@bot.command(help='fanatik')
-async def fanatik(ctx):
-    await ctx.send(f':regional_indicator_f: '
-                   f':regional_indicator_a: '
-                   f':regional_indicator_n: '
-                   f':regional_indicator_a: '
-                   f':regional_indicator_t: '
-                   f':regional_indicator_i: '
-                   f':regional_indicator_k:')
-
-
-@bot.command(help='coycb')
-async def соус(ctx):  # ru
-    search_term = 'sause'
-    limit = 10
-    await ctx.send(find_gif(search_term, limit))
-
-
-@bot.command(help='котик')
-async def котик(ctx):
-    search_term = 'meow'
-    limit = 10
-    await ctx.send(find_gif(search_term, limit))
-
-
-@bot.command(help='метеор')
-async def метеор(ctx):
-    search_term = 'nyan cat'
-    limit = 6
-    await ctx.send(find_gif(search_term, limit))
-
-
-@bot.command(help='DeDuJI9I')
-async def дедуля(ctx):
-    search_term = 'old'
-    limit = 15
-    await ctx.send(find_gif(search_term, limit))
-
-
-@bot.command(help='warlock')
-async def warlock(ctx):
-    search_term = 'warlock wow'
-    limit = 5
-    await ctx.send(find_gif(search_term, limit))
-
-
-@bot.command(help='walidor')
-async def walidor(ctx):
-    await ctx.send(file=discord.File('files/media/walidor.png'))
-
-
-@bot.command(help='dommag')
-async def dommag(ctx):
-    await ctx.send(file=discord.File('files/media/dommag.jpg'))
-
-
-@bot.command(help='domino')
-async def мыша(ctx):
-    domino = ctx.guild.get_member(members.DOMINO)
-    await ctx.send(domino.avatar_url)
-
-
-@bot.command(help='для соуса')
-async def кибермедведь(ctx):
-    await ctx.send(file=discord.File('files/media/cyber.jpg'))
-
-
-@bot.command(help='осуждение')
-async def осуждаю(ctx):
-    await ctx.message.delete()
-    await ctx.send(file=discord.File('files/media/tom.jpg'))
-
-
-@bot.command(help='помотреть аватар')
-async def аватар(ctx, member: discord.Member):
-    await ctx.send(member.avatar_url)
-
-
-@bot.command(help='клуб любителей домино')
-async def секта(ctx):
-    holy = get_member_by_role(ctx, name='Первосвященник секты')
-    zam = get_member_by_role(ctx, name='Просвящённый культист')
-    sekta = get_member_by_role(ctx, name='Верный адепт')
-    msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\n"
-    msg += f"{holy.role}:\n{holy.members[0].display_name}\n"
-    msg += f"{zam.role}:\n{zam.members[0].display_name}\n\nКультисты:\n"
-    for member in sekta.members:
-        msg += member.display_name + '\n'
-    await ctx.send(msg)
-
-
-@bot.command(help='ToT')
-async def tavern(ctx):
-    msg = await ctx.send(_tavern_emoji)
-    for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
-        await msg.add_reaction(emoji)
+bot.add_cog(FunCommands())
