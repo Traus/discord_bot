@@ -23,7 +23,7 @@ class MainCommands(commands.Cog, name='Основные команды'):
         text = '\n'.join(message.content for message in messages)
         await ctx.send(_get_paragraph(par, text))
 
-    @commands.command(pass_context=True, help='Номер правилф. Вывод правил')
+    @commands.command(pass_context=True, help='Номер правила. Вывод правил')
     async def rule(self, ctx, par):
         channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
@@ -63,8 +63,8 @@ class MainCommands(commands.Cog, name='Основные команды'):
 
         await ctx.channel.send('Следующий дейл начнётся через {next_dail}.\n{first}.\n{second}.'.format(
             next_dail=f'{int(before_dail // 3600)} часов {int(before_dail / 60 % 60)} минут {int(before_dail % 60)} секунд',
-            first=starts_first[0].format(datetime.fromtimestamp(starts_first[1])),
-            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1])))
+            first=starts_first[0].format(datetime.fromtimestamp(starts_first[1] + 3600*3)),
+            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1] + 3600*3)))
         )
 
 
