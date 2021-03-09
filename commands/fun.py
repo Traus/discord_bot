@@ -58,6 +58,13 @@ async def дедуля(ctx):
     await ctx.send(find_gif(search_term, limit))
 
 
+@bot.command(help='warlock')
+async def warlock(ctx):
+    search_term = 'warlock wow'
+    limit = 5
+    await ctx.send(find_gif(search_term, limit))
+
+
 @bot.command(help='walidor')
 async def walidor(ctx):
     await ctx.send(file=discord.File('files/media/walidor.png'))
@@ -85,13 +92,9 @@ async def осуждаю(ctx):
     await ctx.send(file=discord.File('files/media/tom.jpg'))
 
 
-@bot.command(help='8march')
-async def поздравляю(ctx):
-    await ctx.message.delete()
-    await ctx.send(f'{ctx.author.display_name} поздравляет <@{797573551774236742}> и <@{818189252188831806}> с праздником!')
-    search_term = '8 march'
-    limit = 10
-    await ctx.send(find_gif(search_term, limit))
+@bot.command(help='помотреть аватар')
+async def аватар(ctx, member: discord.Member):
+    await ctx.send(member.avatar_url)
 
 
 @bot.command(help='клуб любителей домино')
