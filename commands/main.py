@@ -58,7 +58,6 @@ async def страйк(ctx, member: discord.Member, *reason):
     strike_1 = get(all_roles, name='Страйк 1-уровень')
     strike_2 = get(all_roles, name='Страйк 2-уровень')
     strike_3 = get(all_roles, name='Страйк 3-уровень')
-    msg = None
     if strike_1 in member.roles:
         await member.remove_roles(strike_1)
         await member.add_roles(strike_2, reason=reason)
@@ -72,9 +71,8 @@ async def страйк(ctx, member: discord.Member, *reason):
     else:
         await member.add_roles(strike_1, reason=reason)
         msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-    if msg is not None:
-        await ctx.send(msg)
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+    await ctx.send(msg)
+    await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
 
 @bot.command(help='-1 к наказанию')
@@ -132,6 +130,12 @@ async def список(ctx):
 async def roll(ctx, num=100):
     await ctx.message.delete()
     await ctx.send(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}")
+
+
+@bot.command(pass_context=True)
+@commands.has_permissions(kick_members=True)
+async def kick(ctx, member: discord.Member):
+    await ctx.guild.kick(member)
 
 
 @bot.command(help='описание команд')

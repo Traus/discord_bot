@@ -1,7 +1,5 @@
 TENOR_API = 'WUUCF2M4J7H6'
 
-PRIVATE_CHANNELS_MSG_ID = 816781266858934304
-
 
 class _GetDict(dict):
     def __getattr__(self, item):
@@ -22,6 +20,13 @@ channels = _GetDict(
     PRIVATE_CHANNELS=816767538997231656,
     DOMINO=816769493954985984,
 )
+
+
+messages = _GetDict(
+    ROOMS=816781266858934304,
+    RULES=818831442800410634,
+)
+
 
 roles = _GetDict(
     MUTED=811149529231130655,
