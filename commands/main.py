@@ -1,5 +1,7 @@
 import random
 import re
+import time
+from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -43,6 +45,27 @@ class MainCommands(commands.Cog, name='Основные команды'):
     async def roll(self, ctx, num=100):
         await ctx.message.delete()
         await ctx.send(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}")
+
+    @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
+    async def daily(self, ctx):
+        start_time = "10/03/2021 00:00"
+        first = second = 7 * 60 * 60
+        third = 9 * 60 * 60
+        stamp = time.mktime(datetime.strptime(start_time, "%d/%m/%Y %H:%M").timetuple())
+        stamp -= first * 63  # todo delete
+        now = datetime.timestamp(datetime.utcnow())
+        delta = now - stamp
+        starts_first = ("Дейлы 7 и 13 уровня начнутся в {} по мск", now + (first - delta % first))
+        starts_next = ("Дейл 16 уровня начнётся в {} по мск", now + (third - delta % third))
+        if starts_first[1] > starts_next[1]:
+            starts_first, starts_next = starts_next, starts_first
+        before_dail = starts_first[1] - now
+
+        await ctx.channel.send('Следующий дейл начнётся через {next_dail}.\n{first}.\n{second}.'.format(
+            next_dail=f'{int(before_dail // 3600)} часов {int(before_dail / 60 % 60)} минут {int(before_dail % 60)} секунд',
+            first=starts_first[0].format(datetime.fromtimestamp(starts_first[1])),
+            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1])))
+        )
 
 
 class CouncilsCommands(commands.Cog, name='Команды совета'):
