@@ -54,6 +54,12 @@ class FunCommands(commands.Cog, name='Для веселья'):
         limit = 5
         await ctx.send(find_gif(search_term, limit))
 
+    @commands.command(name='арт', help='танцули Арта')
+    async def art(self, ctx):
+        search_term = 'naruto dance'
+        limit = 20
+        await ctx.send(find_gif(search_term, limit))
+
     @commands.command(help='для walidor')
     async def walidor(self, ctx):
         await ctx.send(file=discord.File('files/media/walidor.png'))
