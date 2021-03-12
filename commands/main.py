@@ -10,6 +10,7 @@ from discord.utils import get
 from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
+from utils.format import box
 from utils.guild_utils import get_member_by_role
 
 
@@ -21,7 +22,7 @@ class MainCommands(commands.Cog, name='Основные команды'):
         channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.CHARTER)
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
-        await ctx.send(_get_paragraph(par, text))
+        await ctx.send(box(_get_paragraph(par, text)))
 
     @commands.command(pass_context=True, help='Номер правила. Вывод правил')
     async def rule(self, ctx, par):
@@ -32,19 +33,19 @@ class MainCommands(commands.Cog, name='Основные команды'):
             await ctx.send(_get_paragraph(2, text))
             await ctx.send(file=discord.File('files/media/34.jpg'))
         else:
-            await ctx.send(_get_paragraph(par, text))
+            await ctx.send(box(_get_paragraph(par, text)))
 
     @commands.command(pass_context=True, help='Основные принципы гильдии')
     async def main(self, ctx):
         channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.INFO)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
         text = '\n'.join(message.content for message in messages)
-        await ctx.send(_get_principle(text))
+        await ctx.send(box(_get_principle(text)))
 
     @commands.command(pass_context=True, help='Для решения споров. Случайное число от 1 до 100')
     async def roll(self, ctx, num=100):
         await ctx.message.delete()
-        await ctx.send(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}")
+        await ctx.send(box(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}"))
 
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
     async def daily(self, ctx):
@@ -52,7 +53,6 @@ class MainCommands(commands.Cog, name='Основные команды'):
         first = second = 7 * 60 * 60
         third = 9 * 60 * 60
         stamp = time.mktime(datetime.strptime(start_time, "%d/%m/%Y %H:%M").timetuple())
-        stamp -= first * 63  # todo delete
         now = datetime.timestamp(datetime.utcnow())
         delta = now - stamp
         starts_first = ("Дейлы 7 и 13 уровня начнутся в {} по мск", now + (first - delta % first))
@@ -61,11 +61,12 @@ class MainCommands(commands.Cog, name='Основные команды'):
             starts_first, starts_next = starts_next, starts_first
         before_dail = starts_first[1] - now
 
-        await ctx.channel.send('Следующий дейл начнётся через {next_dail}.\n{first}.\n{second}.'.format(
+        msg = 'Следующий дейл начнётся через {next_dail}.\n{first}.\n{second}.'.format(
             next_dail=f'{int(before_dail // 3600)} часов {int(before_dail / 60 % 60)} минут {int(before_dail % 60)} секунд',
             first=starts_first[0].format(datetime.fromtimestamp(starts_first[1] + 3600*3)),
-            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1] + 3600*3)))
+            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1] + 3600*3))
         )
+        await ctx.channel.send(box(msg))
 
 
 class CouncilsCommands(commands.Cog, name='Команды совета'):
@@ -92,8 +93,8 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         else:
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-        await ctx.send(msg)
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+        await ctx.send(box(msg))
+        await get(ctx.guild.channels, id=channels.COUNCILS).send(box(msg))  # совет-гильдии
 
     @commands.command(name='амнистия', help='Снимает 1 уровень страйка')
     @commands.has_role("Совет ги")
@@ -115,8 +116,8 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             msg = f"{member.display_name} частично прощен за хорошее поведение."
         else:
             msg = f"{member.display_name} и так молодец!"
-        await ctx.send(msg)
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+        await ctx.send(box(msg))
+        await get(ctx.guild.channels, id=channels.COUNCILS).send(box(msg))  # совет-гильдии
 
     @commands.command(pass_context=True, name='список', help='Обновить список членов ги')
     @commands.has_role("Совет ги")
@@ -148,14 +149,14 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def mute(self, ctx, user: discord.Member, time: str = '30s', *reason):
         reason = ' '.join(reason) or "заслужил"
-        await ctx.send(f'{user.display_name} получил мут на {time} по причине: {reason}')
+        await ctx.send(box(f'{user.display_name} получил мут на {time} по причине: {reason}'))
         await _add_mute(user, time)
 
     @commands.command(help='Снять мут')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def unmute(self, ctx, user: discord.Member):
         role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
-        await ctx.send(f'Мут снят с {user.display_name}')
+        await ctx.send(box(f'Мут снят с {user.display_name}'))
         await user.remove_roles(role)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')

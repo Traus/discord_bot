@@ -6,6 +6,7 @@ from re import split
 import discord
 
 from constants import roles
+from utils.format import box
 
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
@@ -35,5 +36,5 @@ async def automoderation(message: discord.Message):
         suffix = 'у' if str(mute_time).endswith('1') and mute_time != 11 \
             else 'ы' if str(mute_time)[-1] in ('2', '3', '4') and mute_time not in [12, 13, 14] \
             else ''
-        await message.channel.send(f'{message.author.display_name} получил мут на {mute_time} секунд{suffix}')
+        await message.channel.send(box(f'{message.author.display_name} получил мут на {mute_time} секунд{suffix}'))
         await _add_mute(message.author, time=f"{mute_time}s")
