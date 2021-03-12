@@ -5,6 +5,7 @@ from constants import *
 
 # commands
 from commands import *
+from utils.guild_utils import set_permissions
 
 try:
     from local_settings import TOKEN
@@ -24,7 +25,7 @@ async def test(ctx, *args):
     # print(ctx.message.id)
     # print(ctx.message.author.id)
     # print(ctx.guild.roles)
-    # print(ctx.channel.id)
+    print(ctx.channel.id)
 
 
 @bot.event
@@ -32,13 +33,13 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     if payload.message_id == messages.ROOMS:
         emoji = payload.emoji
         if emoji.name == '🇩':
-            user = await bot.fetch_user(payload.user_id)
-            domino_channel = bot.get_channel(channels.DOMINO)
             perms_flag = False
             for role in payload.member.roles:
                 if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Первосвященник секты', 'Просвящённый культист', 'Верный адепт']:
                     perms_flag = True
-            await domino_channel.set_permissions(user, read_messages=True, send_messages=perms_flag)
+            await set_permissions(channels.DOMINO, payload.user_id, read_messages=True, send_messages=perms_flag)
+        if emoji.name == '🇰':
+            await set_permissions(channels.KEFIR, payload.user_id, read_messages=True, send_messages=True)
         else:
             channel = bot.get_channel(channels.PRIVATE_CHANNELS)
             message = await channel.fetch_message(payload.message_id)
@@ -62,9 +63,9 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
     if payload.message_id == messages.ROOMS:
         emoji = payload.emoji
         if emoji.name == '🇩':
-            user = await bot.fetch_user(payload.user_id)
-            domino_channel = bot.get_channel(channels.DOMINO)
-            await domino_channel.set_permissions(user, read_messages=False)
+            await set_permissions(channels.DOMINO, payload.user_id, read_messages=False, send_messages=False)
+        if emoji.name == '🇰':
+            await set_permissions(channels.KEFIR, payload.user_id, read_messages=False, send_messages=False)
 
 
 @bot.event
