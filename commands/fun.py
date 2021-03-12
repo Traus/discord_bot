@@ -1,3 +1,5 @@
+import random
+
 import discord
 from discord.ext import commands
 
@@ -56,8 +58,8 @@ class FunCommands(commands.Cog, name='Для веселья'):
 
     @commands.command(name='арт', help='танцули Арта')
     async def art(self, ctx):
-        search_term = 'naruto dance'
-        limit = 20
+        search_term = random.choice(['naruto dance', 'anime dance'])
+        limit = 10
         await ctx.send(find_gif(search_term, limit))
 
     @commands.command(help='для walidor')
