@@ -62,6 +62,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
 
     @commands.command(help='для walidor')
     async def walidor(self, ctx):
+        await ctx.message.delete()
         await ctx.send(file=discord.File('files/media/walidor.png'))
 
     @commands.command(help='для dommag')
