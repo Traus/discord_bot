@@ -101,6 +101,12 @@ class FunCommands(commands.Cog, name='Для веселья'):
             msg += member.display_name + '\n'
         await ctx.send(msg)
 
+    @commands.command(help='=)')
+    async def traus(self, ctx):
+        msg = await ctx.send(_tavern_emoji)
+        for emoji in ('🇴', '🇫', '🇹', '🇷', '🇦', '🇺', '🇸'):
+            await msg.add_reaction(emoji)
+
     @commands.command(help='ToT')
     async def tavern(self, ctx):
         msg = await ctx.send(_tavern_emoji)
