@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from init_bot import bot
 from constants import members
+from utils.format import box
 from utils.guild_utils import get_member_by_role
 from utils.tenor_gifs import find_gif
 
@@ -99,7 +100,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
         msg += f"{zam.role}:\n{zam.members[0].display_name}\n\nКультисты:\n"
         for member in sekta.members:
             msg += member.display_name + '\n'
-        await ctx.send(msg)
+        await ctx.send(box(msg))
 
     @commands.command(help='=)')
     async def traus(self, ctx):
