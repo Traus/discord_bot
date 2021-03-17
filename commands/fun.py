@@ -86,6 +86,11 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.message.delete()
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
+    @commands.command(name='шапалах', help='Я СДЕЛАЮ, ОТСТАНЬТЕ!')
+    async def slap(self, ctx):
+        await ctx.message.delete()
+        await ctx.send(file=discord.File('files/media/slap.png'))
+
     @commands.command(name='аватар', help='помотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):
         await ctx.send(member.avatar_url)
