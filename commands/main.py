@@ -11,7 +11,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role
+from utils.guild_utils import get_member_by_role, is_spam
 
 
 class MainCommands(commands.Cog, name='Основные команды'):
@@ -46,6 +46,22 @@ class MainCommands(commands.Cog, name='Основные команды'):
     async def roll(self, ctx, num=100):
         await ctx.message.delete()
         await ctx.send(box(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}"))
+
+    @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. Злоупотребление наказуемо!')
+    async def all(self, ctx, *message):
+        await ctx.message.delete()
+        if is_spam(ctx.author):
+            await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
+            await _add_mute(ctx.author, '5m')
+        else:
+            all_roles = ctx.guild.roles
+            councils = get(all_roles, id=roles.COUNCILS)
+            tot = get(all_roles, id=roles.TOT)
+            recruit = get(all_roles, id=roles.RECRUIT)
+            msg = f'{councils.mention} {tot.mention} {recruit.mention}'
+            if message:
+                msg += box(f'\n{ctx.author.display_name}:\n{" ".join(message)}')
+            await ctx.send(msg)
 
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
     async def daily(self, ctx):

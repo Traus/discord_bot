@@ -24,7 +24,7 @@ async def test(ctx, *args):
     print(args)
     # print(ctx.message.id)
     # print(ctx.message.author.id)
-    # print(ctx.guild.roles)
+    print(ctx.guild.roles)
     print(ctx.channel.id)
 
 

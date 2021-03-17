@@ -1,10 +1,14 @@
+from datetime import datetime
+
 import discord
 from discord.utils import get
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from init_bot import bot
 
 Members = namedtuple('Members', ['role', 'members'])
+
+when_all_called = defaultdict(lambda: datetime.timestamp(datetime.now()))
 
 
 def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
@@ -19,3 +23,12 @@ async def set_permissions(channel_name: str, user_id: int, **permissions):
     channel = bot.get_channel(channel_name)
     user = await bot.fetch_user(user_id)
     await channel.set_permissions(user, **permissions)
+
+
+def is_spam(author):
+    global when_all_called
+
+    stamp = datetime.timestamp(datetime.now())
+    if 1 < stamp - when_all_called[author] < 60:
+        return True
+    return False
