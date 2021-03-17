@@ -6,6 +6,7 @@ import discord
 import requests
 from PIL import Image
 from discord.ext import commands
+from discord.utils import get
 
 from constants import members
 from init_bot import bot
@@ -135,6 +136,20 @@ class FunCommands(commands.Cog, name='Для веселья'):
         for member in sekta.members:
             msg += member.display_name + '\n'
         await ctx.send(box(msg))
+
+    @commands.command(name='всекту', help='принять в сектанты')
+    @commands.has_any_role("Совет ги", "Крот с ЕС", "Первосвященник секты")
+    async def join_sekta(self, ctx, member: discord.Member):
+        all_roles = ctx.guild.roles
+        sekta = get(all_roles, name='Верный адепт')
+        await member.add_roles(sekta)
+
+    @commands.command(name='изсекты', help='выйти из этой криповой секты')
+    async def exit_sekta(self, ctx):
+        all_roles = ctx.guild.roles
+        sekta = get(all_roles, name='Верный адепт')
+        await ctx.author.remove_roles(sekta)
+        await ctx.send(file=discord.File('files/media/sekta.jpg'))
 
     @commands.command(help='=)')
     async def traus(self, ctx):
