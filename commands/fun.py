@@ -1,10 +1,14 @@
 import random
+from io import BytesIO
+from pathlib import Path
 
 import discord
+import requests
+from PIL import Image
 from discord.ext import commands
 
-from init_bot import bot
 from constants import members
+from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role
 from utils.tenor_gifs import find_gif
@@ -86,10 +90,35 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.message.delete()
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
-    @commands.command(name='шапалах', help='Я СДЕЛАЮ, ОТСТАНЬТЕ!')
-    async def slap(self, ctx):
-        await ctx.message.delete()
-        await ctx.send(file=discord.File('files/media/slap.png'))
+    @commands.command(name='шапалах', help='Втащить')
+    async def slap(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        avatar0 = ctx.author.avatar_url
+        avatar1 = member.avatar_url
+
+        base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
+
+        image_bytes = BytesIO(requests.get(avatar1).content)
+        avatar = Image.open(image_bytes).resize((220, 220)).convert('RGBA')
+        image_bytes = BytesIO(requests.get(avatar0).content)
+        avatar2 = Image.open(image_bytes).resize((200, 200)).convert('RGBA')
+
+        base.paste(avatar, (610, 210), avatar)
+        base.paste(avatar2, (380, 70), avatar2)
+        base = base.convert('RGB')
+
+        b = BytesIO()
+        base.save(b, format='png')
+        b.seek(0)
+
+        tmp_file_path = Path('files/media/temp_slap.png')
+        try:
+            tmp_file_path.write_bytes(b.read())
+            await ctx.send(file=discord.File(tmp_file_path))
+        finally:
+            tmp_file_path.unlink()
 
     @commands.command(name='аватар', help='помотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):
