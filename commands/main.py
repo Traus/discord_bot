@@ -61,6 +61,8 @@ class MainCommands(commands.Cog, name='Основные команды'):
             msg = f'{councils.mention} {tot.mention} {recruit.mention}'
             if message:
                 msg += box(f'\n{ctx.author.display_name}:\n{" ".join(message)}')
+            else:
+                msg += box(f'\n{ctx.author.display_name} объявлет общий сбор')
             await ctx.send(msg)
 
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
