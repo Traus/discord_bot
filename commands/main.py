@@ -184,6 +184,21 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     async def kick(self, ctx, member: discord.Member):
         await ctx.guild.kick(member)
 
+    @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
+    @commands.has_role("Совет ги")
+    async def kick_from_guild(self, ctx, member: discord.Member):
+        kick = False
+        guest = get(ctx.guild.roles, name='Гость')
+        for role in member.roles:
+            if role.name in ['Совет ги', 'ToT', 'Наставник', 'Актив гильдии', 'Рекрут', 'Запас']:
+                kick = True
+                await member.remove_roles(role)
+                await member.add_roles(guest)
+        if kick:
+            msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии')
+            await ctx.send(msg)
+            await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+
 
 def _get_paragraph(par, text):
     pattern = f'(?<![.\d<]){par}.*'
