@@ -144,12 +144,14 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         uniq_users = set()
         leader = get_member_by_role(ctx, name="Глава ги")
         council = get_member_by_role(ctx, name="Совет ги")
+        active = get_member_by_role(ctx, name="Актив гильдии")
         tot = get_member_by_role(ctx, name="ToT")
         recruit = get_member_by_role(ctx, name="Рекрут")
+        reserve = get_member_by_role(ctx, name="Запас")
         channel = bot.get_channel(channels.LIST)
 
         count = 0
-        for group in (leader, council, tot, recruit):
+        for group in (leader, council, active, tot, recruit, reserve):
             message += f"-----------{group.role}-----------\n"
             for i in range(len(group.members)):
                 if group.members[i] not in uniq_users:
