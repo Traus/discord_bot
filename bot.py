@@ -38,7 +38,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Первосвященник секты', 'Просвящённый культист', 'Верный адепт']:
                     perms_flag = True
             await set_permissions(channels.DOMINO, payload.user_id, read_messages=True, send_messages=perms_flag)
-        if emoji.name == '🇰':
+        elif emoji.name == '🇰':
             await set_permissions(channels.KEFIR, payload.user_id, read_messages=True, send_messages=True)
         else:
             channel = bot.get_channel(channels.PRIVATE_CHANNELS)
