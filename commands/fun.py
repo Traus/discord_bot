@@ -24,15 +24,16 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
     @commands.command(name='шапалах', help='Втащить')
-    async def slap(self, ctx, member: discord.Member = None, member2: discord.Member = None):
+    async def slap(self, ctx, member: discord.Member = None, bot=None):
         if member is None:
             member = ctx.author
 
         avatar0 = ctx.author.avatar_url
         avatar1 = member.avatar_url
 
-        if member2 is not None:
-            avatar0 = member2.avatar_url
+        if bot is not None and bot == 'bot':
+            manager = get_member_by_role(ctx, name="Смотритель Таверны").members
+            avatar0 = manager[0].avatar_url
             await ctx.message.delete()
 
         base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
