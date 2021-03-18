@@ -13,7 +13,7 @@ except ImportError:
     TOKEN = os.environ.get("TOKEN")
 
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, help='Траус ломает бота')
 async def test(ctx, *args):
     # retStr = str("""```css\nThis is some colored Text```""")
     # embed = discord.Embed(title="Random test")
