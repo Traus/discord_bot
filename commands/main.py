@@ -187,6 +187,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
     async def kick_from_guild(self, ctx, member: discord.Member):
+        await ctx.message.delete()
         kick = False
         guest = get(ctx.guild.roles, name='Гость')
         for role in member.roles:

@@ -79,6 +79,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
     async def join_sekta(self, ctx, member: discord.Member):
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Верный адепт')
+        await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
@@ -140,6 +141,12 @@ class NamedCommands(commands.Cog, name='Именные команды'):
     async def warlock(self, ctx):
         search_term = 'warlock wow'
         limit = 5
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(help='для Mortuus')
+    async def mortuus(self, ctx):
+        search_term = 'skelet dancing'
+        limit = 10
         await ctx.send(find_gif(search_term, limit))
 
     @commands.command(name='арт', help='танцули Арта')
