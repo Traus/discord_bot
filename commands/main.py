@@ -11,7 +11,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, is_spam
+from utils.guild_utils import get_member_by_role, is_spam, when_all_called
 
 
 class MainCommands(commands.Cog, name='Основные команды'):
@@ -50,7 +50,7 @@ class MainCommands(commands.Cog, name='Основные команды'):
     @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. Злоупотребление наказуемо!')
     async def all(self, ctx, *message):
         await ctx.message.delete()
-        if is_spam(ctx.author):
+        if is_spam(ctx.author, when_all_called, 60):
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
             await _add_mute(ctx.author, '5m')
         else:

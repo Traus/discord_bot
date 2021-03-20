@@ -8,10 +8,11 @@ from PIL import Image
 from discord.ext import commands
 from discord.utils import get
 
+from commands.mute_control import _add_mute
 from constants import members
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role
+from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, when_slap_called
 from utils.tenor_gifs import find_gif
 
 
@@ -24,16 +25,26 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
     @commands.command(name='шапалах', help='Втащить')
-    async def slap(self, ctx, member: discord.Member = None, bot=None):
+    async def slap(self, ctx, member=None, bot=None):
+        if is_spam(ctx.author, when_slap_called, 30):
+            await ctx.send(box(f'{ctx.author.display_name} получил мут на 1 минуту по причине: хорош спамить!'))
+            await _add_mute(ctx.author, '1m')
+            return
+
         if member is None:
             member = ctx.author
 
         avatar0 = ctx.author.avatar_url
-        avatar1 = member.avatar_url
+        try:
+            avatar1 = member.avatar_url
+        except:
+            avatar1 = avatar0
+            avatar0 = get_bot_avatar(ctx)
+            await ctx.send(box("Чо творишь? Получи мут на 30 сек!"))
+            await _add_mute(ctx.author)
 
         if bot is not None and bot == 'bot':
-            manager = get_member_by_role(ctx, name="Смотритель Таверны").members
-            avatar0 = manager[0].avatar_url
+            avatar0 = get_bot_avatar(ctx)
             await ctx.message.delete()
 
         base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
