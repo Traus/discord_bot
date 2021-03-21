@@ -22,6 +22,15 @@ def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) 
     return Members(name, [member for member in all_members if role in member.roles])
 
 
+def get_class_roles(guild: discord.Guild) -> dict:
+    roles_dict = {'💉': get(guild.roles, name='💉'),
+                  '🧙': get(guild.roles, name='🧙'),
+                  '🏹': get(guild.roles, name='🏹'),
+                  '🛡️': get(guild.roles, name='🛡️'),
+                  '🗡️': get(guild.roles, name='🗡️')}
+    return roles_dict
+
+
 def get_bot_avatar(ctx=None):
     manager = get_member_by_role(ctx, name="Смотритель Таверны").members
     return manager[0].avatar_url
