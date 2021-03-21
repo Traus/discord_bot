@@ -4,7 +4,7 @@ from utils.guild_utils import get_member_by_role
 
 
 @bot.command(pass_context=True, name='хай', help="Список хай лвл гильдии")
-async def high(ctx):
+async def high_lvl(ctx):
     group = get_member_by_role(ctx, name="Хай лвл")
     message = ''
     count = 1

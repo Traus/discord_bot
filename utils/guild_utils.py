@@ -1,15 +1,17 @@
 from datetime import datetime
+from io import BytesIO
+from pathlib import Path
 
 import discord
+import requests
+from PIL import Image
 from discord.utils import get
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 
 from init_bot import bot
+from utils.statuses import immune_until
 
 Members = namedtuple('Members', ['role', 'members'])
-
-when_all_called = defaultdict(lambda: datetime.timestamp(datetime.now()))
-when_slap_called = defaultdict(lambda: datetime.timestamp(datetime.now()))
 
 
 def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
@@ -31,8 +33,39 @@ async def set_permissions(channel_name: str, user_id: int, **permissions):
     await channel.set_permissions(user, **permissions)
 
 
+async def create_and_send_slap(ctx, avatar_from, avatar_to):
+    base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
+
+    image_bytes = BytesIO(requests.get(avatar_to).content)
+    avatar = Image.open(image_bytes).resize((220, 220)).convert('RGBA')
+    image_bytes = BytesIO(requests.get(avatar_from).content)
+    avatar2 = Image.open(image_bytes).resize((200, 200)).convert('RGBA')
+
+    base.paste(avatar, (610, 210), avatar)
+    base.paste(avatar2, (380, 70), avatar2)
+    base = base.convert('RGB')
+
+    b = BytesIO()
+    base.save(b, format='png')
+    b.seek(0)
+
+    tmp_file_path = Path('files/media/temp_slap.png')
+    try:
+        tmp_file_path.write_bytes(b.read())
+        await ctx.send(file=discord.File(tmp_file_path))
+    finally:
+        tmp_file_path.unlink()
+
+
+def has_immune(member: discord.Member) -> bool:
+    if immune_until[member] >= datetime.timestamp(datetime.now()):
+        return True
+    return False
+
+
 def is_spam(author, memory, sec):
     stamp = datetime.timestamp(datetime.now())
     if 1 < stamp - memory[author] < sec:
         return True
+    memory[author] = stamp
     return False

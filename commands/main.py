@@ -11,7 +11,8 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, is_spam, when_all_called
+from utils.guild_utils import get_member_by_role, is_spam
+from utils.statuses import when_all_called
 
 
 class MainCommands(commands.Cog, name='Основные команды'):

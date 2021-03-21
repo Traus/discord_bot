@@ -1,10 +1,7 @@
 import random
-from io import BytesIO
-from pathlib import Path
+from datetime import datetime
 
 import discord
-import requests
-from PIL import Image
 from discord.ext import commands
 from discord.utils import get
 
@@ -12,7 +9,8 @@ from commands.mute_control import _add_mute
 from constants import members
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, when_slap_called
+from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, create_and_send_slap, has_immune
+from utils.statuses import when_slap_called, immune_until
 from utils.tenor_gifs import find_gif
 
 
@@ -25,51 +23,41 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
     @commands.command(name='шапалах', help='Втащить')
-    async def slap(self, ctx, member=None, bot=None):
-        if is_spam(ctx.author, when_slap_called, 30):
-            await ctx.send(box(f'{ctx.author.display_name} получил мут на 1 минуту по причине: хорош спамить!'))
-            await _add_mute(ctx.author, '1m')
-            return
-
+    async def slap(self, ctx, member: discord.Member = None, bot=None):
         if member is None:
             member = ctx.author
 
-        avatar0 = ctx.author.avatar_url
-        try:
-            avatar1 = member.avatar_url
-        except:
-            avatar1 = avatar0
-            avatar0 = get_bot_avatar(ctx)
-            await ctx.send(box("Чо творишь? Получи мут на 30 сек!"))
-            await _add_mute(ctx.author)
+        avatar_from = ctx.author.avatar_url
+        avatar_to = member.avatar_url
+
+        if has_immune(member):
+            await ctx.send(box(f'Иммунитет!'))
+            return
+
+        if is_spam(ctx.author, when_slap_called, 30):
+            await ctx.send(box(f'{ctx.author.display_name} получил мут на 1 минуту по причине: хорош спамить!'))
+            await create_and_send_slap(ctx, get_bot_avatar(ctx), avatar_from)
+            await _add_mute(ctx.author, '1m')
+            return
 
         if bot is not None and bot == 'bot':
-            avatar0 = get_bot_avatar(ctx)
+            avatar_from = get_bot_avatar(ctx)
             await ctx.message.delete()
 
-        base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
+        await create_and_send_slap(ctx, avatar_from, avatar_to)
 
-        image_bytes = BytesIO(requests.get(avatar1).content)
-        avatar = Image.open(image_bytes).resize((220, 220)).convert('RGBA')
-        image_bytes = BytesIO(requests.get(avatar0).content)
-        avatar2 = Image.open(image_bytes).resize((200, 200)).convert('RGBA')
+    @commands.command(name='домик', help='временный иммунитет от шапалаха')
+    @commands.has_any_role("Совет ги", "ToT")
+    async def home(self, ctx):
+        minutes = random.randint(1, 10)
+        if has_immune(ctx.author):
+            await ctx.send(box(f'{ctx.author.display_name} не злоупотребляй! {minutes} минут мута'))
+            await _add_mute(ctx.author, f'{minutes}m')
+        stamp = datetime.timestamp(datetime.now()) + minutes*60
+        immune_until[ctx.author] = stamp
+        await ctx.send(box(f'{ctx.author.display_name} получает иммунитет на {minutes} минут.'))
 
-        base.paste(avatar, (610, 210), avatar)
-        base.paste(avatar2, (380, 70), avatar2)
-        base = base.convert('RGB')
-
-        b = BytesIO()
-        base.save(b, format='png')
-        b.seek(0)
-
-        tmp_file_path = Path('files/media/temp_slap.png')
-        try:
-            tmp_file_path.write_bytes(b.read())
-            await ctx.send(file=discord.File(tmp_file_path))
-        finally:
-            tmp_file_path.unlink()
-
-    @commands.command(name='аватар', help='помотреть аватарку')
+    @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):
         await ctx.send(member.avatar_url)
 
@@ -199,4 +187,4 @@ _tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_n:'
 
 bot.add_cog(FunCommands())
-bot.add_cog(NamedCommands   ())
+bot.add_cog(NamedCommands())
