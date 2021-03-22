@@ -48,14 +48,18 @@ class FunCommands(commands.Cog, name='Для веселья'):
 
     @commands.command(name='домик', help='временный иммунитет от шапалаха')
     @commands.has_any_role("Совет ги", "ToT")
-    async def home(self, ctx):
+    async def home(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
         minutes = random.randint(1, 10)
-        if has_immune(ctx.author):
+        if has_immune(member):
             await ctx.send(box(f'{ctx.author.display_name} не злоупотребляй! {minutes} минут мута'))
             await _add_mute(ctx.author, f'{minutes}m')
+            return
         stamp = datetime.timestamp(datetime.now()) + minutes*60
-        immune_until[ctx.author] = stamp
-        await ctx.send(box(f'{ctx.author.display_name} получает иммунитет на {minutes} минут.'))
+        immune_until[member] = stamp
+        await ctx.send(box(f'{member.display_name} получает иммунитет на {minutes} минут.'))
 
     @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):
