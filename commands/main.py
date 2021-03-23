@@ -187,7 +187,8 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
 
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
-    async def kick_from_guild(self, ctx, member: discord.Member):
+    async def kick_from_guild(self, ctx, member: discord.Member, *reason):
+        reason = ' '.join(reason) or "не сложилось"
         await ctx.message.delete()
         kick = False
         guest = get(ctx.guild.roles, name='Гость')
@@ -197,7 +198,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
                 await member.remove_roles(role)
                 await member.add_roles(guest)
         if kick:
-            msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии')
+            msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии. Причина: {reason}')
             await ctx.send(msg)
             await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
