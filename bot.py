@@ -35,9 +35,9 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         if emoji.name == '🇩':
             perms_flag = False
             for role in payload.member.roles:
-                if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Первосвященник секты', 'Просвящённый культист', 'Верный адепт']:
+                if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Верховная жрица', 'Верховный жрец', 'Палач', 'Прихожанин']:
                     perms_flag = True
-            await set_permissions(channels.DOMINO, payload.user_id, read_messages=True, send_messages=perms_flag)
+            await set_permissions(channels.MERY, payload.user_id, read_messages=True, send_messages=perms_flag)
         elif emoji.name == '🇰':
             await set_permissions(channels.KEFIR, payload.user_id, read_messages=True, send_messages=True)
         else:
@@ -76,7 +76,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
     if payload.message_id == messages.ROOMS:
         emoji = payload.emoji
         if emoji.name == '🇩':
-            await set_permissions(channels.DOMINO, payload.user_id, read_messages=False, send_messages=False)
+            await set_permissions(channels.MERY, payload.user_id, read_messages=False, send_messages=False)
         if emoji.name == '🇰':
             await set_permissions(channels.KEFIR, payload.user_id, read_messages=False, send_messages=False)
 

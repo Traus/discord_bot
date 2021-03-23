@@ -6,10 +6,11 @@ from discord.ext import commands
 from discord.utils import get
 
 from commands.mute_control import _add_mute
-from constants import members
+from constants import members, channels
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, create_and_send_slap, has_immune
+from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, create_and_send_slap, has_immune, \
+    set_permissions
 from utils.statuses import when_slap_called, immune_until
 from utils.tenor_gifs import find_gif
 
@@ -65,32 +66,35 @@ class FunCommands(commands.Cog, name='Для веселья'):
     async def avatar(self, ctx, member: discord.Member):
         await ctx.send(member.avatar_url)
 
-    @commands.command(name='секта', help='список участников секты домино')
+    @commands.command(name='секта', help='список участников секты кровавой Мери')
     async def sekta(self, ctx):
-        holy = get_member_by_role(ctx, name='Первосвященник секты')
-        zam = get_member_by_role(ctx, name='Просвящённый культист')
-        sekta = get_member_by_role(ctx, name='Верный адепт')
-        msg = f"Ересиарх:\n{ctx.guild.get_member(members.DOMINO).display_name}\n\n"
-        msg += f"{holy.role}:\n{holy.members[0].display_name}\n"
-        msg += f"{zam.role}:\n{zam.members[0].display_name}\n\nКультисты:\n"
+        main = get_member_by_role(ctx, name='Верховная жрица')
+        zam = get_member_by_role(ctx, name='Верховный жрец')
+        rip = get_member_by_role(ctx, name='Палач')
+        sekta = get_member_by_role(ctx, name='Прихожанин')
+        msg = f"{main.role}:\n{main.members[0].display_name}\n"
+        msg += f"{zam.role}:\n{zam.members[0].display_name}\n"
+        msg += f"{rip.role}:\n{rip.members[0].display_name}\n\nПрихожане:\n"
         for member in sekta.members:
             msg += member.display_name + '\n'
         await ctx.send(box(msg))
 
-    @commands.command(name='всекту', help='принять в сектанты')
-    @commands.has_any_role("Совет ги", "Крот с ЕС", "Первосвященник секты")
+    @commands.command(name='всекту', help='принять в культ')
+    @commands.has_any_role("Совет ги", "Крот с ЕС", "Верховная жрица", "Верховный жрец")
     async def join_sekta(self, ctx, member: discord.Member):
         all_roles = ctx.guild.roles
-        sekta = get(all_roles, name='Верный адепт')
+        sekta = get(all_roles, name='Прихожанин')
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
+        await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
     async def exit_sekta(self, ctx):
         all_roles = ctx.guild.roles
-        sekta = get(all_roles, name='Верный адепт')
+        sekta = get(all_roles, name='Прихожанин')
         await ctx.author.remove_roles(sekta)
         await ctx.send(file=discord.File('files/media/sekta.jpg'))
+        await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
