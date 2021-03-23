@@ -102,6 +102,13 @@ class FunCommands(commands.Cog, name='Для веселья'):
         for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
             await msg.add_reaction(emoji)
 
+    @commands.command(help='ура')
+    async def праздник(self, ctx):
+        await ctx.send(f"Поздравляем {get_member_by_role(ctx, name='Глава ги').members[0].mention} с Днём Рождения!")
+        search_term = random.choice(['dance table', 'very old'])
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
 
 class NamedCommands(commands.Cog, name='Именные команды'):
     """Команды для увеселения отдельных игроков =)"""
