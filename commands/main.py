@@ -48,24 +48,6 @@ class MainCommands(commands.Cog, name='Основные команды'):
         await ctx.message.delete()
         await ctx.send(box(f"{ctx.author.display_name} rolled {random.randint(1, num)} from {num}"))
 
-    @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. Злоупотребление наказуемо!')
-    async def all(self, ctx, *message):
-        await ctx.message.delete()
-        if is_spam(ctx.author, when_all_called, 60):
-            await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
-            await _add_mute(ctx.author, '5m')
-        else:
-            all_roles = ctx.guild.roles
-            councils = get(all_roles, id=roles.COUNCILS)
-            tot = get(all_roles, id=roles.TOT)
-            recruit = get(all_roles, id=roles.RECRUIT)
-            msg = f'{councils.mention} {tot.mention} {recruit.mention}'
-            if message:
-                msg += box(f'\n{ctx.author.display_name}:\n{" ".join(message)}')
-            else:
-                msg += box(f'\n{ctx.author.display_name} объявлет общий сбор')
-            await ctx.send(msg)
-
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
     async def daily(self, ctx):
         start_time = "10/03/2021 00:00"
@@ -203,6 +185,59 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
 
+class GuildCommands(commands.Cog, name='Команды гильдии'):
+    """Команды, доступные участникам гильдии с ролью ToT"""
+
+    @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. '
+                                              'Доступ к команде - Совет, Актив, Наставник. '
+                                              'Злоупотребление наказуемо!')
+    @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
+    async def all(self, ctx, *message):
+        await ctx.message.delete()
+        if is_spam(ctx.author, when_all_called, 60):
+            await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
+            await _add_mute(ctx.author, '5m')
+        else:
+            all_roles = ctx.guild.roles
+            councils = get(all_roles, id=roles.COUNCILS)
+            tot = get(all_roles, id=roles.TOT)
+            recruit = get(all_roles, id=roles.RECRUIT)
+            msg = f'{councils.mention} {tot.mention} {recruit.mention}'
+            if message:
+                msg += box(f'\n{ctx.author.display_name}:\n{" ".join(message)}')
+            else:
+                msg += box(f'\n{ctx.author.display_name} объявлет общий сбор')
+            await ctx.send(msg)
+
+    @commands.command(pass_context=True, name='хай', help="Список хай лвл гильдии")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def high_lvl(self, ctx):
+        group = get_member_by_role(ctx, name="Хай лвл")
+        message = ''
+        count = 1
+        for member in group.members:
+            name = member.display_name
+            if '[tot]' in name.lower() or '[тот]' in name.lower():
+                name = name[5:].strip()
+            message += f'{count}. {name}\n'
+            count += 1
+        await ctx.send(box(message))
+
+    # @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
+    # @commands.has_any_role("Совет ги", "ToT")
+    # async def alhimik(self, ctx):
+    #     group = get_member_by_role(ctx, name="")
+    #     message = ''
+    #     count = 1
+    #     for member in group.members:
+    #         name = member.display_name
+    #         if '[tot]' in name.lower() or '[тот]' in name.lower():
+    #             name = name[5:].strip()
+    #         message += f'{count}. {name}\n'
+    #         count += 1
+    #     await ctx.send(box(message))
+
+
 def _get_paragraph(par, text):
     pattern = f'(?<![.\d<]){par}.*'
     res = re.findall(pattern, text)
@@ -217,3 +252,4 @@ def _get_principle(text):
 
 bot.add_cog(MainCommands())
 bot.add_cog(CouncilsCommands())
+bot.add_cog(GuildCommands())

@@ -35,7 +35,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
             await ctx.send(box(f'Иммунитет!'))
             return
 
-        if is_spam(ctx.author, when_slap_called, 30):
+        if is_spam(ctx.author, when_slap_called, 30) and ctx.channel.id != channels.TEST:
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 1 минуту по причине: хорош спамить!'))
             await create_and_send_slap(ctx, get_bot_avatar(ctx), avatar_from)
             await _add_mute(ctx.author, '1m')
@@ -89,12 +89,15 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
-    async def exit_sekta(self, ctx):
+    async def exit_sekta(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
-        await ctx.author.remove_roles(sekta)
+        await member.remove_roles(sekta)
         await ctx.send(file=discord.File('files/media/sekta.jpg'))
-        await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
+        await set_permissions(channels.MERY, member._user.id, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
