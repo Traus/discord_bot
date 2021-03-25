@@ -14,7 +14,7 @@ from utils.statuses import immune_until
 Members = namedtuple('Members', ['role', 'members'])
 
 
-def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None, exclude_roles=None) -> namedtuple:
+def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
     obj = ctx or user
     all_roles = getattr(obj, 'guild').roles
     role = get(all_roles, name=name)
@@ -29,6 +29,16 @@ def get_class_roles(guild: discord.Guild) -> dict:
                   '🛡️': get(guild.roles, name='🛡️'),
                   '🗡️': get(guild.roles, name='🗡️')}
     return roles_dict
+
+
+def get_guild_members(ctx, name: str) -> str:
+    group_tot = get_member_by_role(ctx, name='ToT')
+    group = get_member_by_role(ctx, name=name)
+    members = set(group.members) & set(group_tot.members)
+    message = ''
+    for count, member in enumerate(members, 1):
+        message += f'{count}. {strip_tot(name=member.display_name)}\n'
+    return message
 
 
 def get_bot_avatar(ctx=None):

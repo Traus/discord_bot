@@ -1,17 +1,14 @@
 import random
-from datetime import datetime
 
 import discord
 from discord.ext import commands
 from discord.utils import get
 
-from commands.mute_control import _add_mute
 from constants import members, channels
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, get_bot_avatar, is_spam, create_and_send_slap, has_immune, \
+from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
-from utils.statuses import when_slap_called, immune_until
 from utils.tenor_gifs import find_gif
 
 
@@ -40,16 +37,6 @@ class FunCommands(commands.Cog, name='Для веселья'):
             await ctx.message.delete()
 
         await create_and_send_slap(ctx, avatar_from, avatar_to)
-
-    @commands.command(name='домик', help='временный иммунитет от шапалаха')
-    @commands.has_any_role("Совет ги")
-    async def home(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.author
-
-        stamp = datetime.timestamp(datetime.now()) + 10*60
-        immune_until[member] = stamp
-        await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
 
     @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):

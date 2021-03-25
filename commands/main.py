@@ -11,8 +11,8 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, is_spam, strip_tot
-from utils.statuses import when_all_called
+from utils.guild_utils import get_member_by_role, is_spam, strip_tot, get_guild_members
+from utils.statuses import when_all_called, immune_until
 
 
 class MainCommands(commands.Cog, name='Основные команды'):
@@ -182,6 +182,16 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             await ctx.send(msg)
             await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
+    @commands.command(name='домик', help='временный иммунитет от шапалаха')
+    @commands.has_any_role("Совет ги")
+    async def home(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        stamp = datetime.timestamp(datetime.now()) + 10*60
+        immune_until[member] = stamp
+        await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
+
 
 class GuildCommands(commands.Cog, name='Команды гильдии'):
     """Команды, доступные участникам гильдии с ролью ToT"""
@@ -216,14 +226,35 @@ class GuildCommands(commands.Cog, name='Команды гильдии'):
             message += f'{count}. {strip_tot(name=member.display_name)}\n'
         await ctx.send(box(message))
 
-    # @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
-    # @commands.has_any_role("Совет ги", "ToT")
-    # async def alchemist(self, ctx):
-    #     group = get_member_by_role(ctx, name='💉')
-    #     message = ''
-    #     for count, member in enumerate(group.members, 1):
-    #         message += f'{count}. {strip_tot(name=member.display_name)}\n'
-    #     await ctx.send(box(message))
+    @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def alchemist(self, ctx):
+        message = get_guild_members(ctx, name='💉')
+        await ctx.send(box(message))
+
+    @commands.command(pass_context=True, name='маг', help="Список чародеев ToT")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def mage(self, ctx):
+        message = get_guild_members(ctx, name='🔮')
+        await ctx.send(box(message))
+
+    @commands.command(pass_context=True, name='охотник', help="Список охотников ToT")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def hunter(self, ctx):
+        message = get_guild_members(ctx, name='🏹')
+        await ctx.send(box(message))
+
+    @commands.command(pass_context=True, name='страж', help="Список стражей ToT")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def guard(self, ctx):
+        message = get_guild_members(ctx, name='🛡️')
+        await ctx.send(box(message))
+
+    @commands.command(pass_context=True, name='тень', help="Список теней ToT")
+    @commands.has_any_role("Совет ги", "ToT")
+    async def rouge(self, ctx):
+        message = get_guild_members(ctx, name='🗡️')
+        await ctx.send(box(message))
 
 
 def _get_paragraph(par, text):
