@@ -14,7 +14,7 @@ from utils.statuses import immune_until
 Members = namedtuple('Members', ['role', 'members'])
 
 
-def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
+def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None, exclude_roles=None) -> namedtuple:
     obj = ctx or user
     all_roles = getattr(obj, 'guild').roles
     role = get(all_roles, name=name)
@@ -24,7 +24,7 @@ def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) 
 
 def get_class_roles(guild: discord.Guild) -> dict:
     roles_dict = {'💉': get(guild.roles, name='💉'),
-                  '🧙': get(guild.roles, name='🧙'),
+                  '🧙': get(guild.roles, name='🔮'),
                   '🏹': get(guild.roles, name='🏹'),
                   '🛡️': get(guild.roles, name='🛡️'),
                   '🗡️': get(guild.roles, name='🗡️')}
@@ -34,6 +34,12 @@ def get_class_roles(guild: discord.Guild) -> dict:
 def get_bot_avatar(ctx=None):
     manager = get_member_by_role(ctx, name="Смотритель Таверны").members
     return manager[0].avatar_url
+
+
+def strip_tot(name: str) -> str:
+    if '[tot]' in name.lower() or '[тот]' in name.lower():
+        return name[5:].strip()
+    return name.strip()
 
 
 async def set_permissions(channel_name: str, user_id: int, **permissions):

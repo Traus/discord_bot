@@ -80,8 +80,10 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.send(box(msg))
 
     @commands.command(name='всекту', help='принять в культ')
-    @commands.has_any_role("Совет ги", "Крот с ЕС", "Верховная жрица", "Верховный жрец")
-    async def join_sekta(self, ctx, member: discord.Member):
+    @commands.has_any_role("Совет ги", "Крот с ЕС", "Верховная жрица", "Верховный жрец", "Палач")
+    async def join_sekta(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
@@ -89,15 +91,12 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
-    async def exit_sekta(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.author
-
+    async def exit_sekta(self, ctx):
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
-        await member.remove_roles(sekta)
+        await ctx.author.remove_roles(sekta)
         await ctx.send(file=discord.File('files/media/sekta.jpg'))
-        await set_permissions(channels.MERY, member._user.id, send_messages=False)
+        await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):

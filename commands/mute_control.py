@@ -5,8 +5,9 @@ from re import split
 
 import discord
 
-from constants import roles
+from constants import roles, channels
 from utils.format import box
+from utils.guild_utils import set_permissions
 
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
@@ -15,9 +16,21 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
     times = {'s': 1, 'm': 60, 'h': 60*60, 'd': 60*60*24}
     time_1, time_2 = int(time[:-1]), time[-1]
     role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
+    permissions = dict()
+    channels_with_perms = [channels.MERY, channels.KEFIR]
+    for channel_id in channels_with_perms:
+        permissions[channel_id] = (user.permissions_in(user.guild.get_channel(channel_id)).read_messages,
+                                   user.permissions_in(user.guild.get_channel(channel_id)).send_messages)
     await user.add_roles(role)
+    for channel_id in channels_with_perms:
+        await set_permissions(channel_id, user.id, send_messages=False)
+        await set_permissions(channels.PRIVATE_CHANNELS, user.id, read_messages=False)
+
     await asyncio.sleep(time_1 * times[time_2])
     await user.remove_roles(role)
+    for channel_id in channels_with_perms:
+        await set_permissions(channel_id, user.id, read_messages=permissions[channel_id][0], send_messages=permissions[channel_id][1])
+        await set_permissions(channels.PRIVATE_CHANNELS, user.id, read_messages=True)
 
 
 async def automoderation(message: discord.Message):

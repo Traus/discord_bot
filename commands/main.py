@@ -11,7 +11,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, is_spam
+from utils.guild_utils import get_member_by_role, is_spam, strip_tot
 from utils.statuses import when_all_called
 
 
@@ -140,9 +140,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
                 if group.members[i] not in uniq_users:
                     count += 1
                     name = group.members[i].display_name
-                    if '[tot]' in name.lower() or '[тот]' in name.lower():
-                        name = name[5:].strip()
-                    message += f'{count}. {name}\n'
+                    message += f'{count}. {strip_tot(name)}\n'
                     uniq_users.add(group.members[i])
         await ctx.message.delete()
         await channel.purge(limit=1, oldest_first=True)
@@ -214,27 +212,17 @@ class GuildCommands(commands.Cog, name='Команды гильдии'):
     async def high_lvl(self, ctx):
         group = get_member_by_role(ctx, name="Хай лвл")
         message = ''
-        count = 1
-        for member in group.members:
-            name = member.display_name
-            if '[tot]' in name.lower() or '[тот]' in name.lower():
-                name = name[5:].strip()
-            message += f'{count}. {name}\n'
-            count += 1
+        for count, member in enumerate(group.members, 1):
+            message += f'{count}. {strip_tot(name=member.display_name)}\n'
         await ctx.send(box(message))
 
     # @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
     # @commands.has_any_role("Совет ги", "ToT")
-    # async def alhimik(self, ctx):
-    #     group = get_member_by_role(ctx, name="")
+    # async def alchemist(self, ctx):
+    #     group = get_member_by_role(ctx, name='💉')
     #     message = ''
-    #     count = 1
-    #     for member in group.members:
-    #         name = member.display_name
-    #         if '[tot]' in name.lower() or '[тот]' in name.lower():
-    #             name = name[5:].strip()
-    #         message += f'{count}. {name}\n'
-    #         count += 1
+    #     for count, member in enumerate(group.members, 1):
+    #         message += f'{count}. {strip_tot(name=member.display_name)}\n'
     #     await ctx.send(box(message))
 
 
