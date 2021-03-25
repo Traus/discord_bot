@@ -35,12 +35,6 @@ class FunCommands(commands.Cog, name='Для веселья'):
             await ctx.send(box(f'Иммунитет!'))
             return
 
-        if is_spam(ctx.author, when_slap_called, 30) and ctx.channel.id != channels.TEST:
-            await ctx.send(box(f'{ctx.author.display_name} получил мут на 1 минуту по причине: хорош спамить!'))
-            await create_and_send_slap(ctx, get_bot_avatar(ctx), avatar_from)
-            await _add_mute(ctx.author, '1m')
-            return
-
         if bot is not None and bot == 'bot':
             avatar_from = get_bot_avatar(ctx)
             await ctx.message.delete()
@@ -48,19 +42,14 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await create_and_send_slap(ctx, avatar_from, avatar_to)
 
     @commands.command(name='домик', help='временный иммунитет от шапалаха')
-    @commands.has_any_role("Совет ги", "ToT")
+    @commands.has_any_role("Совет ги")
     async def home(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
 
-        minutes = random.randint(1, 10)
-        if has_immune(member):
-            await ctx.send(box(f'{ctx.author.display_name} не злоупотребляй! {minutes} минут мута'))
-            await _add_mute(ctx.author, f'{minutes}m')
-            return
-        stamp = datetime.timestamp(datetime.now()) + minutes*60
+        stamp = datetime.timestamp(datetime.now()) + 10*60
         immune_until[member] = stamp
-        await ctx.send(box(f'{member.display_name} получает иммунитет на {minutes} минут.'))
+        await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
 
     @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):
