@@ -57,3 +57,11 @@ members = _GetDict(
     DOMINO=546365530152632331,
     FOURX=728866034462883862,
 )
+
+
+tavern_emoji = f':regional_indicator_t: ' \
+               f':regional_indicator_a: ' \
+               f':regional_indicator_v: ' \
+               f':regional_indicator_e: ' \
+               f':regional_indicator_r: ' \
+               f':regional_indicator_n:'
