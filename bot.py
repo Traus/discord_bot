@@ -29,8 +29,16 @@ async def test(ctx, *args):
 
 @bot.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    emoji: discord.Emoji = payload.emoji
+    guild: discord.Guild = bot.get_guild(payload.guild_id)
+    member: discord.Member = await guild.fetch_member(payload.user_id)
+    channel: discord.TextChannel = bot.get_channel(payload.channel_id)
+    message: discord.Message = await channel.fetch_message(payload.message_id)
+
+    if emoji.name == 'approved' and payload.user_id != members.TRAUS:
+        await message.remove_reaction(emoji, member)
+
     if payload.message_id == messages.ROOMS:
-        emoji = payload.emoji
         if emoji.name == '🇩':
             perms_flag = False
             for role in payload.member.roles:
@@ -40,51 +48,38 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         elif emoji.name == '🇰':
             await set_permissions(channels.KEFIR, payload.user_id, read_messages=True, send_messages=True)
         else:
-            channel = bot.get_channel(channels.PRIVATE_CHANNELS)
-            message = await channel.fetch_message(payload.message_id)
             await message.clear_reaction(emoji)
 
     if payload.message_id == messages.RULES:
-        emoji = payload.emoji
         if emoji.name == '✅':
-            guild = bot.get_guild(payload.guild_id)
-            member: discord.Member = await guild.fetch_member(payload.user_id)
             guest = get(guild.roles, name='Гость')
             if len(member.roles) == 1 and member.roles[0].name == '@everyone':
                 await member.add_roles(guest)
-                channel = bot.get_channel(channels.GUEST)
                 emoji = await member.guild.fetch_emoji(811516186453082133)
                 await channel.send(f'{member.mention} {emoji}')
 
     if payload.message_id == messages.CHOOSE_CLASS:
-        guild = bot.get_guild(payload.guild_id)
-        member: discord.Member = await guild.fetch_member(payload.user_id)
         roles_dict = get_class_roles(guild)
-
-        emoji = payload.emoji
         if emoji.name in roles_dict:
             await member.add_roles(roles_dict[emoji.name])
         else:
-            channel = bot.get_channel(channels.CHOOSE_CLASS)
-            message = await channel.fetch_message(payload.message_id)
             await message.clear_reaction(emoji)
 
 
 @bot.event
 async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
+    emoji = payload.emoji
+    guild = bot.get_guild(payload.guild_id)
+    member: discord.Member = await guild.fetch_member(payload.user_id)
+
     if payload.message_id == messages.ROOMS:
-        emoji = payload.emoji
         if emoji.name == '🇩':
             await set_permissions(channels.MERY, payload.user_id, read_messages=False, send_messages=False)
         if emoji.name == '🇰':
             await set_permissions(channels.KEFIR, payload.user_id, read_messages=False, send_messages=False)
 
     if payload.message_id == messages.CHOOSE_CLASS:
-        guild = bot.get_guild(payload.guild_id)
-        member: discord.Member = await guild.fetch_member(payload.user_id)
         roles_dict = get_class_roles(guild)
-
-        emoji = payload.emoji
         await member.remove_roles(roles_dict[emoji.name])
 
 
