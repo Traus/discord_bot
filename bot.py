@@ -56,7 +56,8 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
             if len(member.roles) == 1 and member.roles[0].name == '@everyone':
                 await member.add_roles(guest)
                 emoji = await member.guild.fetch_emoji(811516186453082133)
-                await channel.send(f'{member.mention} {emoji}')
+                guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
+                await guest_channel.send(f'{member.mention} {emoji}')
 
     if payload.message_id == messages.CHOOSE_CLASS:
         roles_dict = get_class_roles(guild)

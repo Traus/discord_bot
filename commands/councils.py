@@ -115,7 +115,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         kick = False
         guest = get(ctx.guild.roles, name='Гость')
         for role in member.roles:
-            if role.name in ['Совет ги', 'ToT', 'Наставник', 'Актив гильдии', 'Рекрут', 'Запас']:
+            if role.name in ['Совет ги', 'ToT', 'Наставник', 'Актив гильдии', 'Рекрут', 'Запас', 'Хай лвл']:
                 kick = True
                 await member.remove_roles(role)
                 await member.add_roles(guest)
