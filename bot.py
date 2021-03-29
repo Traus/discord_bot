@@ -90,10 +90,6 @@ async def on_message(message: discord.Message):
     if message.channel.id not in no_moderation:
         await automoderation(message)
 
-    # temp
-    if str(members.TRAUS) in message.content:
-        await message.channel.send(f"Траус отдыхает!")
-
     if message.channel.id == channels.MEMES:
         if message.content:
             await message.delete()
