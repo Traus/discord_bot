@@ -8,6 +8,7 @@ import discord
 from constants import roles, channels
 from utils.format import box
 from utils.guild_utils import set_permissions
+from utils.statuses import muted_queue
 
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
@@ -15,6 +16,11 @@ BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 async def _add_mute(user: discord.Member, time: str = '30s'):
     times = {'s': 1, 'm': 60, 'h': 60*60, 'd': 60*60*24}
     time_1, time_2 = int(time[:-1]), time[-1]
+    mute_time = time_1 * times[time_2]
+    if muted_queue[user]:
+        muted_queue[user].append(mute_time)
+        return
+
     role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
     permissions = dict()
     channels_with_perms = [channels.MERY, channels.KEFIR]
@@ -26,7 +32,14 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
         await set_permissions(channel_id, user.id, send_messages=False)
         await set_permissions(channels.PRIVATE_CHANNELS, user.id, read_messages=False)
 
-    await asyncio.sleep(time_1 * times[time_2])
+    muted_queue[user].append(mute_time)
+    while True:
+        if muted_queue[user]:
+            await asyncio.sleep(muted_queue[user][0])
+            muted_queue[user].pop(0)
+        else:
+            break
+
     await user.remove_roles(role)
     for channel_id in channels_with_perms:
         await set_permissions(channel_id, user.id, read_messages=permissions[channel_id][0], send_messages=permissions[channel_id][1])
