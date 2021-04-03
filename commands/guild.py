@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from discord.utils import get
 
@@ -27,11 +28,13 @@ class GuildCommands(commands.Cog, name='Команды гильдии'):
             tot = get(all_roles, id=roles.TOT)
             recruit = get(all_roles, id=roles.RECRUIT)
             msg = f'{councils.mention} {tot.mention} {recruit.mention}'
+
+            embed = discord.Embed()
             if message:
-                msg += box(f'\n{ctx.author.display_name}:\n{" ".join(message)}')
+                embed.add_field(name=f"{ctx.author.display_name}:", value=" ".join(message))
             else:
-                msg += box(f'\n{ctx.author.display_name} объявлет общий сбор')
-            await ctx.send(msg)
+                embed.add_field(name=f"{ctx.author.display_name}:", value='объявлет общий сбор')
+            await ctx.send(msg, embed=embed)
 
     @commands.command(pass_context=True, name='хай', help="Список хай лвл гильдии")
     @commands.has_any_role("Совет ги", "ToT")
