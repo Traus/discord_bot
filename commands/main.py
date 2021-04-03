@@ -66,6 +66,17 @@ class MainCommands(commands.Cog, name='Основные команды'):
         )
         await ctx.channel.send(box(msg))
 
+    @commands.command(pass_context=True, help='Начать опрос')
+    async def vote(self, ctx, *text):
+        await ctx.message.delete()
+        embed = discord.Embed()
+        embed.set_thumbnail(url=ctx.author.avatar_url)
+        embed.add_field(name=f"{ctx.author.display_name}:", value=' '.join(text))
+        msg: discord.Message = await ctx.send(embed=embed)
+        # todo only one reaction (on reaction add check)
+        await msg.add_reaction('<:pepe_yes:811753098867507210>')
+        await msg.add_reaction('<:pepe_no:811753121902362725>')
+
 
 def _get_paragraph(par, text):
     pattern = f'(?<![.\d<]){par}.*'
