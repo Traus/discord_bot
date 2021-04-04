@@ -69,9 +69,10 @@ class MainCommands(commands.Cog, name='Основные команды'):
     @commands.command(pass_context=True, help='Начать опрос')
     async def vote(self, ctx, *text):
         await ctx.message.delete()
-        embed = discord.Embed()
+        embed = discord.Embed(description=f"{ctx.author.mention}:\n{' '.join(text)}")
         embed.set_thumbnail(url=ctx.author.avatar_url)
-        embed.add_field(name=f"{ctx.author.display_name}:", value=' '.join(text))
+        now = datetime.timestamp(datetime.utcnow())
+        embed.set_footer(text=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
         msg: discord.Message = await ctx.send(embed=embed)
         # todo only one reaction (on reaction add check)
         await msg.add_reaction('<:pepe_yes:811753098867507210>')
