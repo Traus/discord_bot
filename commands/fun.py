@@ -7,6 +7,7 @@ from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
+from utils.tenor_gifs import find_gif
 
 
 class FunCommands(commands.Cog, name='Для веселья'):
@@ -83,7 +84,15 @@ class FunCommands(commands.Cog, name='Для веселья'):
         text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
         embed = discord.Embed()
         embed.set_image(url='https://i.ytimg.com/vi/cD4avzML2rw/hqdefault.jpg')
-        embed.add_field(name=f"Думали не уничтожу?", value=text)
+        embed.add_field(name=f"Думали я вас не переиграю?", value=text)
+        await ctx.send(embed=embed)
+
+    @commands.command(name='пять', help='Дать пять')
+    async def five(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        text = f"{ctx.author.mention} даёт пять {member.mention}!"
+        embed = discord.Embed(description=text)
+        embed.set_image(url=find_gif(search_term='highfive', limit=20))
         await ctx.send(embed=embed)
 
 

@@ -29,11 +29,11 @@ class GuildCommands(commands.Cog, name='Команды гильдии'):
             recruit = get(all_roles, id=roles.RECRUIT)
             msg = f'{councils.mention} {tot.mention} {recruit.mention}'
 
-            embed = discord.Embed()
             if message:
-                embed.add_field(name=f"{ctx.author.display_name}:", value=" ".join(message))
+                embed = discord.Embed(description=f"{ctx.author.mention}:\n{' '.join(message)}")
             else:
-                embed.add_field(name=f"{ctx.author.display_name}:", value='объявлет общий сбор')
+                embed = discord.Embed(description=f"{ctx.author.mention} объявляет общий сбор")
+
             await ctx.send(msg, embed=embed)
 
     @commands.command(pass_context=True, name='хай', help="Список хай лвл гильдии")
