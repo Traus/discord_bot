@@ -77,5 +77,14 @@ class FunCommands(commands.Cog, name='Для веселья'):
         for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
             await msg.add_reaction(emoji)
 
+    @commands.command(name='переиграл', help='Переиграл и уничтожил')
+    async def meme_win(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
+        embed = discord.Embed()
+        embed.set_image(url='https://i.ytimg.com/vi/cD4avzML2rw/hqdefault.jpg')
+        embed.add_field(name=f"Думали не уничтожу?", value=text)
+        await ctx.send(embed=embed)
+
 
 bot.add_cog(FunCommands())
