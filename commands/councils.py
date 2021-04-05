@@ -10,6 +10,7 @@ from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, strip_tot
 from utils.statuses import immune_until
+from utils.tenor_gifs import find_gif
 
 
 class CouncilsCommands(commands.Cog, name='Команды совета'):
@@ -106,6 +107,12 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member):
         await ctx.guild.kick(member)
+
+    @commands.command(pass_context=True, help='Забанить засранца')
+    @commands.has_permissions(ban_members=True)
+    async def ban(self, ctx, member: discord.Member):
+        await ctx.send(find_gif('kick from tavern', limit=1))
+        await ctx.guild.ban(member, delete_message_days=0)
 
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
