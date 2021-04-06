@@ -1,4 +1,7 @@
+import re
+
 import discord
+import requests
 from discord.ext import commands
 from discord.utils import get
 
@@ -93,6 +96,16 @@ class FunCommands(commands.Cog, name='Для веселья'):
         text = f"{ctx.author.mention} даёт пять {member.mention}!"
         embed = discord.Embed(description=text)
         embed.set_image(url=find_gif(search_term='highfive', limit=20))
+        await ctx.send(embed=embed)
+
+    @commands.command(name='факт', help='рандомный факт')
+    async def fact(self, ctx):
+        await ctx.message.delete()
+        url = 'https://randstuff.ru/fact/'
+        pattern = r'(?<=Факт:</h1><div id="fact"><table class="text"><tr><td>).*(?=</td>)'
+        resp = requests.get(url)
+        text = re.findall(pattern=pattern, string=resp.content.decode('utf8'))[0]
+        embed = discord.Embed(description=f"{ctx.author.mention}:\n{text}")
         await ctx.send(embed=embed)
 
 
