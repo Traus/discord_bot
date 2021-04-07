@@ -8,8 +8,8 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, strip_tot
-from utils.statuses import immune_until
+from utils.guild_utils import get_member_by_role, strip_tot, set_permissions
+from utils.statuses import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
 
@@ -102,6 +102,16 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
         await ctx.send(box(f'Мут снят с {user.display_name}'))
         await user.remove_roles(role)
+        muted_queue.clear()
+
+        channels_with_perms = [channels.MERY, channels.KEFIR]
+        try:
+            for channel_id in channels_with_perms:
+                await set_permissions(channel_id, user.id, read_messages=user_permissions[user][channel_id][0],
+                                      send_messages=user_permissions[user][channel_id][1])
+        except KeyError:
+            # unmute before first mute happens
+            pass
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
     @commands.has_permissions(kick_members=True)
