@@ -156,5 +156,51 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     async def clean(self, ctx, limit=10):
         await ctx.channel.purge(limit=limit)
 
+    @commands.command(pass_context=True, name='пинг', help='Совет чистит каналы')
+    @commands.has_role("Совет ги")
+    async def ping(self, ctx, start=None):
+        await ctx.message.delete()
+
+        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        all_roles = ctx.guild.roles
+        councils = get(all_roles, id=roles.COUNCILS)
+        tot = get(all_roles, id=roles.TOT)
+        recruit = get(all_roles, id=roles.RECRUIT)
+        guild_ping = f'{councils.mention} {tot.mention} {recruit.mention}'
+
+        embed_first = discord.Embed(
+            description="Проверка активности гильдии.\n"
+                        "Статья Устава 4.3.5 предусматривает выдачу страйка за отсутствие более 7 дней без уважительной причины.\n"
+                        "Обязательно поставьте реакцию на данное сообщение - ✅"
+        )
+
+        if start is not None and start == 'all':
+            await channel.purge()
+            msg = await channel.send(guild_ping, embed=embed_first)
+            await msg.add_reaction('✅')
+        else:
+            all_members = bot.get_all_members()
+            tot = get(all_roles, name='ToT')
+            recruit = get(all_roles, name='Рекрут')
+            all_guild_users = [member for member in all_members if tot in member.roles or recruit in member.roles]
+            history = channel.history(oldest_first=True)
+            msg: discord.Message = await history.next()
+            to_delete = []
+            async for m in history:
+                to_delete.append(m)
+            await channel.delete_messages(to_delete)
+            for reaction in msg.reactions:
+                async for user in reaction.users():
+                    try:
+                        all_guild_users.remove(user)
+                    except ValueError:
+                        # already deleted by previous reaction
+                        pass
+            embed_repeat = discord.Embed(
+                description=f"{' '.join([user.mention for user in all_guild_users])}\n"
+                            f"Обязательно отреагируйте на первое сообщение на этом канале!"
+            )
+            await channel.send(embed=embed_repeat)
+
 
 bot.add_cog(CouncilsCommands())
