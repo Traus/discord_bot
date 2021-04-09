@@ -132,7 +132,20 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         kick = False
         guest = get(ctx.guild.roles, name='Гость')
         for role in member.roles:
-            if role.name in ['Совет ги', 'ToT', 'Наставник', 'Зазывала', 'Актив гильдии', 'Рекрут', 'Запас', 'Хай лвл']:
+            if role.name in [
+                'Совет ги',
+                'ToT',
+                'Наставник',
+                'Зазывала',
+                'Актив гильдии',
+                'Рекрут',
+                'Запас',
+                'Хай лвл'
+                'Разговор'
+                'Страйк 1-уровень'
+                'Страйк 2-уровень'
+                'Страйк 3-уровень'
+            ]:
                 kick = True
                 await member.remove_roles(role)
                 await member.add_roles(guest)
@@ -150,6 +163,13 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         stamp = datetime.timestamp(datetime.now()) + 10*60
         immune_until[member] = stamp
         await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
+
+    @commands.command(name='наковер', help='вызвать человека на ковер для разговора')
+    @commands.has_any_role("Совет ги")
+    async def on_carpet(self, ctx, member: discord.Member):
+        carpet = get(ctx.guild.roles, name='Разговор')
+        await member.add_roles(carpet)
+        await bot.get_channel(channels.CARPET).send(member.mention)
 
     @commands.command(pass_context=True, help='Совет чистит каналы')
     @commands.has_role("Совет ги")
