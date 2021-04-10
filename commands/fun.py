@@ -63,17 +63,24 @@ class FunCommands(commands.Cog, name='Для веселья'):
             member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
-        await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
-        await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
-        await member.add_roles(sekta)
+        mery = get(all_roles, name='Верховная жрица')
+        warlock = get(all_roles, name='Верховный жрец')
+        for role in [mery, warlock]:
+            if role in member.roles:
+                return
+            if role in ctx.author.roles:
+                await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
+                await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
+                await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
     async def exit_sekta(self, ctx):
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
-        await ctx.author.remove_roles(sekta)
-        await ctx.send(file=discord.File('files/media/sekta.jpg'))
-        await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
+        if sekta in ctx.author.roles:
+            await ctx.author.remove_roles(sekta)
+            await ctx.send(file=discord.File('files/media/sekta.jpg'))
+            await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):

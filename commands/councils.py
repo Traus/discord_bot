@@ -8,7 +8,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import get_member_by_role, strip_tot, set_permissions
+from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users
 from utils.statuses import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
@@ -113,6 +113,19 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             # unmute before first mute happens
             pass
 
+    @commands.command(pass_context=True, name='принять', help='Принять в гильдию')
+    @commands.has_role("Совет ги")
+    async def accept(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        guest = get(ctx.guild.roles, name='Гость')
+        recruit = get(ctx.guild.roles, name='Рекрут')
+        await member.add_roles(recruit)
+        await member.remove_roles(guest)
+        msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
+              f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
+              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(channels.CHOOSE_CLASS).mention}'
+        await bot.get_channel(channels.GUILD).send(msg)
+
     @commands.command(pass_context=True, help='Кикнуть с сервера')
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member):
@@ -176,7 +189,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
     async def clean(self, ctx, limit=10):
         await ctx.channel.purge(limit=limit)
 
-    @commands.command(pass_context=True, name='пинг', help='Совет чистит каналы')
+    @commands.command(pass_context=True, name='пинг', help='Проверка активности гильдии')
     @commands.has_role("Совет ги")
     async def ping(self, ctx, start=None):
         await ctx.message.delete()
@@ -199,28 +212,30 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             msg = await channel.send(guild_ping, embed=embed_first)
             await msg.add_reaction('✅')
         else:
-            all_members = bot.get_all_members()
-            tot = get(all_roles, name='ToT')
-            recruit = get(all_roles, name='Рекрут')
-            all_guild_users = [member for member in all_members if tot in member.roles or recruit in member.roles]
             history = channel.history(oldest_first=True)
             msg: discord.Message = await history.next()
             to_delete = []
             async for m in history:
                 to_delete.append(m)
             await channel.delete_messages(to_delete)
-            for reaction in msg.reactions:
-                async for user in reaction.users():
-                    try:
-                        all_guild_users.remove(user)
-                    except ValueError:
-                        # already deleted by previous reaction
-                        pass
+            afk_users = await get_afk_users(msg)
             embed_repeat = discord.Embed(
-                description=f"{' '.join([user.mention for user in all_guild_users])}\n"
+                description=f"{' '.join([user.mention for user in afk_users])}\n"
                             f"Обязательно отреагируйте на первое сообщение на этом канале!"
             )
             await channel.send(embed=embed_repeat)
+
+    @commands.command(pass_context=True, name='афк', help='Список тех, кто не отметился в пинге')
+    @commands.has_role("Совет ги")
+    async def check_afk(self, ctx):
+        await ctx.message.delete()
+
+        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        history = channel.history(oldest_first=True)
+        msg: discord.Message = await history.next()
+        afk_users = await get_afk_users(msg)
+
+        await ctx.channel.send(box('\n'.join([user.display_name for user in afk_users])))
 
 
 bot.add_cog(CouncilsCommands())

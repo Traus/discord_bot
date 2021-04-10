@@ -116,8 +116,11 @@ async def on_message(message: discord.Message):
 
     if message.channel.id == channels.JOIN:  # вступление-в-гильдию
         inv_gi_channel: discord.TextChannel = get(message.channel.guild.channels, id=channels.REQUEST)  # заявки-в-ги
-        message.content = f"{date.today()}\n{message.content}"
-        await inv_gi_channel.send(f"<@{message.author.id}>\n{box(message.content)}")
+
+        embed = discord.Embed(description=f"{date.today()}\n{message.content}")
+        embed.set_thumbnail(url=message.author.avatar_url)
+
+        await inv_gi_channel.send(f"<@{message.author.id}>", embed=embed)
         await message.delete()
     await bot.process_commands(message)
 

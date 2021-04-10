@@ -8,6 +8,7 @@ from PIL import Image
 from discord.utils import get
 from collections import namedtuple
 
+from constants import GUILD_ID
 from init_bot import bot
 from utils.statuses import immune_until
 
@@ -50,6 +51,19 @@ def strip_tot(name: str) -> str:
     if '[tot]' in name.lower() or '[тот]' in name.lower():
         return name[5:].strip()
     return name.strip()
+
+
+async def get_afk_users(msg: discord.Message) -> set:
+    all_roles = bot.get_guild(GUILD_ID).roles
+    all_members = bot.get_all_members()
+    tot = get(all_roles, name='ToT')
+    recruit = get(all_roles, name='Рекрут')
+    all_guild_users = {member for member in all_members if tot in member.roles or recruit in member.roles}
+
+    for reaction in msg.reactions:
+        async for user in reaction.users():
+            all_guild_users.discard(user)
+    return all_guild_users
 
 
 async def set_permissions(channel_name: str, user_id: int, **permissions):
