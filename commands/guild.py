@@ -39,9 +39,11 @@ class GuildCommands(commands.Cog, name='Команды гильдии'):
     @commands.command(pass_context=True, name='хай', help="Список хай лвл гильдии")
     @commands.has_any_role("Совет ги", "ToT")
     async def high_lvl(self, ctx):
-        group = get_member_by_role(ctx, name="Хай лвл")
+        tot = get_member_by_role(ctx, name="ToT")
+        high = get_member_by_role(ctx, name="Хай лвл")
+        group = set(high.members) & set(tot.members)
         message = ''
-        for count, member in enumerate(group.members, 1):
+        for count, member in enumerate(group, 1):
             message += f'{count}. {strip_tot(name=member.display_name)}\n'
         await ctx.send(box(message))
 

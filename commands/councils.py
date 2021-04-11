@@ -123,7 +123,9 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
-              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(channels.CHOOSE_CLASS).mention}'
+              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(channels.CHOOSE_CLASS).mention}' \
+              f'\n\n' \
+              f'**Очень важно**: зайди, пожалуйста, на {bot.get_channel(channels.PING).mention} и поставь ✅ под первым сообщением.'
         await bot.get_channel(channels.GUILD).send(msg)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
