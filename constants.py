@@ -3,8 +3,7 @@ GUILD_ID = 809869724413853706
 
 
 class _GetDict(dict):
-    def __getattr__(self, item):
-        return self.get(item)
+    __getattr__ = dict.__getitem__
 
 
 channels = _GetDict(
