@@ -167,6 +167,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         if kick:
             msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии. Причина: {reason}')
             await ctx.send(msg)
+            await member.send(msg)  # в лс
             await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
     @commands.command(name='домик', help='временный иммунитет от шапалаха')

@@ -57,21 +57,21 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.send(box(msg))
 
     @commands.command(name='всекту', help='принять в культ')
-    @commands.has_any_role("Совет ги", "Крот с ЕС", "Верховная жрица", "Верховный жрец", "Палач")
+    @commands.has_any_role("Глава ги", "Верховная жрица", "Верховный жрец")
     async def join_sekta(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
+        traus = get(all_roles, name='Глава ги')
         mery = get(all_roles, name='Верховная жрица')
         warlock = get(all_roles, name='Верховный жрец')
-        for role in [mery, warlock]:
+        for role in [traus, mery, warlock]:
             if role in member.roles:
                 return
-            if role in ctx.author.roles:
-                await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
-                await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
-                await member.add_roles(sekta)
+        await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
+        await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
+        await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
     async def exit_sekta(self, ctx):
