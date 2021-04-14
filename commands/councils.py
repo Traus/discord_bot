@@ -38,7 +38,9 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
         await ctx.send(box(msg))
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(box(msg))  # совет-гильдии
+        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        if ctx.channel != council_channel:
+            await council_channel.send(box(msg))  # совет-гильдии
 
     @commands.command(name='амнистия', help='Снимает 1 уровень страйка')
     @commands.has_role("Совет ги")
@@ -61,7 +63,9 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         else:
             msg = f"{member.display_name} и так молодец!"
         await ctx.send(box(msg))
-        await get(ctx.guild.channels, id=channels.COUNCILS).send(box(msg))  # совет-гильдии
+        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        if ctx.channel != council_channel:
+            await council_channel.send(box(msg))  # совет-гильдии
 
     @commands.command(pass_context=True, name='список', help='Обновить список членов ги')
     @commands.has_role("Совет ги")
