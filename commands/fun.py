@@ -115,5 +115,11 @@ class FunCommands(commands.Cog, name='Для веселья'):
         embed = discord.Embed(description=f"{ctx.author.mention}:\n{text}")
         await ctx.send(embed=embed)
 
+    @commands.command(help='РОЦК!')
+    async def rockon(self, ctx):
+        search_term = 'rockon'
+        limit = 20
+        await ctx.send(find_gif(search_term, limit))
+
 
 bot.add_cog(FunCommands())
