@@ -1,6 +1,7 @@
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
+from typing import Union
 
 import discord
 import requests
@@ -66,10 +67,9 @@ async def get_afk_users(msg: discord.Message) -> set:
     return all_guild_users
 
 
-async def set_permissions(channel_name: str, user_id: int, **permissions):
-    channel = bot.get_channel(channel_name)
-    user = await bot.fetch_user(user_id)
-    await channel.set_permissions(user, **permissions)
+async def set_permissions(channel_id: int, target: Union[discord.Member, discord.Role], **permissions):
+    channel = bot.get_channel(channel_id)
+    await channel.set_permissions(target, **permissions)
 
 
 async def create_and_send_slap(ctx, avatar_from, avatar_to):

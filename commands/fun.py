@@ -70,7 +70,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
             if role in member.roles:
                 return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
-        await set_permissions(channels.MERY, member._user.id, read_messages=True, send_messages=True)
+        await set_permissions(channels.MERY, member, read_messages=True, send_messages=True)
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
@@ -80,7 +80,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
         if sekta in ctx.author.roles:
             await ctx.author.remove_roles(sekta)
             await ctx.send(file=discord.File('files/media/sekta.jpg'))
-            await set_permissions(channels.MERY, ctx.author._user.id, send_messages=False)
+            await set_permissions(channels.MERY, ctx.author, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
@@ -93,7 +93,7 @@ class FunCommands(commands.Cog, name='Для веселья'):
         await ctx.message.delete()
         text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
         embed = discord.Embed()
-        embed.set_image(url='https://i.ytimg.com/vi/cD4avzML2rw/hqdefault.jpg')
+        embed.set_image(url=find_gif(search_term='уничтожу', limit=1))
         embed.add_field(name=f"Думали я вас не переиграю?", value=text)
         await ctx.send(embed=embed)
 

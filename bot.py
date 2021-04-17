@@ -6,6 +6,7 @@ from constants import *
 # commands
 from commands import *
 from utils.guild_utils import set_permissions, get_class_roles
+from utils.statuses import voice_owners
 
 try:
     from local_settings import TOKEN
@@ -66,9 +67,9 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
             for role in payload.member.roles:
                 if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Верховная жрица', 'Верховный жрец', 'Палач', 'Прихожанин']:
                     perms_flag = True
-            await set_permissions(channels.MERY, payload.user_id, read_messages=True, send_messages=perms_flag)
+            await set_permissions(channels.MERY, member, read_messages=True, send_messages=perms_flag)
         elif emoji.name == '🇰':
-            await set_permissions(channels.KEFIR, payload.user_id, read_messages=True, send_messages=True)
+            await set_permissions(channels.KEFIR, member, read_messages=True, send_messages=True)
         else:
             await message.clear_reaction(emoji)
 
@@ -97,9 +98,9 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
 
     if payload.message_id == messages.ROOMS:
         if emoji.name == '🇩':
-            await set_permissions(channels.MERY, payload.user_id, read_messages=False, send_messages=False)
+            await set_permissions(channels.MERY, member, read_messages=False, send_messages=False)
         if emoji.name == '🇰':
-            await set_permissions(channels.KEFIR, payload.user_id, read_messages=False, send_messages=False)
+            await set_permissions(channels.KEFIR, member, read_messages=False, send_messages=False)
 
     if payload.message_id == messages.CHOOSE_CLASS:
         roles_dict = get_class_roles(guild)
@@ -125,6 +126,19 @@ async def on_message(message: discord.Message):
         await inv_gi_channel.send(f"<@{message.author.id}>", embed=embed)
         await message.delete()
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_voice_state_update(member: discord.Member, before, after):
+    voice: discord.VoiceChannel = get(member.guild.channels, id=channels.VOICE)
+    if after.channel == voice:
+        new_voc = await voice.clone(name=f"{member.display_name}'s Channel")
+        voice_owners[new_voc] = member
+        await member.move_to(new_voc)
+    if before.channel is not None:
+        if all([before.channel.category_id == categories.PRIVATE, before.channel != voice, not before.channel.members]):
+            await before.channel.delete()
+            del voice_owners[before.channel]
 
 
 @bot.event

@@ -111,7 +111,7 @@ class CouncilsCommands(commands.Cog, name='Команды совета'):
         channels_with_perms = [channels.MERY, channels.KEFIR]
         try:
             for channel_id in channels_with_perms:
-                await set_permissions(channel_id, user.id, read_messages=user_permissions[user][channel_id][0],
+                await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0],
                                       send_messages=user_permissions[user][channel_id][1])
         except KeyError:
             # unmute before first mute happens

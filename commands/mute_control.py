@@ -28,7 +28,7 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
                                    user.permissions_in(user.guild.get_channel(channel_id)).send_messages)
     await user.add_roles(role)
     for channel_id in channels_with_perms:
-        await set_permissions(channel_id, user.id, send_messages=False)
+        await set_permissions(channel_id, user, send_messages=False)
 
     muted_queue[user].append(mute_time)
     while True:
@@ -44,7 +44,7 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
 
     await user.remove_roles(role)
     for channel_id in channels_with_perms:
-        await set_permissions(channel_id, user.id, read_messages=user_permissions[user][channel_id][0], send_messages=user_permissions[user][channel_id][1])
+        await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0], send_messages=user_permissions[user][channel_id][1])
 
 
 async def automoderation(message: discord.Message):
