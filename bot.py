@@ -28,7 +28,7 @@ async def test(ctx, *args):
 
 
 @bot.event
-async def on_member_join(member):
+async def on_member_join(member: discord.Member):
     welcome = bot.get_channel(channels.WELCOME)
     text = f"""
 Для доступа к каналам ознакомься с {bot.get_channel(channels.RULES).mention} и поставь под ними ✅.
@@ -45,6 +45,8 @@ async def on_member_join(member):
 
     await welcome.send(embed=embed)
     await welcome.send(text)
+    if muted_queue[member]:
+        await member.add_roles(member.guild.get_role(roles.MUTED))
 
 
 @bot.event
@@ -73,7 +75,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     if payload.message_id == messages.RULES:
         if emoji.name == '✅':
             guest = get(guild.roles, name='Гость')
-            if len(member.roles) == 1 and member.roles[0].name == '@everyone':
+            if len(member.roles) == 1 or (len(member.roles) == 2 and get(guild.roles, name='Muted') in member.roles):
                 await member.add_roles(guest)
                 emoji = await member.guild.fetch_emoji(811516186453082133)
                 guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
