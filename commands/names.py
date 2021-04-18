@@ -8,7 +8,7 @@ from init_bot import bot
 from utils.tenor_gifs import find_gif
 
 
-class NamedCommands(commands.Cog, name='Именные команды'):
+class NamedCommands(commands.Cog, name='Имена'):
     """Команды для увеселения отдельных игроков =)"""
 
     @commands.command(help='рофлить')

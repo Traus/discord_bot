@@ -12,7 +12,7 @@ from init_bot import bot
 from utils.format import box
 
 
-class MainCommands(commands.Cog, name='Основные команды'):
+class MainCommands(commands.Cog, name='Основное'):
     """Основные команды, доступные каждому"""
 
     @commands.command(pass_context=True, name='устав', help='Глава устава. Вывод глав устава')

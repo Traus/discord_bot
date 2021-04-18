@@ -1,12 +1,12 @@
-import re
+from typing import Union
 
 import discord
 from discord.ext import commands
 
-from constants import categories, roles
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import set_permissions
+from utils.statuses import voice_owners
 
 docs = dict(
     lock="!nv lock - Закрыть канал.",
@@ -28,95 +28,94 @@ doc_text = """Для использования команд необоходи�
 """.format('\n'.join(_pattern.format(*value.split(' - ')) for value in docs.values()))
 
 
-async def join_channel(text_channel):
-    await text_channel.send(box("Сначала необходимо подключиться к приватному голосовому каналу!"))
+# def check_owner(func):
+#     def wrap(*args, **kwargs):
+#         print(args)
+#         ctx = args[0]
+#         if voice_owners[ctx.author.voice.channel] != ctx.author:
+#             await ctx.send(box(f'Владелец канала - {voice_owners[ctx.author.voice.channel].display_name}'))
+#             return
+#         await func(*args, **kwargs)
+#     return wrap
 
 
-class NewVocCommands(commands.Cog, name='Управление приватными голосовыми каналами', description=doc_text):
+async def join_channel(ctx):
+    await ctx.channel.send(box("Сначала необходимо подключиться к приватному голосовому каналу!"))
 
-    @commands.command(help=doc_text)
-    async def nv(self, ctx, command: str = 'help', *args):
+
+class NewVocCommands(commands.Cog, name='Голос', description="Управление приватными голосовыми каналами"):
+    # todo ограничение по вызовыу команд
+    @commands.group(pass_context=True, help="Возможные команды после !nv - lock, unlock, invite @user/@role, remove @user/@role, rename [name], limit [number]")
+    async def nv(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(box(doc_text))
+        if ctx.author.voice is None:
+            return await join_channel(ctx)
+
+    @nv.command(help=docs['lock'])
+    async def lock(self, ctx):
         member: discord.Member = ctx.author
-        text_channel: discord.TextChannel = ctx.channel
-        if member.voice is None:
-            await join_channel(ctx)
-            return
+
+        await ctx.send(box(f'{member.voice.channel.name} закрыт'))
+        for role in member.guild.roles:
+            await set_permissions(member.voice.channel.id, role, connect=False)
+
+    @nv.command(help=docs['unlock'])
+    async def unlock(self, ctx):
+        member: discord.Member = ctx.author
+
+        await ctx.send(box(f'{member.voice.channel.name} открыт'))
+        for role in member.guild.roles:
+            await set_permissions(member.voice.channel.id, role, connect=True)
+
+    @nv.command(help=docs['invite'])
+    async def invite(self, ctx, target: Union[discord.Member, discord.Role]):
+        member: discord.Member = ctx.author
         channel: discord.VoiceChannel = member.voice.channel
 
-        async def lock(*args):
-            for role in member.guild.roles:
-                await set_permissions(channel.id, role, connect=False)
-
-        async def unlock(*args):
-            for role in member.guild.roles:
-                await set_permissions(channel.id, role, connect=True)
-
-        async def invite(*args):
-            if not args:
-                await text_channel.send(box(docs['invite']))
-            else:
-                obj = args[0]
-                if '!' in obj:
-                    obj_type = 'get_member'
-                else:
-                    obj_type = 'get_role'
-                obj_id = int(re.findall(r'\d+', obj)[0])
-                tg = getattr(ctx.guild, obj_type)(obj_id)
-                await set_permissions(channel.id, tg, connect=True)
-                await text_channel.send(box(f"{tg.display_name if obj_type == 'get_member' else tg.name} "
-                                            f"пригалашен на {channel.name}"))
-
-        async def remove(*args):
-            if not member:
-                await text_channel.send(box(docs['remove']))
-            else:
-                obj = args[0]
-                if '!' in obj:
-                    obj_type = 'get_member'
-                else:
-                    obj_type = 'get_role'
-                obj_id = int(re.findall(r'\d+', obj)[0])
-                tg = getattr(ctx.guild, obj_type)(obj_id)
-                await set_permissions(channel.id, tg, connect=False)
-                if obj_type == 'get_member':
-                    await tg.move_to(None)
-                    await text_channel.send(box(f"{tg.display_name} удален с {channel.name}"))
-                else:
-                    await text_channel.send(box(f"{tg.name} удален с {channel.name}"))
-                    users = channel.members
-                    for user in users:
-                        if tg in user.roles:
-                            await user.move_to(None)
-
-        async def rename(*name):
-            if not name:
-                await text_channel.send(box(docs['rename']))
-            else:
-                await channel.edit(name=' '.join(name))
-
-        async def limit(new_limit: int, *args):
-            if not new_limit:
-                await text_channel.send(box(docs['limit']))
-            else:
-                await channel.edit(user_limit=int(new_limit))
-
-        async def _help(*args):
-            await text_channel.send(box(doc_text))
-
-        commands_dict = dict(
-            lock=lock,
-            unlock=unlock,
-            invite=invite,
-            remove=remove,
-            rename=rename,
-            limit=limit,
-            help=_help,
-        )
-
-        if channel.category_id != categories.PRIVATE:
-            await join_channel(ctx)
+        if isinstance(target, discord.Member):
+            name = 'display_name'
+        elif isinstance(target, discord.Role):
+            name = 'name'
         else:
-            await commands_dict.get(command, _help)(*args)
+            await ctx.send(box(docs['invite']))
+            return
+        await set_permissions(channel.id, target, connect=True)
+        await ctx.send(box(f"{getattr(target, name)} пригалашен на {channel.name}"))
+
+    @nv.command(help=docs['remove'])
+    async def remove(self, ctx, target: Union[discord.Member, discord.Role]):
+        member: discord.Member = ctx.author
+        channel: discord.VoiceChannel = member.voice.channel
+
+        if isinstance(target, discord.Member):
+            name = 'display_name'
+            await target.move_to(None)
+        elif isinstance(target, discord.Role):
+            name = 'name'
+            users = channel.members
+            for user in users:
+                if target in user.roles:
+                    await user.move_to(None)
+        else:
+            await ctx.send(box(docs['remove']))
+            return
+        await set_permissions(channel.id, target, connect=False)
+        await ctx.send(box(f"{getattr(target, name)} удален с {channel.name}"))
+
+    @nv.command(help=docs['rename'])
+    async def rename(self, ctx, *name):
+        if voice_owners[ctx.author.voice.channel] != ctx.author:
+            await ctx.send(box(f'Владелец канала - {voice_owners[ctx.author.voice.channel].display_name}'))
+            return
+        await ctx.author.voice.channel.edit(name=' '.join(name))
+
+    @nv.command(help=docs['limit'])
+    async def limit(self, ctx, new_limit: int):
+        if voice_owners[ctx.author.voice.channel] != ctx.author:
+            await ctx.send(box(f'Владелец канала - {voice_owners[ctx.author.voice.channel].display_name}'))
+            return
+        await ctx.author.voice.channel.edit(user_limit=int(new_limit))
 
 
 bot.add_cog(NewVocCommands())

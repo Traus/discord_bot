@@ -10,7 +10,7 @@ from utils.guild_utils import is_spam, get_member_by_role, strip_tot, get_guild_
 from utils.statuses import when_all_called
 
 
-class GuildCommands(commands.Cog, name='Команды гильдии'):
+class GuildCommands(commands.Cog, name='Гильдия'):
     """Команды, доступные участникам гильдии с ролью ToT"""
 
     @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. '

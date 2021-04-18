@@ -13,7 +13,7 @@ from utils.statuses import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
 
-class CouncilsCommands(commands.Cog, name='Команды совета'):
+class CouncilsCommands(commands.Cog, name='Совет'):
     """Команды, доступные совету гильдии"""
 
     @commands.command(name='страйк', help='ник [причина]. Даёт +1 уровень страйка')
