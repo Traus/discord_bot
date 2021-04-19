@@ -49,6 +49,7 @@ class NewVocCommands(commands.Cog, name='Голос', description="Управл�
     async def nv(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send(box(doc_text))
+            return
         if ctx.author.voice is None:
             return await join_channel(ctx)
 

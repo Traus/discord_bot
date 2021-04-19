@@ -49,7 +49,7 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
 
 async def automoderation(message: discord.Message):
     mute = False
-    pattern = r'[ !.,?;:-_@#]+'
+    pattern = r'[ !.,?;:_@#&$-]+'
     for word in split(pattern, message.content):
         if word.lower() in BAD_WORDS:
             mute = True

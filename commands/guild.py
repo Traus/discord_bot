@@ -13,11 +13,11 @@ from utils.statuses import when_all_called
 class GuildCommands(commands.Cog, name='Гильдия'):
     """Команды, доступные участникам гильдии с ролью ToT"""
 
-    @commands.command(pass_context=True, help='Вызвать всю гильдию ТоТ. '
-                                              'Доступ к команде - Совет, Актив, Наставник. '
-                                              'Злоупотребление наказуемо!')
+    @commands.command(pass_context=True, name='all',  help='Вызвать всю гильдию ТоТ. '
+                                                           'Доступ к команде - Совет, Актив, Наставник. '
+                                                           'Злоупотребление наказуемо!')
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
-    async def all(self, ctx, *message):
+    async def _all(self, ctx, *message):
         await ctx.message.delete()
         if is_spam(ctx.author, when_all_called, 60):
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
