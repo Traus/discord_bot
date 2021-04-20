@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from typing import Union
 
 import discord
@@ -29,7 +28,6 @@ doc_text = """Для использования команд необоходи�
 """.format('\n'.join(_pattern.format(*value.split(' - ')) for value in docs.values()))
 
 
-@asynccontextmanager
 async def check_owner(ctx):
     if voice_owners[ctx.author.voice.channel] != ctx.author:
         await ctx.send(box(f'Владелец канала - {voice_owners[ctx.author.voice.channel].display_name}'))
@@ -55,19 +53,19 @@ class NewVocCommands(commands.Cog, name='Голос', description="Управл�
     async def lock(self, ctx):
         member: discord.Member = ctx.author
 
-        async with check_owner(ctx):
-            await ctx.send(box(f'{member.voice.channel.name} закрыт'))
-            for role in member.guild.roles:
-                await set_permissions(member.voice.channel.id, role, connect=False)
+        # async with check_owner(ctx):
+        await ctx.send(box(f'{member.voice.channel.name} закрыт'))
+        for role in member.guild.roles:
+            await set_permissions(member.voice.channel.id, role, connect=False)
 
     @nv.command(help=docs['unlock'])
     async def unlock(self, ctx):
         member: discord.Member = ctx.author
 
-        async with check_owner(ctx):
-            await ctx.send(box(f'{member.voice.channel.name} открыт'))
-            for role in member.guild.roles:
-                await set_permissions(member.voice.channel.id, role, connect=True)
+        # async with check_owner(ctx):
+        await ctx.send(box(f'{member.voice.channel.name} открыт'))
+        for role in member.guild.roles:
+            await set_permissions(member.voice.channel.id, role, connect=True)
 
     @nv.command(help=docs['invite'])
     async def invite(self, ctx, target: Union[discord.Member, discord.Role]):
@@ -106,12 +104,12 @@ class NewVocCommands(commands.Cog, name='Голос', description="Управл�
 
     @nv.command(help=docs['rename'])
     async def rename(self, ctx, *name):
-        async with check_owner(ctx):
+        # async with check_owner(ctx):
             await ctx.author.voice.channel.edit(name=' '.join(name))
 
     @nv.command(help=docs['limit'])
     async def limit(self, ctx, new_limit: int):
-        async with check_owner(ctx):
+        # async with check_owner(ctx):
             await ctx.author.voice.channel.edit(user_limit=int(new_limit))
 
 
