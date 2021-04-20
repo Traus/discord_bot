@@ -125,5 +125,9 @@ class FunCommands(commands.Cog, name='Весельe'):
     async def logo(self, ctx):
         await ctx.send(ctx.guild.icon_url)
 
+    @commands.command(name='гц', help='поздравить')
+    async def gc(self, ctx):
+        await ctx.send(file=discord.File('files/media/gc.png'))
+
 
 bot.add_cog(FunCommands())
