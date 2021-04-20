@@ -121,5 +121,9 @@ class FunCommands(commands.Cog, name='Весельe'):
         limit = 20
         await ctx.send(find_gif(search_term, limit))
 
+    @commands.command(name='лого', help='лого гильдии')
+    async def logo(self, ctx):
+        await ctx.send(ctx.guild.icon_url)
+
 
 bot.add_cog(FunCommands())
