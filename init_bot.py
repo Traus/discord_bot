@@ -1,84 +1,133 @@
-from typing import List
+from random import randint
 
 import discord
 from discord.ext import commands
-from pretty_help import PrettyHelp
-from pretty_help.pretty_help import Paginator
+from discord.ext.commands import MinimalHelpCommand
 
 intents = discord.Intents.default()
 intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
-ending_note = '!help команда - для подробной информации о команде.\n' \
-          '!help категория - для информации по категории.'
+ending_note = '`!help <команда> - для подробной информации о команде.`\n' \
+          '`!help <категория> - для информации по категории.`'
 
 
-class ShortPaginator(Paginator):
-    def _add_command_fields(self, embed: discord.Embed, page_title: str, commands: List[commands.Command]):
-        """
-        Adds command fields to Category/Cog and Command Group pages
-
-        Args:
-            embed (discord.Embed): The page to add command descriptions
-            page_title (str): The title of the page
-            commands (List[commands.Command]): The list of commands for the fields
-        """
-        description = "```"
-        for command in commands:
-            if not self._check_embed(
-                    embed,
-                    self.ending_note,
-                    command.name,
-                    command.short_doc,
-                    self.prefix,
-                    self.suffix,
-            ):
-                self._add_page(embed)
-                embed = self._new_page(page_title, embed.description)
-
-            description += f"\n{command.name}"
-        embed.description += f"{description}```"
-        self._add_page(embed)
-
-    def add_index(self, include: bool, title: str, bot: commands.Bot):
-        """
-        Add an index page to the response of the bot_help command
-
-        Args:
-            include (bool): Include the index page or not
-            title (str): The title of the index page
-            bot (commands.Bot): The bot instance
-        """
-        if include:
-            index = self._new_page(title, bot.description or "")
-
-            # todo ковыряться
-            for page_no, page in enumerate(self._pages, 2):
-                if not page.description:
-                    description = "No Description"
-                else:
-                    description = page.description.split('\n')[0].strip('`')
-
-                index.add_field(
-                    name=f"{page_no}) {page.title}",
-                    value=f'{self.prefix}{description}{self.suffix}',
-                    inline=False,
-                )
-            index.set_footer(text=self.ending_note)
-            self._pages.insert(0, index)
-        else:
-            self._pages[0].description = bot.description
-
-
-class ShortHelp(PrettyHelp):
+class ShortHelp(MinimalHelpCommand):
     def __init__(self, **options):
         super().__init__(**options)
-        self.paginator = ShortPaginator(color=self.color)
+        self.color = options.pop(
+            "color",
+            discord.Color.from_rgb(randint(0, 255), randint(0, 255), randint(0, 255)),
+        )
+
+    async def send_pages(self):
+        color = discord.Color.from_rgb(randint(0, 255), randint(0, 255), randint(0, 255))
+        destination = self.get_destination()
+        e = discord.Embed(color=color, description='')
+        for page in self.paginator.pages:
+            e.description += page
+        await destination.send(embed=e)
+
+    def get_opening_note(self):
+        return
+
+    def get_ending_note(self):
+        return ending_note
+
+    def add_bot_commands_formatting(self, commands, heading):
+        """Adds the minified bot heading with commands to the output.
+
+        The formatting should be added to the :attr:`paginator`.
+
+        The default implementation is a bold underline heading followed
+        by commands separated by an EN SPACE (U+2002) in the next line.
+
+        Parameters
+        -----------
+        commands: Sequence[:class:`Command`]
+            A list of commands that belong to the heading.
+        heading: :class:`str`
+            The heading to add to the line.
+        """
+        if commands:
+            joined = ''
+
+            cmds = [f"!{c.name}" for c in commands]
+            while True:
+                if len(cmds) % 3:
+                    cmds.append('')
+                else:
+                    break
+            one_line = []
+            for i in range(len(cmds)):
+                one_line.append(cmds[i])
+                if len(one_line) == 3:
+                    joined += "{:\u2002<20}{:\u2002<20}{:<}\n".format(*one_line)
+                    one_line.clear()
+
+            if one_line:
+                joined += "{:\u2002<20}{:\u2002<20}{:<}\n".format(*one_line)
+
+            self.paginator.add_line('`%s`' % heading)
+            self.paginator.add_line(joined)
+
+    def add_command_formatting(self, command):
+        """A utility function to format commands and groups.
+
+        Parameters
+        ------------
+        command: :class:`Command`
+            The command to format.
+        """
+
+        if command.description:
+            self.paginator.add_line(command.description, empty=True)
+
+        signature = self.get_command_signature(command)
+        if command.aliases:
+            self.paginator.add_line(signature)
+            self.add_aliases_formatting(command.aliases)
+        else:
+            self.paginator.add_line(f'```{signature}```', empty=True)
+
+        if command.help:
+            try:
+                self.paginator.add_line(f'`{command.help}`', empty=True)
+            except RuntimeError:
+                for line in command.help.splitlines():
+                    self.paginator.add_line(line)
+                self.paginator.add_line()
+
+    async def send_cog_help(self, cog):
+        bot = self.context.bot
+        if bot.description:
+            self.paginator.add_line(bot.description, empty=True)
+
+        note = self.get_opening_note()
+        if note:
+            self.paginator.add_line(note, empty=True)
+
+        if cog.description:
+            self.paginator.add_line(f'__**{cog.description}**__', empty=True)
+
+        filtered = await self.filter_commands(cog.get_commands(), sort=self.sort_commands)
+        if filtered:
+            self.paginator.add_line('```%s```' % (cog.qualified_name))
+            for command in filtered:
+                self.add_subcommand_formatting(command)
+
+            note = self.get_ending_note()
+            if note:
+                self.paginator.add_line()
+                self.paginator.add_line(note)
+
+        await self.send_pages()
 
 
-bot.help_command = PrettyHelp(
+bot.help_command = ShortHelp(
     no_category='Разное',
     ending_note=ending_note,
     index_title='Доступные группы команд',
     active_time=60,
+    commands_heading='Команды:',
 )

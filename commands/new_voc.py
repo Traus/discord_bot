@@ -9,13 +9,13 @@ from utils.guild_utils import set_permissions
 from utils.statuses import voice_owners
 
 docs = dict(
-    lock="!nv lock - Закрыть канал.",
-    unlock="!nv unlock - Открыть канал.",
-    invite="!nv invite @роль или @имя - Выдать право присоединяться к каналу.",
-    remove="!nv remove @роль или @имя - Кикнуть и отобрать право присоединяться к каналу.",
-    rename="!nv rename новое имя - Переименовать канал.",
-    limit="!nv limit число - Ограничить число участников.",
-    help="!nv help или !nv - Вызов справки.",
+    lock="Закрыть канал.",
+    unlock="Открыть канал.",
+    invite="Выдать право присоединяться к каналу.",
+    remove="Кикнуть и отобрать право присоединяться к каналу.",
+    rename="Переименовать канал.",
+    limit="Ограничить число участников.",
+    help="Вызов справки.",
 )
 
 _pattern = '{:<30}-{}'
@@ -25,7 +25,7 @@ doc_text = """Для использования команд необоходи�
 {}
 
 Обратите внимание, что имя каналу можно менять не чаще 2х раз за 10 минут (ограничения дискорда)
-""".format('\n'.join(_pattern.format(*value.split(' - ')) for value in docs.values()))
+"""
 
 
 async def check_owner(ctx):
@@ -44,7 +44,15 @@ class NewVocCommands(commands.Cog, name='Голос', description="Управл�
     @commands.group(pass_context=True, help="Возможные команды после !nv - lock, unlock, invite @user/@role, remove @user/@role, rename [name], limit [number]")
     async def nv(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send(box(doc_text))
+            cmds = {}
+            for i in self.walk_commands():
+                if i.name != 'nv':
+                    cmds[i.name] = i.help
+            await ctx.send(
+                box(
+                    doc_text.format('\n'.join(_pattern.format(*[key, cmds[key]]) for key in cmds))
+                )
+            )
             return
         if ctx.author.voice is None:
             return await join_channel(ctx)

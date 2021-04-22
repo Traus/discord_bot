@@ -13,7 +13,7 @@ from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_sen
 from utils.tenor_gifs import find_gif
 
 
-class FunCommands(commands.Cog, name='Весельe'):
+class FunCommands(commands.Cog, name='Веселье'):
     """Рофлы и пасхалки"""
 
     @commands.command(name='осуждаю', help='Осудить!')
