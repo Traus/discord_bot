@@ -91,5 +91,29 @@ class NamedCommands(commands.Cog, name='Имена'):
         for emoji in ('🇴', '🇫', '🇹', '🇷', '🇦', '🇺', '🇸'):
             await msg.add_reaction(emoji)
 
+    @commands.command(name='самка', help='для инстасамки')
+    async def samka(self, ctx):
+        search_term = 'fat chicks'
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(name='мери', help='для Мери')
+    async def mery(self, ctx):
+        msg = await ctx.send(tavern_emoji)
+        for emoji in ('🇴', '<:pepe_f:811746753081638952>', '🇲', '🇪', '🇷', '🇾', '❓'):
+            await msg.add_reaction(emoji)
+
+    @commands.command(name='миз', help='для Миза')
+    async def miz(self, ctx):
+        search_term = 'hunter'
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
+    @commands.command(name='килара', help='для Килары')
+    async def kilara(self, ctx):
+        search_term = 'hey girl'
+        limit = 10
+        await ctx.send(find_gif(search_term, limit))
+
 
 bot.add_cog(NamedCommands())

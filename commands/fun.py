@@ -121,6 +121,12 @@ class FunCommands(commands.Cog, name='Веселье'):
         limit = 20
         await ctx.send(find_gif(search_term, limit))
 
+    @commands.command(name='горит', help='горииииит!')
+    async def fire(self, ctx):
+        search_term = 'ass on fire'
+        limit = 5
+        await ctx.send(find_gif(search_term, limit))
+
     @commands.command(name='лого', help='лого гильдии')
     async def logo(self, ctx):
         await ctx.send(ctx.guild.icon_url)
