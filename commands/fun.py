@@ -139,6 +139,8 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='стат', help='статистика по таверне')
     async def stat(self, ctx, message: str = ''):
+        await ctx.message.delete()
+
         if message == 'save':
             await bot.get_channel(channels.BOTS).send(
                 f"#стат "
@@ -151,7 +153,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             history = bot.get_channel(channels.BOTS).history()
             async for m in history:
                 if "#стат" in m.content:
-                    statistic[beer_emoji.beer], statistic[beer_emoji.ale], statistic['slap'] = m.content.split()[1:]
+                    statistic[beer_emoji.beer], statistic[beer_emoji.ale], statistic['slap'] = [int(i) for i in m.content.split()[1:]]
                     await ctx.send(box("Статистика загружена"))
                     break
         else:

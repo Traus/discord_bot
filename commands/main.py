@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels
+from constants import channels, vote_reactions
 from init_bot import bot
 from utils.format import box
 
@@ -74,9 +74,9 @@ class MainCommands(commands.Cog, name='Основное'):
         now = datetime.timestamp(datetime.utcnow())
         embed.set_footer(text=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
         msg: discord.Message = await ctx.send(embed=embed)
-        # todo only one reaction (on reaction add check)
-        await msg.add_reaction('<:pepe_yes:811753098867507210>')
-        await msg.add_reaction('<:pepe_no:811753121902362725>')
+
+        for reaction in vote_reactions:
+            await msg.add_reaction(reaction)
 
 
 def _get_paragraph(par, text):

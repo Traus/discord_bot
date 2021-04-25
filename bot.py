@@ -60,9 +60,11 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
     check_for_beer(emoji)
 
+    # only traus reaction
     if emoji.name == 'approved' and payload.user_id != members.TRAUS:
         await message.remove_reaction(emoji, member)
 
+    # private rooms
     if payload.message_id == messages.ROOMS:
         if emoji.name == '🇩':
             perms_flag = False
@@ -75,6 +77,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         else:
             await message.clear_reaction(emoji)
 
+    # rules channel
     if payload.message_id == messages.RULES:
         if emoji.name == '✅':
             guest = get(guild.roles, name='Гость')
@@ -84,12 +87,28 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
                 await guest_channel.send(f'{member.mention} {emoji}')
 
+    # class channels
     if payload.message_id == messages.CHOOSE_CLASS:
         roles_dict = get_class_roles(guild)
         if emoji.name in roles_dict:
             await member.add_roles(roles_dict[emoji.name])
         else:
             await message.clear_reaction(emoji)
+
+    # vote
+    # can be lag of quick click
+    if all([
+        message.embeds,
+        member != guild.get_member(members.BOT),
+        'Опрос от' in str(message.embeds[0].footer.text),
+        str(emoji) in vote_reactions
+    ]):
+        opposite = vote_reactions[0] if str(emoji) == vote_reactions[1] else vote_reactions[1]
+        for old_reaction in message.reactions:
+            if str(old_reaction) == opposite:
+                async for user in old_reaction.users():
+                    if user == member:
+                        await message.remove_reaction(old_reaction, member)
 
 
 @bot.event

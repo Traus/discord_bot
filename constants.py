@@ -86,3 +86,6 @@ beer_emoji = Alco(
     "<:pepe_beer:828026991361261619>",
     "<:tavern_beer:822536261079662672>",
 )
+
+
+vote_reactions = ['<:pepe_yes:811753098867507210>', '<:pepe_no:811753121902362725>']
