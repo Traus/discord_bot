@@ -7,7 +7,7 @@ from constants import roles
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import is_spam, get_member_by_role, strip_tot, get_guild_members
-from utils.statuses import when_all_called
+from utils.states import when_all_called
 
 
 class GuildCommands(commands.Cog, name='Гильдия'):

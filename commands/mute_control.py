@@ -8,7 +8,7 @@ import discord
 from constants import roles, channels
 from utils.format import box
 from utils.guild_utils import set_permissions
-from utils.statuses import muted_queue, user_permissions
+from utils.states import muted_queue, user_permissions
 
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 

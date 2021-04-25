@@ -7,7 +7,7 @@ from discord.ext import commands
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import set_permissions
-from utils.statuses import voice_owners
+from utils.states import voice_owners
 
 docs = dict(
     lock="Закрыть канал.",

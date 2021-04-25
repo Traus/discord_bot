@@ -5,8 +5,8 @@ from constants import *
 
 # commands
 from commands import *
-from utils.guild_utils import set_permissions, get_class_roles
-from utils.statuses import voice_owners
+from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
+from utils.states import voice_owners
 
 try:
     from local_settings import TOKEN
@@ -57,6 +57,8 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     member: discord.Member = await guild.fetch_member(payload.user_id)
     channel: discord.TextChannel = bot.get_channel(payload.channel_id)
     message: discord.Message = await channel.fetch_message(payload.message_id)
+
+    check_for_beer(emoji)
 
     if emoji.name == 'approved' and payload.user_id != members.TRAUS:
         await message.remove_reaction(emoji, member)
@@ -110,6 +112,9 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
 @bot.event
 async def on_message(message: discord.Message):
     no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES)
+
+    check_for_beer(message.content)
+
     if message.channel.id not in no_moderation:
         await automoderation(message)
 

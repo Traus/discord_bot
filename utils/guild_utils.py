@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -9,9 +10,9 @@ from PIL import Image
 from discord.utils import get
 from collections import namedtuple
 
-from constants import GUILD_ID
+from constants import GUILD_ID, beer_emoji
 from init_bot import bot
-from utils.statuses import immune_until
+from utils.states import immune_until, statistic
 
 Members = namedtuple('Members', ['role', 'members'])
 
@@ -108,3 +109,9 @@ def is_spam(author, memory, sec):
         return True
     memory[author] = stamp
     return False
+
+
+def check_for_beer(content: Union[discord.Message, discord.Emoji]):
+    for smile in beer_emoji:
+        if smile in str(content):
+            statistic[smile] += len(re.findall(smile, str(content)))

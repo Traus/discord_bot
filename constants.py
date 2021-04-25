@@ -1,3 +1,6 @@
+from collections import namedtuple
+
+
 TENOR_API = 'WUUCF2M4J7H6'
 GUILD_ID = 809869724413853706
 
@@ -31,6 +34,7 @@ channels = _GetDict(
     GUARDS=810136096537051147,
     ROUGES=810136116602601482,
     VOICE=833005450201923614,
+    BOTS=827098809334628383,
 )
 
 
@@ -75,3 +79,10 @@ tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_e: ' \
                f':regional_indicator_r: ' \
                f':regional_indicator_n:'
+
+
+Alco = namedtuple('Alco', ['beer', 'ale'])
+beer_emoji = Alco(
+    "<:pepe_beer:828026991361261619>",
+    "<:tavern_beer:822536261079662672>",
+)

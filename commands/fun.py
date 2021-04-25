@@ -5,11 +5,12 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, tavern_emoji
+from constants import channels, tavern_emoji, beer_emoji
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
+from utils.states import statistic
 from utils.tenor_gifs import find_gif
 
 
@@ -23,6 +24,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, member: discord.Member = None, bot=None):
+        statistic['slap'] += 1
         if member is None:
             member = ctx.author
 
@@ -134,6 +136,30 @@ class FunCommands(commands.Cog, name='Веселье'):
     @commands.command(name='гц', help='поздравить')
     async def gc(self, ctx):
         await ctx.send(file=discord.File('files/media/gc.png'))
+
+    @commands.command(name='стат', help='статистика по таверне')
+    async def stat(self, ctx, message: str = ''):
+        if message == 'save':
+            await bot.get_channel(channels.BOTS).send(
+                f"#стат "
+                f"{statistic[beer_emoji.beer]} "
+                f"{statistic[beer_emoji.ale]} "
+                f"{statistic['slap']}"
+            )
+            await ctx.send(box("Статистика сохранена"))
+        elif message == 'load':
+            history = bot.get_channel(channels.BOTS).history()
+            async for m in history:
+                if "#стат" in m.content:
+                    statistic[beer_emoji.beer], statistic[beer_emoji.ale], statistic['slap'] = m.content.split()[1:]
+                    await ctx.send(box("Статистика загружена"))
+                    break
+        else:
+            msg = f"Статистика по таверне.\nВыпито:\n" \
+                  f"{statistic[beer_emoji.beer]} кружек пива\n" \
+                  f"{statistic[beer_emoji.ale]} литров эля\n\n" \
+                  f"Выдано {statistic['slap']} шапалахов."
+            await ctx.send(box(msg))
 
 
 bot.add_cog(FunCommands())

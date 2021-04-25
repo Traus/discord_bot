@@ -9,7 +9,7 @@ from constants import channels, roles
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users
-from utils.statuses import immune_until, user_permissions, muted_queue
+from utils.states import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
 
@@ -19,6 +19,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(name='страйк', help='ник [причина]. Даёт +1 уровень страйка')
     @commands.has_role("Совет ги")
     async def strike(self, ctx, member: discord.Member, *reason):
+        await ctx.message.delete()
+
         reason = ' '.join(reason) or "заслужил"
         all_roles = ctx.guild.roles
         strike_1 = get(all_roles, name='Страйк 1-уровень')
@@ -45,6 +47,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(name='амнистия', help='Снимает 1 уровень страйка')
     @commands.has_role("Совет ги")
     async def remove_strike(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+
         all_roles = ctx.guild.roles
         strike_1 = get(all_roles, name='Страйк 1-уровень')
         strike_2 = get(all_roles, name='Страйк 2-уровень')
