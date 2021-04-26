@@ -146,6 +146,8 @@ class FunCommands(commands.Cog, name='Веселье'):
                 f"#стат "
                 f"{statistic[beer_emoji.beer]} "
                 f"{statistic[beer_emoji.ale]} "
+                f"{statistic[beer_emoji.wine]} "
+                f"{statistic[beer_emoji.vodka]} "
                 f"{statistic['slap']}"
             )
             await ctx.send(box("Статистика сохранена"))
@@ -153,13 +155,21 @@ class FunCommands(commands.Cog, name='Веселье'):
             history = bot.get_channel(channels.BOTS).history()
             async for m in history:
                 if "#стат" in m.content:
-                    statistic[beer_emoji.beer], statistic[beer_emoji.ale], statistic['slap'] = [int(i) for i in m.content.split()[1:]]
+                    (
+                        statistic[beer_emoji.beer],
+                        statistic[beer_emoji.ale],
+                        statistic[beer_emoji.wine],
+                        statistic[beer_emoji.vodka],
+                        statistic['slap']
+                     ) = [int(i) for i in m.content.split()[1:]]
                     await ctx.send(box("Статистика загружена"))
                     break
         else:
             msg = f"Статистика по таверне.\nВыпито:\n" \
                   f"{statistic[beer_emoji.beer]} кружек пива\n" \
-                  f"{statistic[beer_emoji.ale]} литров эля\n\n" \
+                  f"{statistic[beer_emoji.ale]} литров эля\n" \
+                  f"{statistic[beer_emoji.wine]} бокалов вина\n" \
+                  f"{statistic[beer_emoji.vodka]} бутылок водки\n\n" \
                   f"Выдано {statistic['slap']} шапалахов."
             await ctx.send(box(msg))
 

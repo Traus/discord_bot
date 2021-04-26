@@ -132,6 +132,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
 async def on_message(message: discord.Message):
     no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES)
 
+    print(message.content)
     check_for_beer(message.content)
 
     if message.channel.id not in no_moderation:

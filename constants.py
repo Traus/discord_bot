@@ -81,10 +81,12 @@ tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_n:'
 
 
-Alco = namedtuple('Alco', ['beer', 'ale'])
+Alco = namedtuple('Alco', ['beer', 'ale', 'wine', 'vodka'])
 beer_emoji = Alco(
     "<:pepe_beer:828026991361261619>",
     "<:tavern_beer:822536261079662672>",
+    "<:pepe_celebrate:811749316313350144>",
+    "<:pepe_vodka:811737381551079425>",
 )
 
 
