@@ -1,7 +1,7 @@
 import random
 import re
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
@@ -47,6 +47,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
     async def daily(self, ctx):
+        # todo refactor with timedelta (shop)
         start_time = "10/03/2021 00:00"
         first = second = 7 * 60 * 60
         third = 9 * 60 * 60
@@ -65,6 +66,18 @@ class MainCommands(commands.Cog, name='Основное'):
             second=starts_next[0].format(datetime.fromtimestamp(starts_next[1] + 3600*3))
         )
         await ctx.channel.send(box(msg))
+
+    @commands.command(name='магаз', help='игровой магазин, !магаз + для просмотра магазина на завтра')
+    async def shop(self, ctx, message: str = ''):
+        await ctx.message.delete()
+        start_time = datetime.strptime("21.04.2021 01", "%d.%m.%Y %H")
+        current_time = datetime.utcnow() + timedelta(hours=3)
+        days = (current_time - start_time).days + 1
+        day_delta = 1 if message == '+' else 0
+        await ctx.send(
+            f'Магазин на {current_time.day + day_delta}.{current_time.month}.{current_time.year}',
+            file=discord.File(f'files/media/shop/{(days + day_delta) % 12}.jpg')
+        )
 
     @commands.command(pass_context=True, help='Начать опрос')
     async def vote(self, ctx, *text):
