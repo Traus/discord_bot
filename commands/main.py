@@ -67,15 +67,19 @@ class MainCommands(commands.Cog, name='Основное'):
         )
         await ctx.channel.send(box(msg))
 
-    @commands.command(name='магаз', help='игровой магазин, !магаз + для просмотра магазина на завтра')
-    async def shop(self, ctx, message: str = ''):
+    @commands.command(name='магаз', help='игровой магазин, !магаз <число> для просмотра магазина на дни вперед')
+    async def shop(self, ctx, days: str = ''):
         await ctx.message.delete()
+        try:
+            day_delta = int(days.strip("+"))
+        except ValueError:
+            day_delta = 0
         start_time = datetime.strptime("21.04.2021 01", "%d.%m.%Y %H")
         current_time = datetime.utcnow() + timedelta(hours=3)
         days = (current_time - start_time).days + 1
-        day_delta = 1 if message == '+' else 0
+        shop_date = current_time + timedelta(days=day_delta)
         await ctx.send(
-            f'Магазин на {current_time.day + day_delta}.{current_time.month}.{current_time.year}',
+            f'Магазин на {shop_date.strftime("%d.%m.%Y")}',
             file=discord.File(f'files/media/shop/{(days + day_delta) % 12}.jpg')
         )
 

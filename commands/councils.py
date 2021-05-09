@@ -100,6 +100,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(help='ник [время] [причина]. Время в формате число[smhd]')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def mute(self, ctx, user: discord.Member, time: str = '30s', *reason):
+        await ctx.message.delete()
         reason = ' '.join(reason) or "заслужил"
         await ctx.send(box(f'{user.display_name} получил мут на {time} по причине: {reason}'))
         await _add_mute(user, time)
@@ -107,6 +108,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(help='Снять мут')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def unmute(self, ctx, user: discord.Member):
+        await ctx.message.delete()
         role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
         await ctx.send(box(f'Мут снят с {user.display_name}'))
         await user.remove_roles(role)

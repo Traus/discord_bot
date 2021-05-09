@@ -27,7 +27,12 @@ class FunCommands(commands.Cog, name='Веселье'):
     async def slap(self, ctx, member: discord.Member = None, bot=None):
         statistic['slap'] += 1
         if member is None:
-            member = ctx.author
+            if ctx.message.reference is not None:
+                message_id = ctx.message.reference.message_id
+                message = await ctx.fetch_message(message_id)
+                member = message.author
+            else:
+                member = ctx.author
 
         avatar_from = ctx.author.avatar_url
         avatar_to = member.avatar_url
@@ -139,10 +144,10 @@ class FunCommands(commands.Cog, name='Веселье'):
         await ctx.send(file=discord.File('files/media/gc.png'))
 
     @commands.command(name='стат', help='статистика по таверне')
-    async def stat(self, ctx, message: str = ''):
+    async def stat(self, ctx, option: str = ''):
         await ctx.message.delete()
 
-        if message == 'save':
+        if option == 'save':
             await bot.get_channel(channels.BOTS).send(
                 f"#стат "
                 f"{statistic[beer_emoji.beer]} "
@@ -152,7 +157,7 @@ class FunCommands(commands.Cog, name='Веселье'):
                 f"{statistic['slap']}"
             )
             await ctx.send(box("Статистика сохранена"))
-        elif message == 'load':
+        elif option == 'load':
             history = bot.get_channel(channels.BOTS).history()
             async for m in history:
                 if "#стат" in m.content:
