@@ -95,7 +95,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
                     uniq_users.add(group.members[i])
         await ctx.message.delete()
         await channel.purge(limit=1, oldest_first=True)
-        await channel.send(message)
+        await channel.send(box(message))
 
     @commands.command(help='ник [время] [причина]. Время в формате число[smhd]')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)

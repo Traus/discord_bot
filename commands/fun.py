@@ -171,11 +171,10 @@ class FunCommands(commands.Cog, name='Веселье'):
                     await ctx.send(box("Статистика загружена"))
                     break
         else:
-            # todo за N дней (с 26.05.21)
             start_time = datetime.strptime("26.04.2021", "%d.%m.%Y")
             current_time = datetime.utcnow() + timedelta(hours=3)
 
-            msg = f"Статистика по таверне.\nВыпито:\n" \
+            msg = f"Статистика по таверне.\nВыпито за {(current_time - start_time).days} дней:\n" \
                   f"{statistic[beer_emoji.beer]} кружек пива\n" \
                   f"{statistic[beer_emoji.ale]} литров эля\n" \
                   f"{statistic[beer_emoji.wine]} бокалов вина\n" \

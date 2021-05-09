@@ -42,7 +42,6 @@ async def join_channel(ctx):
 
 
 class NewVocCommands(commands.Cog, name='Голос', description="Управление приватными голосовыми каналами"):
-    # todo ограничение по вызовыу команд
     @commands.group(pass_context=True, help="Возможные команды после !nv - lock, unlock, invite @user/@role, remove @user/@role, rename [name], limit [number]")
     async def nv(self, ctx):
         if ctx.invoked_subcommand is None:

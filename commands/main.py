@@ -47,23 +47,21 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, name='дейл', help='Узнать, когда обновятся дейлы')
     async def daily(self, ctx):
-        # todo refactor with timedelta (shop)
-        start_time = "10/03/2021 00:00"
-        first = second = 7 * 60 * 60
-        third = 9 * 60 * 60
-        stamp = time.mktime(datetime.strptime(start_time, "%d/%m/%Y %H:%M").timetuple())
-        now = datetime.timestamp(datetime.utcnow())
-        delta = now - stamp
-        starts_first = ("Дейлы 7 и 13 уровня начнутся в {} по мск", now + (first - delta % first))
-        starts_next = ("Дейл 16 уровня начнётся в {} по мск", now + (third - delta % third))
+        first = second = timedelta(hours=7)
+        third = timedelta(hours=9)
+        start_time = datetime.strptime("10/03/2021 00:00", "%d/%m/%Y %H:%M")  # all daily updated
+        current_time = datetime.utcnow()
+        delta = current_time - start_time
+        starts_first = ("Дейлы 7 и 13 уровня начнутся в {} по мск", current_time + (first - delta % first))
+        starts_next = ("Дейл 16 уровня начнётся в {} по мск", current_time + (third - delta % third))
         if starts_first[1] > starts_next[1]:
             starts_first, starts_next = starts_next, starts_first
-        before_dail = starts_first[1] - now
+        before_daily = starts_first[1] - current_time
 
-        msg = 'Следующий дейл начнётся через {next_dail}.\n{first}.\n{second}.'.format(
-            next_dail=f'{int(before_dail // 3600)} часов {int(before_dail / 60 % 60)} минут {int(before_dail % 60)} секунд',
-            first=starts_first[0].format(datetime.fromtimestamp(starts_first[1] + 3600*3)),
-            second=starts_next[0].format(datetime.fromtimestamp(starts_next[1] + 3600*3))
+        msg = 'Следующий дейл начнётся через {next_daily}.\n{first}.\n{second}.'.format(
+            next_daily=f'{int(before_daily.seconds // 3600)} часов {int(before_daily.seconds / 60 % 60)} минут {before_daily.seconds % 60} секунд',
+            first=starts_first[0].format((starts_first[1] + timedelta(hours=3)).strftime("%H:%M:%S")),  # msk time
+            second=starts_next[0].format((starts_next[1] + timedelta(hours=3)).strftime("%H:%M:%S"))  # msk time
         )
         await ctx.channel.send(box(msg))
 
@@ -75,7 +73,7 @@ class MainCommands(commands.Cog, name='Основное'):
         except ValueError:
             day_delta = 0
         start_time = datetime.strptime("21.04.2021 01", "%d.%m.%Y %H")
-        current_time = datetime.utcnow() + timedelta(hours=3)
+        current_time = datetime.utcnow() + timedelta(hours=3)  # msk time
         days = (current_time - start_time).days + 1
         shop_date = current_time + timedelta(days=day_delta)
         await ctx.send(
