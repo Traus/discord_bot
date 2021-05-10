@@ -1,6 +1,3 @@
-from collections import namedtuple
-
-
 TENOR_API = 'WUUCF2M4J7H6'
 GUILD_ID = 809869724413853706
 
@@ -81,13 +78,12 @@ tavern_emoji = f':regional_indicator_t: ' \
                f':regional_indicator_n:'
 
 
-Alco = namedtuple('Alco', ['beer', 'ale', 'wine', 'vodka'])
-beer_emoji = Alco(
-    "<:pepe_beer:828026991361261619>",
-    "<:tavern_beer:822536261079662672>",
-    "<:pepe_celebrate:811749316313350144>",
-    "<:pepe_vodka:811737381551079425>",
-)
+beer_emoji = {
+    "<:pepe_beer:828026991361261619>": "beer",
+    "<:tavern_beer:822536261079662672>": "ale",
+    "<:pepe_celebrate:811749316313350144>": "wine",
+    "<:pepe_vodka:811737381551079425>": "vodka",
+}
 
 
 vote_reactions = ['<:pepe_yes:811753098867507210>', '<:pepe_no:811753121902362725>']

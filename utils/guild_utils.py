@@ -11,8 +11,9 @@ from discord.utils import get
 from collections import namedtuple
 
 from constants import GUILD_ID, beer_emoji
+from database.stat import add_value
 from init_bot import bot
-from utils.states import immune_until, statistic
+from utils.states import immune_until
 
 Members = namedtuple('Members', ['role', 'members'])
 
@@ -114,4 +115,5 @@ def is_spam(author, memory, sec):
 def check_for_beer(content: Union[discord.Message, discord.Emoji]):
     for smile in beer_emoji:
         if smile in str(content):
-            statistic[smile] += len(re.findall(smile, str(content)))
+            count_smiles = len(re.findall(smile, str(content)))
+            add_value(beer_emoji[smile], count_smiles)

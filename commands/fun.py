@@ -7,11 +7,11 @@ from discord.ext import commands
 from discord.utils import get
 
 from constants import channels, tavern_emoji, beer_emoji
+from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
-from utils.states import statistic
 from utils.tenor_gifs import find_gif
 
 
@@ -25,7 +25,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, member: discord.Member = None, bot=None):
-        statistic['slap'] += 1
+        add_value('slap')
         if member is None:
             if ctx.message.reference is not None:
                 message_id = ctx.message.reference.message_id
@@ -144,43 +144,24 @@ class FunCommands(commands.Cog, name='Веселье'):
         await ctx.send(file=discord.File('files/media/gc.png'))
 
     @commands.command(name='стат', help='статистика по таверне')
-    async def stat(self, ctx, option: str = ''):
+    async def stat(self, ctx):
         await ctx.message.delete()
+        start_time = datetime.strptime("26.04.2021", "%d.%m.%Y")
+        current_time = datetime.utcnow() + timedelta(hours=3)
 
-        if option == 'save':
-            await bot.get_channel(channels.BOTS).send(
-                f"#стат "
-                f"{statistic[beer_emoji.beer]} "
-                f"{statistic[beer_emoji.ale]} "
-                f"{statistic[beer_emoji.wine]} "
-                f"{statistic[beer_emoji.vodka]} "
-                f"{statistic['slap']}"
-            )
-            await ctx.send(box("Статистика сохранена"))
-        elif option == 'load':
-            history = bot.get_channel(channels.BOTS).history()
-            async for m in history:
-                if "#стат" in m.content:
-                    (
-                        statistic[beer_emoji.beer],
-                        statistic[beer_emoji.ale],
-                        statistic[beer_emoji.wine],
-                        statistic[beer_emoji.vodka],
-                        statistic['slap']
-                     ) = [int(i) for i in m.content.split()[1:]]
-                    await ctx.send(box("Статистика загружена"))
-                    break
-        else:
-            start_time = datetime.strptime("26.04.2021", "%d.%m.%Y")
-            current_time = datetime.utcnow() + timedelta(hours=3)
+        beer = get_value('beer')
+        ale = get_value('ale')
+        wine = get_value('wine')
+        vodka = get_value('vodka')
+        slap = get_value('slap')
 
-            msg = f"Статистика по таверне.\nВыпито за {(current_time - start_time).days} дней:\n" \
-                  f"{statistic[beer_emoji.beer]} кружек пива\n" \
-                  f"{statistic[beer_emoji.ale]} литров эля\n" \
-                  f"{statistic[beer_emoji.wine]} бокалов вина\n" \
-                  f"{statistic[beer_emoji.vodka]} бутылок водки\n\n" \
-                  f"Выдано {statistic['slap']} шапалахов."
-            await ctx.send(box(msg))
+        msg = f"Статистика по таверне.\nВыпито за {(current_time - start_time).days} дней:\n" \
+              f"{beer} кружек пива\n" \
+              f"{ale} литров эля\n" \
+              f"{wine} бокалов вина\n" \
+              f"{vodka} бутылок водки\n\n" \
+              f"Выдано {slap} шапалахов."
+        await ctx.send(box(msg))
 
 
 bot.add_cog(FunCommands())
