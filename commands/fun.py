@@ -12,6 +12,7 @@ from init_bot import bot
 from utils.format import box
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
+from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
 
 
@@ -24,7 +25,7 @@ class FunCommands(commands.Cog, name='Веселье'):
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
     @commands.command(name='шапалах', help='Втащить')
-    async def slap(self, ctx, member: discord.Member = None, bot=None):
+    async def slap(self, ctx, member: discord.Member = None, bot: str = None):
         add_value('slap')
         if member is None:
             if ctx.message.reference is not None:
@@ -57,26 +58,24 @@ class FunCommands(commands.Cog, name='Веселье'):
         zam = get_member_by_role(ctx, name='Верховный жрец')
         rip = get_member_by_role(ctx, name='Палач')
         sekta = get_member_by_role(ctx, name='Прихожанин')
-        msg = f"{main.role}:\n{main.members[0].display_name}\n"
-        msg += f"{zam.role}:\n{zam.members[0].display_name}\n"
-        msg += f"{rip.role}:\n{rip.members[0].display_name}\n\nПрихожане:\n"
-        for member in sekta.members:
-            msg += member.display_name + '\n'
+
+        msg = ''
+        for role in [main, zam, rip, sekta]:
+            members = role.members
+            if members:
+                m = '\n'.join([role.members[i].display_name for i in range(len(role.members))])
+                msg += f"{role.role}:\n{m}\n"
         await ctx.send(box(msg))
 
     @commands.command(name='всекту', help='принять в культ')
-    @commands.has_any_role("Глава ги", "Верховная жрица", "Верховный жрец")
     async def join_sekta(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
         traus = get(all_roles, name='Глава ги')
-        mery = get(all_roles, name='Верховная жрица')
-        warlock = get(all_roles, name='Верховный жрец')
-        for role in [traus, mery, warlock]:
-            if role in member.roles:
-                return
+        if traus in member.roles:
+            return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
         await set_permissions(channels.MERY, member, read_messages=True, send_messages=True)
         await member.add_roles(sekta)
@@ -162,6 +161,17 @@ class FunCommands(commands.Cog, name='Веселье'):
               f"{vodka} бутылок водки\n\n" \
               f"Выдано {slap} шапалахов."
         await ctx.send(box(msg))
+
+    @commands.command(name='стол', help='перевернуть стол')
+    async def table(self, ctx):
+        await ctx.message.delete()
+
+        if table_turn_over[0]:
+            await ctx.send(f'{ctx.author.mention} (╮°-°)┳┳')
+            table_turn_over[0] = False
+        else:
+            await ctx.send(f'{ctx.author.mention} ( ╯°□°)╯┻┻ ')
+            table_turn_over[0] = True
 
 
 bot.add_cog(FunCommands())

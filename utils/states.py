@@ -8,3 +8,5 @@ immune_until = defaultdict(int)
 muted_queue = defaultdict(list)
 user_permissions = defaultdict(dict)
 voice_owners = dict()
+
+table_turn_over = [False]
