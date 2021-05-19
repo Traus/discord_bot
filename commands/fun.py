@@ -154,7 +154,8 @@ class FunCommands(commands.Cog, name='Веселье'):
         vodka = get_value('vodka')
         slap = get_value('slap')
 
-        msg = f"Статистика по таверне.\nВыпито за {(current_time - start_time).days} дней:\n" \
+        msg = f"Статистика по таверне за {(current_time - start_time).days} дней.\n" \
+              f"Выпито:\n" \
               f"{beer} кружек пива\n" \
               f"{ale} литров эля\n" \
               f"{wine} бокалов вина\n" \
