@@ -1,3 +1,4 @@
+import random
 import re
 from datetime import datetime, timedelta
 
@@ -6,7 +7,7 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, tavern_emoji, beer_emoji
+from constants import channels, tavern_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box
@@ -26,6 +27,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, member: discord.Member = None, bot: str = None):
+        # todo combo of members
         add_value('slap')
         if member is None:
             if ctx.message.reference is not None:
@@ -46,7 +48,10 @@ class FunCommands(commands.Cog, name='Веселье'):
             avatar_from = get_bot_avatar(ctx)
             await ctx.message.delete()
 
-        await create_and_send_slap(ctx, avatar_from, avatar_to)
+        all_roles = ctx.guild.roles
+        traus = get(all_roles, name='Глава ги')
+        gif = True if traus in ctx.author.roles else random.randint(0, 100) >= 95
+        await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif)
 
     @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member):

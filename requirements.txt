@@ -4,3 +4,4 @@ discord-pretty-help
 Pillow
 async-contextlib
 psycopg2-binary
+imageio

@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Union
 
 import discord
+import imageio
 import requests
-from PIL import Image
+from PIL import Image, ImageOps
 from discord.utils import get
 from collections import namedtuple
 
@@ -74,7 +75,8 @@ async def set_permissions(channel_id: int, target: Union[discord.Member, discord
     await channel.set_permissions(target, **permissions)
 
 
-async def create_and_send_slap(ctx, avatar_from, avatar_to):
+async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False):
+    clean_list = []
     base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
 
     image_bytes = BytesIO(requests.get(avatar_to).content)
@@ -91,11 +93,30 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to):
     b.seek(0)
 
     tmp_file_path = Path('files/media/temp_slap.png')
+    tmp_file_path.write_bytes(b.read())
+    clean_list.append(tmp_file_path)
+
+    if gif:
+        reversed = ImageOps.mirror(Image.open(tmp_file_path))
+        tmp_file_path_2 = Path('files/media/temp_slap_reverse.png')
+        reversed.save('files/media/temp_slap_reverse.png', quality=95)
+        clean_list.append(tmp_file_path_2)
+
+        images = []
+        for filename in sorted(clean_list*2):
+            images.append(imageio.imread(filename))
+        tmp_gif_path = Path('files/media/temp_gif_slap.gif')
+        imageio.mimsave(tmp_gif_path, images)
+        clean_list.append(tmp_gif_path)
+
     try:
-        tmp_file_path.write_bytes(b.read())
-        await ctx.send(file=discord.File(tmp_file_path))
+        if gif:
+            await ctx.send(file=discord.File(tmp_gif_path))
+        else:
+            await ctx.send(file=discord.File(tmp_file_path))
     finally:
-        tmp_file_path.unlink()
+        for file in clean_list:
+            file.unlink()
 
 
 def has_immune(member: discord.Member) -> bool:
