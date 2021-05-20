@@ -7,7 +7,7 @@ from discord.utils import get
 from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
-from utils.format import box
+from utils.format import box, send_by_bot
 from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users
 from utils.states import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
@@ -39,7 +39,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         else:
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-        await ctx.send(box(msg))
+        await send_by_bot(ctx.message, msg)
         council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
@@ -66,7 +66,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             msg = f"{member.display_name} частично прощен за хорошее поведение."
         else:
             msg = f"{member.display_name} и так молодец!"
-        await ctx.send(box(msg))
+        await send_by_bot(ctx.message, msg)
         council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии

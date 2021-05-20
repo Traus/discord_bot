@@ -14,6 +14,7 @@ from collections import namedtuple
 from constants import GUILD_ID, beer_emoji
 from database.stat import add_value
 from init_bot import bot
+from utils.format import send_by_bot
 from utils.states import immune_until
 
 Members = namedtuple('Members', ['role', 'members'])
@@ -111,9 +112,9 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False):
 
     try:
         if gif:
-            await ctx.send(file=discord.File(tmp_gif_path))
+            await send_by_bot(ctx.message, file=discord.File(tmp_gif_path))
         else:
-            await ctx.send(file=discord.File(tmp_file_path))
+            await send_by_bot(ctx.message, file=discord.File(tmp_file_path))
     finally:
         for file in clean_list:
             file.unlink()

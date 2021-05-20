@@ -10,7 +10,7 @@ from discord.utils import get
 from constants import channels, tavern_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
-from utils.format import box
+from utils.format import box, send_by_bot
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions
 from utils.states import table_turn_over
@@ -22,11 +22,12 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
-        await ctx.message.delete()
-        await ctx.send(file=discord.File('files/media/tom.jpg'))
+        await send_by_bot(ctx.message, file=discord.File('files/media/tom.jpg'), delete=True)
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, members: commands.Greedy[discord.Member], bot: str = None):
+        await ctx.message.delete()
+
         from_bot = bot is not None and bot == 'bot'
         if not members:
             if ctx.message.reference is not None:
@@ -38,10 +39,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
         add_value('slap', number=len(members))
 
-        if from_bot:
-            await ctx.message.delete()
-
-        for member in members:
+        for member in set(members):
             avatar_from = ctx.author.avatar_url
             avatar_to = member.avatar_url
 
@@ -99,12 +97,12 @@ class FunCommands(commands.Cog, name='Веселье'):
         sekta = get(all_roles, name='Прихожанин')
         if sekta in ctx.author.roles:
             await ctx.author.remove_roles(sekta)
-            await ctx.send(file=discord.File('files/media/sekta.jpg'))
+            await send_by_bot(ctx.message, file=discord.File('files/media/sekta.jpg'), delete=True)
             await set_permissions(channels.MERY, ctx.author, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
-        msg = await ctx.send(tavern_emoji)
+        msg = await send_by_bot(ctx.message, tavern_emoji, delete=True)
         for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
             await msg.add_reaction(emoji)
 
@@ -127,25 +125,23 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='факт', help='рандомный факт')
     async def fact(self, ctx):
-        await ctx.message.delete()
         url = 'https://randstuff.ru/fact/'
         pattern = r'(?<=Факт:</h1><div id="fact"><table class="text"><tr><td>).*(?=</td>)'
         resp = requests.get(url)
         text = re.findall(pattern=pattern, string=resp.content.decode('utf8'))[0]
-        embed = discord.Embed(description=f"{ctx.author.mention}:\n{text}")
-        await ctx.send(embed=embed)
+        await send_by_bot(ctx.message, box(text), delete=True)
 
     @commands.command(help='РОЦК!')
     async def rockon(self, ctx):
         search_term = 'rockon'
         limit = 20
-        await ctx.send(find_gif(search_term, limit))
+        await send_by_bot(ctx.message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='горит', help='горииииит!')
     async def fire(self, ctx):
         search_term = 'ass on fire'
         limit = 5
-        await ctx.send(find_gif(search_term, limit))
+        await send_by_bot(ctx.message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='лого', help='лого гильдии')
     async def logo(self, ctx):
@@ -153,7 +149,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='гц', help='поздравить')
     async def gc(self, ctx):
-        await ctx.send(file=discord.File('files/media/gc.png'))
+        await send_by_bot(ctx.message, file=discord.File('files/media/gc.png'), delete=True)
 
     @commands.command(name='стат', help='статистика по таверне')
     async def stat(self, ctx):
@@ -178,13 +174,11 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='стол', help='перевернуть стол')
     async def table(self, ctx):
-        await ctx.message.delete()
-
         if table_turn_over[0]:
-            await ctx.send(f'{ctx.author.mention} (╮°-°)┳┳')
+            await send_by_bot(ctx.message, '(╮°-°)┳┳', delete=True)
             table_turn_over[0] = False
         else:
-            await ctx.send(f'{ctx.author.mention} ( ╯°□°)╯┻┻ ')
+            await send_by_bot(ctx.message, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[0] = True
 
 
