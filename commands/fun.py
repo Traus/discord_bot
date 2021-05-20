@@ -26,35 +26,43 @@ class FunCommands(commands.Cog, name='Веселье'):
         await ctx.send(file=discord.File('files/media/tom.jpg'))
 
     @commands.command(name='шапалах', help='Втащить')
-    async def slap(self, ctx, member: discord.Member = None, bot: str = None):
-        # todo combo of members
-        add_value('slap')
-        if member is None:
+    async def slap(self, ctx, members: commands.Greedy[discord.Member], bot: str = None):
+        from_bot = bot is not None and bot == 'bot'
+        if not members:
             if ctx.message.reference is not None:
                 message_id = ctx.message.reference.message_id
                 message = await ctx.fetch_message(message_id)
-                member = message.author
+                members = [message.author]
             else:
-                member = ctx.author
+                members = [ctx.author]
 
-        avatar_from = ctx.author.avatar_url
-        avatar_to = member.avatar_url
+        add_value('slap', number=len(members))
 
-        if has_immune(member):
-            await ctx.send(box(f'Иммунитет!'))
-            return
-
-        if bot is not None and bot == 'bot':
-            avatar_from = get_bot_avatar(ctx)
+        if from_bot:
             await ctx.message.delete()
 
-        all_roles = ctx.guild.roles
-        traus = get(all_roles, name='Глава ги')
-        gif = True if traus in ctx.author.roles else random.randint(0, 100) >= 95
-        await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif)
+        for member in members:
+            avatar_from = ctx.author.avatar_url
+            avatar_to = member.avatar_url
+
+            if has_immune(member):
+                await ctx.send(box(f'У {member.display_name} иммунитет!'))
+                continue
+
+            if from_bot:
+                avatar_from = get_bot_avatar(ctx)
+
+            all_roles = ctx.guild.roles
+            traus = get(all_roles, name='Глава ги')
+            gif = traus in ctx.author.roles or random.randint(0, 100) >= 95
+            await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif)
 
     @commands.command(name='аватар', help='посмотреть аватарку')
-    async def avatar(self, ctx, member: discord.Member):
+    async def avatar(self, ctx, member: discord.Member = None):
+        await ctx.message.delete()
+
+        if member is None:
+            member = ctx.author
         await ctx.send(member.avatar_url)
 
     @commands.command(name='секта', help='список участников секты кровавой Мери')
