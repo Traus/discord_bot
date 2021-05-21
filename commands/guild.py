@@ -33,7 +33,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
             else:
                 msg += box("Общий сбор!")
 
-            await send_by_bot(ctx.message, msg, delete=True)
+            await send_by_bot(ctx, msg, delete=True)
 
     @commands.command(pass_context=True, name='хайлвл', help="Список хай лвл гильдии")
     @commands.has_any_role("Совет ги", "ToT")

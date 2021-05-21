@@ -115,7 +115,7 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False, from_bot=
         if from_bot:
             await ctx.send(file=discord.File(file_path))
         else:
-            await send_by_bot(ctx.message, file=discord.File(file_path))
+            await send_by_bot(ctx, file=discord.File(file_path))
     finally:
         for file in clean_list:
             file.unlink()

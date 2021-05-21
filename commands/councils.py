@@ -35,11 +35,11 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             await member.add_roles(strike_3, reason=reason)
             msg = f"{member.display_name} получил {strike_3}. Причина: {reason}.\nСоветом Гильдии будет рассмотрен вопрос об изгнании {member}"
         elif strike_3 in member.roles:
-            msg = f"Вопрос об изннании {member.display_name} уже находится на расмотрении Совета Гильдии."
+            msg = f"Вопрос об изгнании {member.display_name} уже находится на расмотрении Совета Гильдии."
         else:
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-        await send_by_bot(ctx.message, msg)
+        await send_by_bot(ctx, msg)
         council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
@@ -66,7 +66,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             msg = f"{member.display_name} частично прощен за хорошее поведение."
         else:
             msg = f"{member.display_name} и так молодец!"
-        await send_by_bot(ctx.message, msg)
+        await send_by_bot(ctx, msg)
         council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии

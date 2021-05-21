@@ -22,7 +22,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
-        await send_by_bot(ctx.message, file=discord.File('files/media/tom.jpg'), delete=True)
+        await send_by_bot(ctx, file=discord.File('files/media/tom.jpg'), delete=True)
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, members: commands.Greedy[discord.Member], bot: str = None):
@@ -97,12 +97,12 @@ class FunCommands(commands.Cog, name='Веселье'):
         sekta = get(all_roles, name='Прихожанин')
         if sekta in ctx.author.roles:
             await ctx.author.remove_roles(sekta)
-            await send_by_bot(ctx.message, file=discord.File('files/media/sekta.jpg'), delete=True)
+            await send_by_bot(ctx, file=discord.File('files/media/sekta.jpg'), delete=True)
             await set_permissions(channels.MERY, ctx.author, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
-        msg = await send_by_bot(ctx.message, tavern_emoji, delete=True)
+        msg = await send_by_bot(ctx, tavern_emoji, delete=True)
         for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
             await msg.add_reaction(emoji)
 
@@ -129,19 +129,19 @@ class FunCommands(commands.Cog, name='Веселье'):
         pattern = r'(?<=Факт:</h1><div id="fact"><table class="text"><tr><td>).*(?=</td>)'
         resp = requests.get(url)
         text = re.findall(pattern=pattern, string=resp.content.decode('utf8'))[0]
-        await send_by_bot(ctx.message, box(text), delete=True)
+        await send_by_bot(ctx, box(text), delete=True)
 
     @commands.command(help='РОЦК!')
     async def rockon(self, ctx):
         search_term = 'rockon'
         limit = 20
-        await send_by_bot(ctx.message, find_gif(search_term, limit), delete=True)
+        await send_by_bot(ctx, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='горит', help='горииииит!')
     async def fire(self, ctx):
         search_term = 'ass on fire'
         limit = 5
-        await send_by_bot(ctx.message, find_gif(search_term, limit), delete=True)
+        await send_by_bot(ctx, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='лого', help='лого гильдии')
     async def logo(self, ctx):
@@ -149,7 +149,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='гц', help='поздравить')
     async def gc(self, ctx):
-        await send_by_bot(ctx.message, file=discord.File('files/media/gc.png'), delete=True)
+        await send_by_bot(ctx, file=discord.File('files/media/gc.png'), delete=True)
 
     @commands.command(name='стат', help='статистика по таверне')
     async def stat(self, ctx):
@@ -175,10 +175,10 @@ class FunCommands(commands.Cog, name='Веселье'):
     @commands.command(name='стол', help='перевернуть стол')
     async def table(self, ctx):
         if table_turn_over[0]:
-            await send_by_bot(ctx.message, '(╮°-°)┳┳', delete=True)
+            await send_by_bot(ctx, '(╮°-°)┳┳', delete=True)
             table_turn_over[0] = False
         else:
-            await send_by_bot(ctx.message, '( ╯°□°)╯┻┻', delete=True)
+            await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[0] = True
 
 
