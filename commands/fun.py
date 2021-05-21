@@ -53,7 +53,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             all_roles = ctx.guild.roles
             traus = get(all_roles, name='Глава ги')
             gif = traus in ctx.author.roles or random.randint(0, 100) >= 95
-            await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif)
+            await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif, from_bot=from_bot)
 
     @commands.command(name='аватар', help='посмотреть аватарку')
     async def avatar(self, ctx, member: discord.Member = None):

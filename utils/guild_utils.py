@@ -76,7 +76,7 @@ async def set_permissions(channel_id: int, target: Union[discord.Member, discord
     await channel.set_permissions(target, **permissions)
 
 
-async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False):
+async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False, from_bot=False):
     clean_list = []
     base = Image.open(Path('files/media/batslap.png')).resize((1000, 500)).convert('RGBA')
 
@@ -110,11 +110,12 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False):
         imageio.mimsave(tmp_gif_path, images)
         clean_list.append(tmp_gif_path)
 
+    file_path = tmp_gif_path if gif else tmp_file_path
     try:
-        if gif:
-            await send_by_bot(ctx.message, file=discord.File(tmp_gif_path))
+        if from_bot:
+            await ctx.send(file=discord.File(file_path))
         else:
-            await send_by_bot(ctx.message, file=discord.File(tmp_file_path))
+            await send_by_bot(ctx.message, file=discord.File(file_path))
     finally:
         for file in clean_list:
             file.unlink()

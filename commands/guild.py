@@ -31,7 +31,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
             if message:
                 msg += ' '.join(message)
             else:
-                msg += "ТоТ, общий сбор!"
+                msg += box("Общий сбор!")
 
             await send_by_bot(ctx.message, msg, delete=True)
 
