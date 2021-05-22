@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 import discord
 import imageio
@@ -140,3 +140,17 @@ def check_for_beer(content: Union[discord.Message, discord.Emoji]):
         if smile in str(content):
             count_smiles = len(re.findall(smile, str(content)))
             add_value(beer_emoji[smile], count_smiles)
+
+
+def find_animated_emoji(word: str) -> Optional[str]:
+    for emoji in bot.get_guild(GUILD_ID).emojis:
+        if word == emoji.name and emoji.animated:
+            return f"<a:{emoji.name}:{emoji.id}>"
+
+
+def replace_animated_emoji(message: str, word: str) -> bool:
+    for emoji in bot.get_guild(GUILD_ID).emojis:
+        if word == emoji.name and emoji.animated:
+            return message.replace(f":{word}:", f"<a:{emoji.name}:{emoji.id}>")
+            return True
+    return False

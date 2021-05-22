@@ -5,7 +5,7 @@ from constants import *
 
 # commands
 from commands import *
-from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
+from utils.guild_utils import set_permissions, get_class_roles, check_for_beer, find_animated_emoji
 from utils.states import voice_owners
 
 try:
@@ -134,6 +134,16 @@ async def on_message(message: discord.Message):
 
     check_for_beer(message.content)
 
+    animated_emoji_flag = False
+    content = message.content
+    words = set(content.split(':'))
+    for word in words:
+        emoji = find_animated_emoji(word)
+        if emoji:
+            animated_emoji_flag = True
+            content = content.replace(f':{word}:', emoji)
+    message._handle_content(content)
+
     if message.channel.id not in no_moderation:
         await automoderation(message)
 
@@ -149,6 +159,13 @@ async def on_message(message: discord.Message):
 
         await inv_gi_channel.send(f"<@{message.author.id}>", embed=embed)
         await message.delete()
+
+    if animated_emoji_flag:
+        # todo немного костыльно. Подумать на свежую голову
+        if message.author.bot:
+            return
+        ctx = await bot.get_context(message)
+        await send_by_bot(ctx, content, delete=True)
     await bot.process_commands(message)
 
 
