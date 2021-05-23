@@ -12,7 +12,7 @@ from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions
+    set_permissions, get_renference_author
 from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
 
@@ -30,10 +30,9 @@ class FunCommands(commands.Cog, name='Веселье'):
 
         from_bot = bot is not None and bot == 'bot'
         if not members:
-            if ctx.message.reference is not None:
-                message_id = ctx.message.reference.message_id
-                message = await ctx.fetch_message(message_id)
-                members = [message.author]
+            author = await get_renference_author(ctx)
+            if author is not None:
+                members = [author]
             else:
                 members = [ctx.author]
 
@@ -107,21 +106,27 @@ class FunCommands(commands.Cog, name='Веселье'):
             await msg.add_reaction(emoji)
 
     @commands.command(name='переиграл', help='Переиграл и уничтожил')
-    async def meme_win(self, ctx, member: discord.Member):
+    async def meme_win(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
-        embed = discord.Embed()
-        embed.set_image(url=find_gif(search_term='уничтожу', limit=1))
-        embed.add_field(name=f"Думали я вас не переиграю?", value=text)
-        await ctx.send(embed=embed)
+        author = await get_renference_author(ctx)
+        member = member or author
+        if member:
+            text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
+            embed = discord.Embed()
+            embed.set_image(url=find_gif(search_term='уничтожу', limit=1))
+            embed.add_field(name=f"Думали я вас не переиграю?", value=text)
+            await ctx.send(embed=embed)
 
     @commands.command(name='пять', help='Дать пять')
-    async def five(self, ctx, member: discord.Member):
+    async def five(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        text = f"{ctx.author.mention} даёт пять {member.mention}!"
-        embed = discord.Embed(description=text)
-        embed.set_image(url=find_gif(search_term='highfive', limit=20))
-        await ctx.send(embed=embed)
+        author = await get_renference_author(ctx)
+        member = member or author
+        if member:
+            text = f"{ctx.author.mention} даёт пять {member.mention}!"
+            embed = discord.Embed(description=text)
+            embed.set_image(url=find_gif(search_term='highfive', limit=20))
+            await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='факт', help='рандомный факт')
     async def fact(self, ctx):

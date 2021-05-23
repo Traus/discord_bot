@@ -113,7 +113,7 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False, from_bot=
     file_path = tmp_gif_path if gif else tmp_file_path
     try:
         if from_bot:
-            await ctx.send(file=discord.File(file_path))
+            await ctx.send(file=discord.File(file_path), reference=ctx.message.reference)
         else:
             await send_by_bot(ctx, file=discord.File(file_path))
     finally:
@@ -148,9 +148,8 @@ def find_animated_emoji(word: str) -> Optional[str]:
             return f"<a:{emoji.name}:{emoji.id}>"
 
 
-def replace_animated_emoji(message: str, word: str) -> bool:
-    for emoji in bot.get_guild(GUILD_ID).emojis:
-        if word == emoji.name and emoji.animated:
-            return message.replace(f":{word}:", f"<a:{emoji.name}:{emoji.id}>")
-            return True
-    return False
+async def get_renference_author(ctx) -> Optional[discord.Member]:
+    if ctx.message.reference is not None:
+        message_id = ctx.message.reference.message_id
+        message = await ctx.fetch_message(message_id)
+        return message.author

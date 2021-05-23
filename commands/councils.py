@@ -39,7 +39,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         else:
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-        await send_by_bot(ctx, msg)
+        await send_by_bot(ctx, box(msg))
         council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
