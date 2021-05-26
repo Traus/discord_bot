@@ -5,6 +5,7 @@ from constants import *
 
 # commands
 from commands import *
+from on_reaction import ReactionHandler
 from utils.guild_utils import set_permissions, get_class_roles, check_for_beer, find_animated_emoji
 from utils.states import voice_owners
 
@@ -58,57 +59,22 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     channel: discord.TextChannel = bot.get_channel(payload.channel_id)
     message: discord.Message = await channel.fetch_message(payload.message_id)
 
+    handler = ReactionHandler(
+        payload=payload,
+        emoji=emoji,
+        guild=guild,
+        member=member,
+        channel=channel,
+        message=message,
+    )
+
     check_for_beer(emoji)
 
-    # only traus reaction
-    if emoji.name == 'approved' and payload.user_id != members.TRAUS:
-        await message.remove_reaction(emoji, member)
-
-    # private rooms
-    if payload.message_id == messages.ROOMS:
-        if emoji.name == '🇩':
-            perms_flag = False
-            for role in payload.member.roles:
-                if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Верховная жрица', 'Верховный жрец', 'Палач', 'Прихожанин']:
-                    perms_flag = True
-            await set_permissions(channels.MERY, member, read_messages=True, send_messages=perms_flag)
-        elif emoji.name == '🇰':
-            await set_permissions(channels.KEFIR, member, read_messages=True, send_messages=True)
-        else:
-            await message.clear_reaction(emoji)
-
-    # rules channel
-    if payload.message_id == messages.RULES:
-        if emoji.name == '✅':
-            guest = get(guild.roles, name='Гость')
-            if len(member.roles) == 1 or (len(member.roles) == 2 and get(guild.roles, name='Muted') in member.roles):
-                await member.add_roles(guest)
-                emoji = await member.guild.fetch_emoji(811516186453082133)
-                guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
-                await guest_channel.send(f'{member.mention} {emoji}')
-
-    # class channels
-    if payload.message_id == messages.CHOOSE_CLASS:
-        roles_dict = get_class_roles(guild)
-        if emoji.name in roles_dict:
-            await member.add_roles(roles_dict[emoji.name])
-        else:
-            await message.clear_reaction(emoji)
-
-    # vote
-    # can be lag of quick click
-    if all([
-        message.embeds,
-        member != guild.get_member(members.BOT),
-        'Опрос от' in str(message.embeds[0].footer.text),
-        str(emoji) in vote_reactions
-    ]):
-        opposite = vote_reactions[0] if str(emoji) == vote_reactions[1] else vote_reactions[1]
-        for old_reaction in message.reactions:
-            if str(old_reaction) == opposite:
-                async for user in old_reaction.users():
-                    if user == member:
-                        await message.remove_reaction(old_reaction, member)
+    await handler.on_traus_reaction()
+    await handler.on_private_room_reaction()
+    await handler.on_rules_channel_reaction()
+    await handler.on_class_channels_reaction()
+    await handler.on_vote_reaction()
 
 
 @bot.event
