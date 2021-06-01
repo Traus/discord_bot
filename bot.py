@@ -59,14 +59,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     channel: discord.TextChannel = bot.get_channel(payload.channel_id)
     message: discord.Message = await channel.fetch_message(payload.message_id)
 
-    handler = ReactionHandler(
-        payload=payload,
-        emoji=emoji,
-        guild=guild,
-        member=member,
-        channel=channel,
-        message=message,
-    )
+    handler = ReactionHandler(payload=payload, emoji=emoji, guild=guild, member=member, channel=channel, message=message)
 
     check_for_beer(emoji)
 

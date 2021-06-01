@@ -21,6 +21,11 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def strike(self, ctx, member: discord.Member, *reason):
         await ctx.message.delete()
 
+        all_roles = ctx.guild.roles
+        traus = get(all_roles, name='Глава ги')
+        if traus in ctx.author.roles:
+            return
+
         reason = ' '.join(reason) or "заслужил"
         all_roles = ctx.guild.roles
         strike_1 = get(all_roles, name='Страйк 1-уровень')

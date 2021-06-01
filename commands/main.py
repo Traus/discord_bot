@@ -9,7 +9,7 @@ from discord.utils import get
 
 from constants import channels, vote_reactions
 from init_bot import bot
-from utils.format import box
+from utils.format import box, send_by_bot
 
 
 class MainCommands(commands.Cog, name='Основное'):
@@ -63,7 +63,7 @@ class MainCommands(commands.Cog, name='Основное'):
             first=starts_first[0].format((starts_first[1] + timedelta(hours=3)).strftime("%H:%M:%S")),  # msk time
             second=starts_next[0].format((starts_next[1] + timedelta(hours=3)).strftime("%H:%M:%S"))  # msk time
         )
-        await ctx.channel.send(box(msg))
+        await send_by_bot(ctx, box(msg), delete=True)
 
     @commands.command(name='магаз', help='игровой магазин, !магаз <число> для просмотра магазина на дни вперед')
     async def shop(self, ctx, days: str = ''):
