@@ -98,7 +98,7 @@ async def on_message(message: discord.Message):
     words = set(content.split(':'))
     for word in words:
         emoji = find_animated_emoji(word)
-        if emoji:
+        if emoji and f':{word}:' in content:  # only 1 word without :
             animated_emoji_flag = True
             content = content.replace(f':{word}:', emoji)
     message._handle_content(content)
