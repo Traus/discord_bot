@@ -5,6 +5,7 @@ from constants import *
 
 # commands
 from commands import *
+from database.stat import select_all, insert_value
 from on_reaction import ReactionHandler
 from utils.guild_utils import set_permissions, get_class_roles, check_for_beer, find_animated_emoji
 from utils.states import voice_owners
@@ -15,18 +16,23 @@ except ImportError:
     TOKEN = os.environ.get("TOKEN")
 
 
+@bot.command(pass_context=True, help='Траус ломает бота3')
+async def test_select(ctx, *args):
+    print(select_all())
+
+@bot.command(pass_context=True, help='Траус ломает бота2')
+async def test_insert(ctx, *args):
+    print(insert_value(6, 'honey', 50))
+
 @bot.command(pass_context=True, help='Траус ломает бота')
 async def test(ctx, *args):
-    # retStr = str("""```css\nThis is some colored Text```""")
-    # embed = discord.Embed(title="Random test")
-    # embed.add_field(name="Name field can't be colored as it seems",value=retStr)
-    # await ctx.send(embed=embed)
-    retStr = "```css\nпам пам```"
-    await ctx.send(retStr)
-    print(args)
-    print(ctx.message.id)
-    print(ctx.guild.roles)
-    print(ctx.channel.id)
+    msg: discord.Message = ctx.message
+    print(msg.channel_mentions)
+    print(msg.reference)
+    print(msg.guild.emojis)
+    m: discord.Message = await ctx.send('123', reference=msg.reference)
+    await m.add_reaction(await ctx.guild.fetch_emoji(845429022141186078))
+    # await m.add_reaction(await ctx.guild.fetch_emoji(84542902x`2141186078))
 
 
 @bot.event

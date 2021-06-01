@@ -83,6 +83,7 @@ beer_emoji = {
     "<:tavern_beer:822536261079662672>": "ale",
     "<:pepe_celebrate:811749316313350144>": "wine",
     "<:pepe_vodka:811737381551079425>": "vodka",
+    "<:honey:847010009874432040>": "honey",
 }
 
 
