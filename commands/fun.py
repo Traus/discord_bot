@@ -12,7 +12,7 @@ from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_renference_author
+    set_permissions, get_renference_author, is_traus
 from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
 
@@ -49,9 +49,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             if from_bot:
                 avatar_from = get_bot_avatar(ctx)
 
-            all_roles = ctx.guild.roles
-            traus = get(all_roles, name='Глава ги')
-            gif = traus in ctx.author.roles or random.randint(0, 100) >= 95
+            gif = is_traus(ctx, ctx.author) or random.randint(0, 100) >= 95
             await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif, from_bot=from_bot)
 
     @commands.command(name='аватар', help='посмотреть аватарку')
@@ -83,8 +81,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Прихожанин')
-        traus = get(all_roles, name='Глава ги')
-        if traus in member.roles:
+        if is_traus(ctx, member):
             return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
         await set_permissions(channels.MERY, member, read_messages=True, send_messages=True)

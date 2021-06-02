@@ -153,3 +153,10 @@ async def get_renference_author(ctx) -> Optional[discord.Member]:
         message_id = ctx.message.reference.message_id
         message = await ctx.fetch_message(message_id)
         return message.author
+
+
+def is_traus(ctx, member: discord.Member) -> bool:
+    traus = get(ctx.guild.roles, name='Глава ги')
+    if traus in member.roles:
+        return True
+    return False

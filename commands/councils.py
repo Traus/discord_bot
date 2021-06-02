@@ -8,7 +8,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users
+from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users, is_traus
 from utils.states import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
@@ -21,9 +21,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def strike(self, ctx, member: discord.Member, *reason):
         await ctx.message.delete()
 
-        all_roles = ctx.guild.roles
-        traus = get(all_roles, name='Глава ги')
-        if traus in ctx.author.roles:
+        if is_traus(ctx, ctx.author):
             return
 
         reason = ' '.join(reason) or "заслужил"
@@ -106,9 +104,17 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def mute(self, ctx, user: discord.Member, time: str = '30s', *reason):
         await ctx.message.delete()
+
+        day = 60 * 60 * 24
+        times = {'s': 1, 'm': 60, 'h': 60 * 60, 'd': day}
+        time_1, time_2 = int(time[:-1]), time[-1]
+        mute_time = time_1 * times[time_2]
+        if mute_time > day:
+            mute_time = day
         reason = ' '.join(reason) or "заслужил"
-        await ctx.send(box(f'{user.display_name} получил мут на {time} по причине: {reason}'))
-        await _add_mute(user, time)
+
+        await ctx.send(box(f'{user.display_name} получил мут на {"24 часа" if mute_time == day else time} по причине: {reason}'))
+        await _add_mute(user, mute_time)
 
     @commands.command(help='Снять мут')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
@@ -157,6 +163,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
     async def kick_from_guild(self, ctx, member: discord.Member, *reason):
+        if is_traus(ctx, member):
+            return
         reason = ' '.join(reason) or "не сложилось"
         await ctx.message.delete()
         kick = False

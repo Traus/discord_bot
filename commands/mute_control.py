@@ -13,24 +13,25 @@ from utils.states import muted_queue, user_permissions
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
 
-async def _add_mute(user: discord.Member, time: str = '30s'):
-    times = {'s': 1, 'm': 60, 'h': 60*60, 'd': 60*60*24}
-    time_1, time_2 = int(time[:-1]), time[-1]
-    mute_time = time_1 * times[time_2]
+async def _add_mute(user: discord.Member, time: int):
     if muted_queue[user]:
-        muted_queue[user].append(mute_time)
+        muted_queue[user].append(time)
         return
 
     role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
     channels_with_perms = [channels.MERY, channels.KEFIR]
+    user_permissions[user]['manage_roles'] = user.guild_permissions.manage_roles
+    user.guild_permissions.manage_roles = False
     for channel_id in channels_with_perms:
-        user_permissions[user][channel_id] = (user.permissions_in(user.guild.get_channel(channel_id)).read_messages,
-                                   user.permissions_in(user.guild.get_channel(channel_id)).send_messages)
+        user_permissions[user][channel_id] = (
+            user.permissions_in(user.guild.get_channel(channel_id)).read_messages,
+            user.permissions_in(user.guild.get_channel(channel_id)).send_messages
+        )
     await user.add_roles(role)
     for channel_id in channels_with_perms:
         await set_permissions(channel_id, user, send_messages=False)
 
-    muted_queue[user].append(mute_time)
+    muted_queue[user].append(time)
     while True:
         if muted_queue[user]:
             await asyncio.sleep(muted_queue[user][0])
@@ -43,6 +44,7 @@ async def _add_mute(user: discord.Member, time: str = '30s'):
             break
 
     await user.remove_roles(role)
+    user.guild_permissions.manage_roles = user_permissions[user]['manage_roles']
     for channel_id in channels_with_perms:
         await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0], send_messages=user_permissions[user][channel_id][1])
 
@@ -64,4 +66,4 @@ async def automoderation(message: discord.Message):
             else 'ы' if str(mute_time)[-1] in ('2', '3', '4') and mute_time not in [12, 13, 14] \
             else ''
         await message.channel.send(box(f'{message.author.display_name} получил мут на {mute_time} секунд{suffix}'))
-        await _add_mute(message.author, time=f"{mute_time}s")
+        await _add_mute(message.author, time=mute_time)

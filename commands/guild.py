@@ -20,7 +20,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
     async def _all(self, ctx, *message):
         if is_spam(ctx.author, when_all_called, 60):
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
-            await _add_mute(ctx.author, '5m')
+            await _add_mute(ctx.author, 5*60)
         else:
             all_roles = ctx.guild.roles
             councils = get(all_roles, id=roles.COUNCILS)
