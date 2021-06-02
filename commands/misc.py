@@ -1,10 +1,15 @@
-from discord.ext import commands
-
+from database import reconnect
+from database.stat import select_all
 from init_bot import bot
-from utils.tenor_gifs import find_gif
 
 
-@bot.command(pass_context=True, name='мегашапалах', help='Ульта Трауса')
-@commands.has_role("Глава ги")
-async def mega_slap(ctx):
-    await ctx.send(find_gif('batman slap', 1))
+@bot.command(pass_context=True, help='Чекнуть таблицу стат')
+async def test_select(ctx, *args):
+    await ctx.send(select_all())
+
+
+@bot.command(pass_context=True, help='Переконектиться к базе данных')
+async def connect(ctx, *args):
+    reconnect()
+    await ctx.send('База перезагружена')
+

@@ -5,7 +5,6 @@ from constants import *
 
 # commands
 from commands import *
-from database.stat import select_all, insert_value
 from on_reaction import ReactionHandler
 from utils.guild_utils import set_permissions, get_class_roles, check_for_beer, find_animated_emoji
 from utils.states import voice_owners
@@ -15,14 +14,6 @@ try:
 except ImportError:
     TOKEN = os.environ.get("TOKEN")
 
-
-@bot.command(pass_context=True, help='Траус ломает бота3')
-async def test_select(ctx, *args):
-    print(select_all())
-
-@bot.command(pass_context=True, help='Траус ломает бота2')
-async def test_insert(ctx, *args):
-    print(insert_value(6, 'honey', 50))
 
 @bot.command(pass_context=True, help='Траус ломает бота')
 async def test(ctx, *args):
