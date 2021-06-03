@@ -3,7 +3,7 @@ from discord.utils import get
 
 from constants import members, messages, channels, vote_reactions
 from init_bot import bot
-from utils.guild_utils import set_permissions, get_class_roles
+from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
 
 
 class ReactionHandler:
@@ -71,3 +71,39 @@ class ReactionHandler:
                         async for user in old_reaction.users():
                             if user == self.member:
                                 await self.message.remove_reaction(old_reaction, self.member)
+
+
+@bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    emoji: discord.Emoji = payload.emoji
+    guild: discord.Guild = bot.get_guild(payload.guild_id)
+    member: discord.Member = await guild.fetch_member(payload.user_id)
+    channel: discord.TextChannel = bot.get_channel(payload.channel_id)
+    message: discord.Message = await channel.fetch_message(payload.message_id)
+
+    handler = ReactionHandler(payload=payload, emoji=emoji, guild=guild, member=member, channel=channel, message=message)
+
+    check_for_beer(emoji)
+
+    await handler.on_traus_reaction()
+    await handler.on_private_room_reaction()
+    await handler.on_rules_channel_reaction()
+    await handler.on_class_channels_reaction()
+    await handler.on_vote_reaction()
+
+
+@bot.event
+async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
+    emoji = payload.emoji
+    guild = bot.get_guild(payload.guild_id)
+    member: discord.Member = await guild.fetch_member(payload.user_id)
+
+    if payload.message_id == messages.ROOMS:
+        if emoji.name == '🇩':
+            await set_permissions(channels.MERY, member, read_messages=False, send_messages=False)
+        if emoji.name == '🇰':
+            await set_permissions(channels.KEFIR, member, read_messages=False, send_messages=False)
+
+    if payload.message_id == messages.CHOOSE_CLASS:
+        roles_dict = get_class_roles(guild)
+        await member.remove_roles(roles_dict[emoji.name])
