@@ -36,38 +36,46 @@ class MessageHandler:
             await self.message.delete()
 
     async def replace_animated_emoji(self) -> list:
-        animated_emojis_ids = []
+        animated_emojis = []
 
         content = self.message.content
         words = set(content.split(':'))
         for word in words:
             emoji = find_animated_emoji(word)
             if emoji and f':{word}:' in content:  # only 1 word without ::
-                animated_emojis_ids.append(emoji.strip(">").split(':')[-1])
+                animated_emojis.append(emoji)
                 content = content.replace(f':{word}:', emoji)
         self.message._handle_content(content)
 
-        return animated_emojis_ids
+        return animated_emojis
 
-    async def send_message(self, is_animated: bool):
+    def is_only_emojis(self, animated_emojis) -> bool:
+        content = self.message.content
+        for emoji in animated_emojis:
+            content = content.replace(emoji, '')
+        return not bool(content.strip())
+
+    async def send_message(self, animated_emojis: list):
         ctx = await bot.get_context(self.message)
 
-        if is_animated:
+        if animated_emojis:
             if self.message.author.bot:
                 return
-            # todo переделать
+            # todo переделать ответ (красивую ссылку на сообщение) Nqn bot
             # reference_author = await get_renference_author(ctx)
             # await send_by_bot(ctx, f"{reference_author.mention if reference_author else ''}\n{self.message.content}", delete=True)
-            await send_by_bot(ctx, self.message.content, delete=True)
+            await ctx.message.delete()
+            if not self.is_only_emojis(animated_emojis):
+                await send_by_bot(ctx, self.message.content)
         await bot.process_commands(self.message)
 
-    async def add_reactions(self, animated_emojis_ids):
+    async def add_reactions(self, animated_emojis):
         ctx = await bot.get_context(self.message)
 
         message_id = ctx.message.reference.message_id
         message = await ctx.fetch_message(message_id)
-        for emoji_id in animated_emojis_ids:
-            await message.add_reaction(await ctx.guild.fetch_emoji(emoji_id))
+        for emoji in animated_emojis:
+            await message.add_reaction(await ctx.guild.fetch_emoji(emoji.strip(">").split(':')[-1]))
 
 
 @bot.event
@@ -76,13 +84,12 @@ async def on_message(message: discord.Message):
 
     check_for_beer(message.content)
 
-    animated_emojis_ids = await handler.replace_animated_emoji()
-    is_animated = animated_emojis_ids != []
+    animated_emojis = await handler.replace_animated_emoji()
 
     await handler.swear_moderation()
     await handler.on_mems_channel()
     await handler.on_join_to_guild_channel()
 
-    await handler.send_message(is_animated)
+    await handler.send_message(animated_emojis)
     if message.reference:
-        await handler.add_reactions(animated_emojis_ids)
+        await handler.add_reactions(animated_emojis)
