@@ -65,7 +65,7 @@ class MessageHandler:
             # reference_author = await get_renference_author(ctx)
             # await send_by_bot(ctx, f"{reference_author.mention if reference_author else ''}\n{self.message.content}", delete=True)
             await ctx.message.delete()
-            if not self.is_only_emojis(animated_emojis):
+            if not (self.is_only_emojis(animated_emojis) and self.message.reference):
                 await send_by_bot(ctx, self.message.content)
         await bot.process_commands(self.message)
 
