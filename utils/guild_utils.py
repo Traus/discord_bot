@@ -160,3 +160,9 @@ def is_traus(ctx, member: discord.Member) -> bool:
     if traus in member.roles:
         return True
     return False
+
+
+def is_nitro_user(member: discord.Member) -> bool:
+    if member.premium_since:
+        return True
+    return False

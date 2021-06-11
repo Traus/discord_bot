@@ -6,7 +6,7 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, is_nitro_user
 
 
 class MessageHandler:
@@ -84,7 +84,7 @@ async def on_message(message: discord.Message):
 
     check_for_beer(message.content)
 
-    animated_emojis = await handler.replace_animated_emoji()
+    animated_emojis = await handler.replace_animated_emoji() if not is_nitro_user(message.author) else []
 
     await handler.swear_moderation()
     await handler.on_mems_channel()

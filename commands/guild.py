@@ -6,7 +6,7 @@ from commands.mute_control import _add_mute
 from constants import roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import is_spam, get_member_by_role, strip_tot, get_guild_members
+from utils.guild_utils import is_spam, get_member_by_role, strip_tot, get_guild_members, is_traus
 from utils.states import when_all_called
 
 
@@ -18,8 +18,8 @@ class GuildCommands(commands.Cog, name='Гильдия'):
                                                            'Злоупотребление наказуемо!')
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
     async def _all(self, ctx, *message):
-        if is_spam(ctx.author, when_all_called, 60):
-            await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: предупреждал же!'))
+        if is_spam(ctx.author, when_all_called, 60) and not is_traus(ctx, ctx.author):
+            await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: не злоупотреблять!'))
             await _add_mute(ctx.author, 5*60)
         else:
             all_roles = ctx.guild.roles
