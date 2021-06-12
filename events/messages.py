@@ -6,7 +6,8 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, is_nitro_user
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, is_nitro_user, \
+    get_member_by_role, is_traus
 
 
 class MessageHandler:
@@ -55,6 +56,16 @@ class MessageHandler:
             content = content.replace(emoji, '')
         return not bool(content.strip())
 
+    async def send_vacation_message(self, message: discord.Message):
+        ctx = await bot.get_context(self.message)
+        vaction_members = get_member_by_role(ctx, name="Отпуск")
+        for member in vaction_members.members:
+            if str(member.id) in message.content:
+                if is_traus(ctx, member):
+                    await message.channel.send(f"Траус не бухает, Траус отдыхает!")
+                else:
+                    await message.channel.send(f"{member.display_name} отдыхает!")
+
     async def send_message(self, animated_emojis: list):
         ctx = await bot.get_context(self.message)
 
@@ -90,6 +101,7 @@ async def on_message(message: discord.Message):
     await handler.on_mems_channel()
     await handler.on_join_to_guild_channel()
 
+    await handler.send_vacation_message(message)
     await handler.send_message(animated_emojis)
     if message.reference:
         await handler.add_reactions(animated_emojis)
