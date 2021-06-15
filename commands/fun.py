@@ -42,7 +42,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             avatar_from = ctx.author.avatar_url
             avatar_to = member.avatar_url
 
-            if has_immune(member):
+            if has_immune(member) and not from_bot:
                 await ctx.send(box(f'У {member.display_name} иммунитет!'))
                 continue
 
