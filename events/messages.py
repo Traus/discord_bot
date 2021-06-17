@@ -6,8 +6,7 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, is_nitro_user, \
-    get_member_by_role, is_traus
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, get_member_by_role, is_traus
 
 
 class MessageHandler:
@@ -39,15 +38,21 @@ class MessageHandler:
     async def replace_animated_emoji(self) -> list:
         animated_emojis = []
 
-        content = self.message.content
-        words = set(content.split(':'))
-        for word in words:
-            emoji = find_animated_emoji(word)
-            if emoji and f':{word}:' in content:  # only 1 word without ::
-                animated_emojis.append(emoji)
-                content = content.replace(f':{word}:', emoji)
-        self.message._handle_content(content)
+        if self.message.author.bot:
+            return animated_emojis
 
+        content = self.message.content
+        new_content = content
+
+        if ":" in content:
+            words = set(content.split(':'))
+            for word in words:
+                emoji = find_animated_emoji(word)
+                if emoji and emoji not in content and f':{word}:' in content:  # only 1 word without ::
+                    animated_emojis.append(emoji)
+                    new_content = new_content.replace(f':{word}:', emoji)
+
+        self.message._handle_content(new_content)
         return animated_emojis
 
     def is_only_emojis(self, animated_emojis) -> bool:
@@ -70,8 +75,6 @@ class MessageHandler:
         ctx = await bot.get_context(self.message)
 
         if animated_emojis:
-            if self.message.author.bot:
-                return
             # todo переделать ответ (красивую ссылку на сообщение) Nqn bot
             # reference_author = await get_renference_author(ctx)
             # await send_by_bot(ctx, f"{reference_author.mention if reference_author else ''}\n{self.message.content}", delete=True)
@@ -95,7 +98,7 @@ async def on_message(message: discord.Message):
 
     check_for_beer(message.content)
 
-    animated_emojis = await handler.replace_animated_emoji() if not is_nitro_user(message.author) else []
+    animated_emojis = await handler.replace_animated_emoji()
 
     await handler.swear_moderation()
     await handler.on_mems_channel()
