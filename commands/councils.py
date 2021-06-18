@@ -21,7 +21,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def strike(self, ctx, member: discord.Member, *reason):
         await ctx.message.delete()
 
-        if is_traus(ctx, ctx.author):
+        if is_traus(ctx, member):
             return
 
         reason = ' '.join(reason) or "заслужил"
