@@ -63,9 +63,8 @@ class NamedCommands(commands.Cog, name='Имена'):
 
     @commands.command(name='арт', help='танцули Арта')
     async def art(self, ctx):
-        search_term = random.choice(['naruto dance', 'anime dance'])
-        limit = 10
-        await ctx.send(find_gif(search_term, limit))
+        await ctx.message.delete()
+        await ctx.send(file=discord.File('files/media/no_anime.jpg'))
 
     @commands.command(help='для walidor')
     async def walidor(self, ctx):
