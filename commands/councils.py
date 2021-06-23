@@ -8,7 +8,7 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users, is_traus
+from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, get_role_by_name
 from utils.states import immune_until, user_permissions, muted_queue
 from utils.tenor_gifs import find_gif
 
@@ -79,12 +79,12 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def guild_list(self, ctx):
         message = ''
         uniq_users = set()
-        leader = get_member_by_role(ctx, name="Глава ги")
-        council = get_member_by_role(ctx, name="Совет ги")
-        active = get_member_by_role(ctx, name="Актив гильдии")
-        tot = get_member_by_role(ctx, name="ToT")
-        recruit = get_member_by_role(ctx, name="Рекрут")
-        reserve = get_member_by_role(ctx, name="Запас")
+        leader = get_members_by_role(ctx, name="Глава ги")
+        council = get_members_by_role(ctx, name="Совет ги")
+        active = get_members_by_role(ctx, name="Актив гильдии")
+        tot = get_members_by_role(ctx, name="ToT")
+        recruit = get_members_by_role(ctx, name="Рекрут")
+        reserve = get_members_by_role(ctx, name="Запас")
         channel = bot.get_channel(channels.LIST)
 
         count = 0
@@ -214,6 +214,20 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.has_role("Совет ги")
     async def clean(self, ctx, limit=10):
         await ctx.channel.purge(limit=limit)
+
+    @commands.command(pass_context=True, name='отпуск', help='Уйти/вернуться с отпуска')
+    @commands.has_role("Совет ги")
+    async def vacation(self, ctx):
+        await ctx.message.delete()
+
+        member: discord.Member = ctx.author
+        role = get_role_by_name(ctx, 'Отпуск')
+        if role in member.roles:
+            await member.remove_roles(role)
+            await ctx.send(box(f'{member.display_name} вернулся с отпуска'))
+        else:
+            await member.add_roles(role)
+            await ctx.send(box(f'{member.display_name} ушёл в отпуск'))
 
     @commands.command(pass_context=True, name='пинг', help='Проверка активности гильдии')
     @commands.has_role("Совет ги")

@@ -20,7 +20,12 @@ from utils.states import immune_until
 Members = namedtuple('Members', ['role', 'members'])
 
 
-def get_member_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
+def get_role_by_name(ctx, name: str) -> discord.Role:
+    all_roles = ctx.guild.roles
+    return get(all_roles, name=name)
+
+
+def get_members_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
     obj = ctx or user
     all_roles = getattr(obj, 'guild').roles
     role = get(all_roles, name=name)
@@ -38,8 +43,8 @@ def get_class_roles(guild: discord.Guild) -> dict:
 
 
 def get_guild_members(ctx, name: str) -> str:
-    group_tot = get_member_by_role(ctx, name='ToT')
-    group = get_member_by_role(ctx, name=name)
+    group_tot = get_members_by_role(ctx, name='ToT')
+    group = get_members_by_role(ctx, name=name)
     members = set(group.members) & set(group_tot.members)
     message = ''
     for count, member in enumerate(members, 1):
@@ -48,7 +53,7 @@ def get_guild_members(ctx, name: str) -> str:
 
 
 def get_bot_avatar(ctx=None):
-    manager = get_member_by_role(ctx, name="Смотритель Таверны").members
+    manager = get_members_by_role(ctx, name="Смотритель Таверны").members
     return manager[0].avatar_url
 
 

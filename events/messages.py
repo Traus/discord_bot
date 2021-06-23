@@ -6,7 +6,7 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, get_member_by_role, is_traus
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, get_members_by_role, is_traus
 
 
 class MessageHandler:
@@ -63,7 +63,7 @@ class MessageHandler:
 
     async def send_vacation_message(self, message: discord.Message):
         ctx = await bot.get_context(self.message)
-        vaction_members = get_member_by_role(ctx, name="Отпуск")
+        vaction_members = get_members_by_role(ctx, name="Отпуск")
         for member in vaction_members.members:
             if str(member.id) in message.content:
                 if is_traus(ctx, member):

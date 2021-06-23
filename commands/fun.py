@@ -11,7 +11,7 @@ from constants import channels, tavern_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import get_member_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
+from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions, get_renference_author, is_traus
 from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
@@ -62,10 +62,10 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='секта', help='список участников секты кровавой Мери')
     async def sekta(self, ctx):
-        main = get_member_by_role(ctx, name='Верховная жрица')
-        zam = get_member_by_role(ctx, name='Верховный жрец')
-        rip = get_member_by_role(ctx, name='Палач')
-        sekta = get_member_by_role(ctx, name='Прихожанин')
+        main = get_members_by_role(ctx, name='Верховная жрица')
+        zam = get_members_by_role(ctx, name='Верховный жрец')
+        rip = get_members_by_role(ctx, name='Палач')
+        sekta = get_members_by_role(ctx, name='Прихожанин')
 
         msg = ''
         for role in [main, zam, rip, sekta]:

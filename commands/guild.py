@@ -6,7 +6,7 @@ from commands.mute_control import _add_mute
 from constants import roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import is_spam, get_member_by_role, strip_tot, get_guild_members, is_traus
+from utils.guild_utils import is_spam, get_members_by_role, strip_tot, get_guild_members, is_traus
 from utils.states import when_all_called
 
 
@@ -38,8 +38,8 @@ class GuildCommands(commands.Cog, name='Гильдия'):
     @commands.command(pass_context=True, name='хайлвл', help="Список хай лвл гильдии")
     @commands.has_any_role("Совет ги", "ToT")
     async def high_lvl(self, ctx):
-        tot = get_member_by_role(ctx, name="ToT")
-        high = get_member_by_role(ctx, name="Хай лвл")
+        tot = get_members_by_role(ctx, name="ToT")
+        high = get_members_by_role(ctx, name="Хай лвл")
         group = set(high.members) & set(tot.members)
         message = ''
         for count, member in enumerate(group, 1):
