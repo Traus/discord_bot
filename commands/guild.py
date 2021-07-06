@@ -1,3 +1,5 @@
+from random import randint
+
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -35,16 +37,21 @@ class GuildCommands(commands.Cog, name='Гильдия'):
 
             await send_by_bot(ctx, msg, delete=True)
 
-    @commands.command(pass_context=True, name='хайлвл', help="Список хай лвл гильдии")
+    @commands.command(pass_context=True, name='роль', help="Список членов ги с определенной ролью")
     @commands.has_any_role("Совет ги", "ToT")
-    async def high_lvl(self, ctx):
+    async def roles(self, ctx, *role_name):
         tot = get_members_by_role(ctx, name="ToT")
-        high = get_members_by_role(ctx, name="Хай лвл")
-        group = set(high.members) & set(tot.members)
+        role = get_members_by_role(ctx, name=' '.join(role_name))
+        group = set(role.members) & set(tot.members)
+
         message = ''
         for count, member in enumerate(group, 1):
             message += f'{count}. {strip_tot(name=member.display_name)}\n'
-        await ctx.send(box(message))
+
+        embed = discord.Embed(colour=discord.Color.from_rgb(randint(0, 255), randint(0, 255), randint(0, 255)))
+        embed.add_field(name=f'**{role.role}**:', value=message)
+
+        await ctx.send(embed=embed)
 
     @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
     @commands.has_any_role("Совет ги", "ToT")

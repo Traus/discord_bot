@@ -50,26 +50,10 @@ class ShortHelp(MinimalHelpCommand):
             The heading to add to the line.
         """
         if commands:
-            joined = ''
+            cmds = [f"`{c.name}`" for c in commands]
 
-            cmds = [f"!{c.name}" for c in commands]
-            while True:
-                if len(cmds) % 3:
-                    cmds.append('')
-                else:
-                    break
-            one_line = []
-            for i in range(len(cmds)):
-                one_line.append(cmds[i])
-                if len(one_line) == 3:
-                    joined += "{:\u2002<20}{:\u2002<20}{:<}\n".format(*one_line)
-                    one_line.clear()
-
-            if one_line:
-                joined += "{:\u2002<20}{:\u2002<20}{:<}\n".format(*one_line)
-
-            self.paginator.add_line('`%s`' % heading)
-            self.paginator.add_line(joined)
+            self.paginator.add_line('**%s**' % heading)
+            self.paginator.add_line(', '.join(cmds), empty=True)
 
     def add_command_formatting(self, command):
         """A utility function to format commands and groups.

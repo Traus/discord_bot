@@ -12,7 +12,7 @@ from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_renference_author, is_traus
+    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message
 from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
 
@@ -22,7 +22,15 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
-        await send_by_bot(ctx, file=discord.File('files/media/tom.jpg'), delete=True)
+        message = await quote_renferenced_message(ctx)
+        await send_by_bot(ctx, message, file=discord.File('files/media/tom.jpg'), delete=True)
+
+    @commands.command(name='одобряю', help='Одобрить!')
+    async def approve(self, ctx):
+        message = await quote_renferenced_message(ctx)
+        search_term = 'approve'
+        limit = 10
+        await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='шапалах', help='Втащить')
     async def slap(self, ctx, members: commands.Greedy[discord.Member], bot: str = None):
@@ -30,7 +38,7 @@ class FunCommands(commands.Cog, name='Веселье'):
 
         from_bot = bot is not None and bot == 'bot'
         if not members:
-            author = await get_renference_author(ctx)
+            author = await get_renferenced_author(ctx)
             if author is not None:
                 members = [author]
             else:
@@ -105,19 +113,19 @@ class FunCommands(commands.Cog, name='Веселье'):
     @commands.command(name='переиграл', help='Переиграл и уничтожил')
     async def meme_win(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        author = await get_renference_author(ctx)
+        author = await get_renferenced_author(ctx)
         member = member or author
         if member:
             text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
             embed = discord.Embed()
-            embed.set_image(url=find_gif(search_term='уничтожу', limit=1))
+            embed.set_image(url=find_gif(search_term='переиграл', limit=1))
             embed.add_field(name=f"Думали я вас не переиграю?", value=text)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='пять', help='Дать пять')
     async def five(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        author = await get_renference_author(ctx)
+        author = await get_renferenced_author(ctx)
         member = member or author
         if member:
             text = f"{ctx.author.mention} даёт пять {member.mention}!"
@@ -143,7 +151,8 @@ class FunCommands(commands.Cog, name='Веселье'):
     async def fire(self, ctx):
         search_term = 'ass on fire'
         limit = 5
-        await send_by_bot(ctx, find_gif(search_term, limit), delete=True)
+        message = await quote_renferenced_message(ctx)
+        await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='лого', help='лого гильдии')
     async def logo(self, ctx):
@@ -151,7 +160,8 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='гц', help='поздравить')
     async def gc(self, ctx):
-        await send_by_bot(ctx, file=discord.File('files/media/gc.png'), delete=True)
+        message = await quote_renferenced_message(ctx)
+        await send_by_bot(ctx, message, file=discord.File('files/media/gc.png'), delete=True)
 
     @commands.command(name='стат', help='статистика по таверне')
     async def stat(self, ctx):

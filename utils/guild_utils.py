@@ -116,11 +116,13 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False, from_bot=
         clean_list.append(tmp_gif_path)
 
     file_path = tmp_gif_path if gif else tmp_file_path
+    message = await quote_renferenced_message(ctx, limit=50)
+
     try:
         if from_bot:
             await ctx.send(file=discord.File(file_path), reference=ctx.message.reference)
         else:
-            await send_by_bot(ctx, file=discord.File(file_path))
+            await send_by_bot(ctx, message, file=discord.File(file_path))
     finally:
         for file in clean_list:
             file.unlink()
@@ -153,11 +155,28 @@ def find_animated_emoji(word: str) -> Optional[str]:
             return f"<a:{emoji.name}:{emoji.id}>"
 
 
-async def get_renference_author(ctx) -> Optional[discord.Member]:
+async def get_renferenced_message(ctx) -> Optional[discord.Message]:
     if ctx.message.reference is not None:
         message_id = ctx.message.reference.message_id
-        message = await ctx.fetch_message(message_id)
+        return await ctx.fetch_message(message_id)
+
+
+async def get_renferenced_author(ctx) -> Optional[discord.Member]:
+    if ctx.message.reference is not None:
+        message = await get_renferenced_message(ctx)
         return message.author
+
+
+async def quote_renferenced_message(ctx, limit: int = 100) -> str:
+    if ctx.message.reference is not None:
+        message = await get_renferenced_message(ctx)
+        content = message.content
+        if len(content) > limit:
+            content = content[:limit] + '**...**'
+        if content.count('\n') > 4:
+            content = '\n'.join(content.split('\n', maxsplit=3)[:3]) + '**...**'
+        return f'{message.author.mention}\n{">>> " if content else ""}{content.replace(">>> ", "")}\n'
+    return ''
 
 
 def is_traus(ctx, member: discord.Member) -> bool:

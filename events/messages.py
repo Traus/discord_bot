@@ -6,7 +6,8 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renference_author, get_members_by_role, is_traus
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_renferenced_author, get_members_by_role, \
+    is_traus, quote_renferenced_message
 
 
 class MessageHandler:
@@ -75,10 +76,8 @@ class MessageHandler:
         ctx = await bot.get_context(self.message)
 
         if animated_emojis:
-            # todo переделать ответ (красивую ссылку на сообщение) Nqn bot
-            # reference_author = await get_renference_author(ctx)
-            # await send_by_bot(ctx, f"{reference_author.mention if reference_author else ''}\n{self.message.content}", delete=True)
             await ctx.message.delete()
+            # message = await quote_renferenced_message(ctx)  # todo потестить на свежую голову, message в 82 строку
             if not (self.is_only_emojis(animated_emojis) and self.message.reference):
                 await send_by_bot(ctx, self.message.content)
         await bot.process_commands(self.message)
