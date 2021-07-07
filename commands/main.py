@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, vote_reactions
+from constants import channels, vote_reactions, number_emoji
 from init_bot import bot
 from utils.format import box, send_by_bot
 
@@ -81,16 +81,30 @@ class MainCommands(commands.Cog, name='Основное'):
             file=discord.File(f'files/media/shop/{(days + day_delta) % 12}.jpg')
         )
 
-    @commands.command(pass_context=True, help='Начать опрос')
+    @commands.command(
+        pass_context=True,
+        help='Начать опрос. Если начать текст с число:, то в голсосовании будет от 1 до число(10) вариантов'
+    )
     async def vote(self, ctx, *text):
         await ctx.message.delete()
-        embed = discord.Embed(description=f"{ctx.author.mention}:\n{' '.join(text)}")
+
+        reactions = vote_reactions
+        if text:
+            number = text[0].strip(':') if re.match(r'\d+:', text[0]) else []
+            if number:
+                if int(number) > 10:
+                    await ctx.send(box("Слишком много вариантов. Максимум 10."))
+                    return
+                text = text[1:]
+                reactions = [number_emoji[i+1] for i in range(int(number))]
+        text = ' '.join(text).replace('\\n', '\n')
+        embed = discord.Embed(description=f"{ctx.author.mention}:\n{text}")
         embed.set_thumbnail(url=ctx.author.avatar_url)
         now = datetime.timestamp(datetime.utcnow())
         embed.set_footer(text=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
         msg: discord.Message = await ctx.send(embed=embed)
 
-        for reaction in vote_reactions:
+        for reaction in reactions:
             await msg.add_reaction(reaction)
 
 
