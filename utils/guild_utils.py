@@ -1,3 +1,4 @@
+import random
 import re
 from datetime import datetime
 from io import BytesIO
@@ -184,3 +185,10 @@ def is_traus(ctx, member: discord.Member) -> bool:
     if traus in member.roles:
         return True
     return False
+
+
+def random_emoji(ctx, animated=True) -> discord.Emoji:
+    emojis = ctx.guild.emojis
+    if animated:
+        emojis = list(filter(lambda x: x.animated, emojis))
+    return random.choice(emojis)

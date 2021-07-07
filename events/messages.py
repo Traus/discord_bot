@@ -7,7 +7,7 @@ from commands import automoderation, send_by_bot
 from constants import channels
 from init_bot import bot
 from utils.guild_utils import check_for_beer, find_animated_emoji, get_renferenced_author, get_members_by_role, \
-    is_traus, quote_renferenced_message
+    is_traus, quote_renferenced_message, random_emoji
 
 
 class MessageHandler:
@@ -15,7 +15,7 @@ class MessageHandler:
         self.message = message
 
     async def swear_moderation(self):
-        no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES)
+        no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES, channels.SEKTA)
 
         if self.message.channel.id not in no_moderation:
             await automoderation(self.message)
@@ -68,18 +68,19 @@ class MessageHandler:
         for member in vaction_members.members:
             if str(member.id) in message.content:
                 if is_traus(ctx, member):
-                    await message.channel.send(f"Траус не бухает, Траус отдыхает!")
+                    bot_msg = await message.channel.send(f"Траус не бухает, Траус отдыхает!")
                 else:
-                    await message.channel.send(f"{member.display_name} отдыхает!")
+                    bot_msg = await message.channel.send(f"{member.display_name} отдыхает!")
+                await bot_msg.add_reaction(random_emoji(ctx))
 
     async def send_message(self, animated_emojis: list):
         ctx = await bot.get_context(self.message)
 
         if animated_emojis:
             await ctx.message.delete()
-            # message = await quote_renferenced_message(ctx)  # todo потестить на свежую голову, message в 82 строку
             if not (self.is_only_emojis(animated_emojis) and self.message.reference):
-                await send_by_bot(ctx, self.message.content)
+                message = await quote_renferenced_message(ctx)
+                await send_by_bot(ctx, message, self.message.content)
         await bot.process_commands(self.message)
 
     async def add_reactions(self, animated_emojis):
@@ -105,5 +106,5 @@ async def on_message(message: discord.Message):
 
     await handler.send_vacation_message(message)
     await handler.send_message(animated_emojis)
-    if message.reference:
+    if message.reference and handler.is_only_emojis(animated_emojis):
         await handler.add_reactions(animated_emojis)

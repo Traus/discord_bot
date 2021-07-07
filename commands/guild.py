@@ -42,7 +42,9 @@ class GuildCommands(commands.Cog, name='Гильдия'):
     async def roles(self, ctx, *role_name):
         tot = get_members_by_role(ctx, name="ToT")
         role = get_members_by_role(ctx, name=' '.join(role_name))
-        group = set(role.members) & set(tot.members)
+        group = set(role.members)
+        if role.role != "Рекрут":
+            group = group & set(tot.members)
 
         message = ''
         for count, member in enumerate(group, 1):

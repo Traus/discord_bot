@@ -31,9 +31,9 @@ class ReactionHandler:
             if self.emoji.name == '🇩':
                 perms_flag = False
                 for role in self.payload.member.roles:
-                    if role.name in ['Совет ги', 'ToT', 'Крот с ЕС', 'Верховная жрица', 'Верховный жрец', 'Палач', 'Прихожанин']:
+                    if role.name in ['Совет ги', 'ToT', 'Верховная жрица', 'Верховный жрец', 'Сектант']:
                         perms_flag = True
-                await set_permissions(channels.MERY, self.member, read_messages=True, send_messages=perms_flag)
+                await set_permissions(channels.SEKTA, self.member, read_messages=True, send_messages=perms_flag)
             elif self.emoji.name == '🇰':
                 await set_permissions(channels.KEFIR, self.member, read_messages=True, send_messages=True)
             else:
@@ -100,7 +100,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
 
     if payload.message_id == messages.ROOMS:
         if emoji.name == '🇩':
-            await set_permissions(channels.MERY, member, read_messages=False, send_messages=False)
+            await set_permissions(channels.SEKTA, member, read_messages=False, send_messages=False)
         if emoji.name == '🇰':
             await set_permissions(channels.KEFIR, member, read_messages=False, send_messages=False)
 

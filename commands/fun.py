@@ -72,37 +72,36 @@ class FunCommands(commands.Cog, name='Веселье'):
     async def sekta(self, ctx):
         main = get_members_by_role(ctx, name='Верховная жрица')
         zam = get_members_by_role(ctx, name='Верховный жрец')
-        rip = get_members_by_role(ctx, name='Палач')
-        sekta = get_members_by_role(ctx, name='Прихожанин')
+        sekta = get_members_by_role(ctx, name='Сектант')
 
         msg = ''
-        for role in [main, zam, rip, sekta]:
+        for role in [main, zam, sekta]:
             members = role.members
             if members:
                 m = '\n'.join([role.members[i].display_name for i in range(len(role.members))])
                 msg += f"{role.role}:\n{m}\n"
         await ctx.send(box(msg))
 
-    @commands.command(name='всекту', help='принять в культ')
+    @commands.command(name='всекту', help='принять в секту беспредела')
     async def join_sekta(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         all_roles = ctx.guild.roles
-        sekta = get(all_roles, name='Прихожанин')
+        sekta = get(all_roles, name='Сектант')
         if is_traus(ctx, member):
             return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
-        await set_permissions(channels.MERY, member, read_messages=True, send_messages=True)
+        await set_permissions(channels.SEKTA, member, read_messages=True, send_messages=True)
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
     async def exit_sekta(self, ctx):
         all_roles = ctx.guild.roles
-        sekta = get(all_roles, name='Прихожанин')
+        sekta = get(all_roles, name='Сектант')
         if sekta in ctx.author.roles:
             await ctx.author.remove_roles(sekta)
             await send_by_bot(ctx, file=discord.File('files/media/sekta.jpg'), delete=True)
-            await set_permissions(channels.MERY, ctx.author, send_messages=False)
+            await set_permissions(channels.SEKTA, ctx.author, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
@@ -130,7 +129,7 @@ class FunCommands(commands.Cog, name='Веселье'):
         if member:
             text = f"{ctx.author.mention} даёт пять {member.mention}!"
             embed = discord.Embed(description=text)
-            embed.set_image(url=find_gif(search_term='highfive', limit=20))
+            embed.set_image(url=find_gif(search_term='highfive', limit=50))
             await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='факт', help='рандомный факт')
@@ -145,13 +144,14 @@ class FunCommands(commands.Cog, name='Веселье'):
     async def rockon(self, ctx):
         search_term = 'rockon'
         limit = 20
-        await send_by_bot(ctx, find_gif(search_term, limit), delete=True)
+        message = await quote_renferenced_message(ctx, limit=50)
+        await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='горит', help='горииииит!')
     async def fire(self, ctx):
         search_term = 'ass on fire'
         limit = 5
-        message = await quote_renferenced_message(ctx)
+        message = await quote_renferenced_message(ctx, limit=50)
         await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='лого', help='лого гильдии')

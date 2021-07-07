@@ -125,7 +125,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         await user.remove_roles(role)
         muted_queue.clear()
 
-        channels_with_perms = [channels.MERY, channels.KEFIR]
+        channels_with_perms = [channels.SEKTA, channels.KEFIR]
         try:
             for channel_id in channels_with_perms:
                 await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0],

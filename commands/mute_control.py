@@ -19,7 +19,7 @@ async def _add_mute(user: discord.Member, time: int):
         return
 
     role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
-    channels_with_perms = [channels.MERY, channels.KEFIR]
+    channels_with_perms = [channels.SEKTA, channels.KEFIR]
     user_permissions[user]['manage_roles'] = user.guild_permissions.manage_roles
     user.guild_permissions.manage_roles = False
     for channel_id in channels_with_perms:
