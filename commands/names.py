@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from constants import members, tavern_emoji
 from init_bot import bot
+from utils.format import send_by_bot
 from utils.tenor_gifs import find_gif
 
 
@@ -14,6 +15,11 @@ class NamedCommands(commands.Cog, name='Имена'):
     @commands.command(help='рофлить')
     async def rofl(self, ctx):
         await ctx.send(f'{ctx.author.display_name} <@{members.ROFL}>`ит')
+
+    @commands.command(name='кринж', help='кринж...')
+    async def kringe(self, ctx):
+        await ctx.message.delete()
+        await send_by_bot(ctx, f'Как-то <@{members.COYC}>`ово...')
 
     @commands.command(help='для fanatik')
     async def fanatik(self, ctx):
