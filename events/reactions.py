@@ -1,8 +1,10 @@
 import discord
 from discord.utils import get
 
+from commands.mute_control import _add_mute
 from constants import members, messages, channels, vote_reactions
 from init_bot import bot
+from utils.format import box
 from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
 
 
@@ -25,6 +27,15 @@ class ReactionHandler:
     async def on_traus_reaction(self):
         if self.emoji.name == 'approved' and self.payload.user_id != members.TRAUS:
             await self.message.remove_reaction(self.emoji, self.member)
+
+    async def on_samka_reaction(self):
+        if self.emoji.name == 'delete' and self.payload.user_id in [members.TRAUS, members.SAMKA]:
+            await self.message.delete()
+            await self.message.channel.send(
+                box('Аниме на сервере осуждается и удаляется.'),
+                file=discord.File('files/media/no_anime.jpg')
+            )
+            await _add_mute(self.message.author, time=30)
 
     async def on_private_room_reaction(self):
         if self.payload.message_id == messages.ROOMS:
@@ -86,6 +97,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     check_for_beer(emoji)
 
     await handler.on_traus_reaction()
+    await handler.on_samka_reaction()
     await handler.on_private_room_reaction()
     await handler.on_rules_channel_reaction()
     await handler.on_class_channels_reaction()

@@ -28,10 +28,21 @@ def get_role_by_name(ctx, name: str) -> discord.Role:
 
 def get_members_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
     obj = ctx or user
-    all_roles = getattr(obj, 'guild').roles
-    role = get(all_roles, name=name)
+    name = name.replace(' ', '').lower()
     all_members = bot.get_all_members()
-    return Members(name, [member for member in all_members if role in member.roles])
+    all_roles = getattr(obj, 'guild').roles
+    class_roles = dict(
+        алхимик='💉',
+        маг='🔮',
+        охотник='🏹',
+        страж='🛡️',
+        тень='🗡️',
+    )
+    if name in class_roles:
+        name = class_roles[name]
+    for role in all_roles:
+        if role.name.replace(' ', '').lower() == name:
+            return Members(role.name, [member for member in all_members if role in member.roles])
 
 
 def get_class_roles(guild: discord.Guild) -> dict:

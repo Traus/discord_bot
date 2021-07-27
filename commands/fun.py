@@ -188,12 +188,12 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='стол', help='перевернуть стол')
     async def table(self, ctx):
-        if table_turn_over[0]:
+        if table_turn_over[ctx.channel.id]:
             await send_by_bot(ctx, '(╮°-°)┳┳', delete=True)
-            table_turn_over[0] = False
+            table_turn_over[ctx.channel.id] = False
         else:
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
-            table_turn_over[0] = True
+            table_turn_over[ctx.channel.id] = True
 
 
 bot.add_cog(FunCommands())

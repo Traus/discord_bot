@@ -8,7 +8,7 @@ from commands.mute_control import _add_mute
 from constants import roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import is_spam, get_members_by_role, strip_tot, get_guild_members, is_traus
+from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus
 from utils.states import when_all_called
 
 
@@ -43,7 +43,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
         tot = get_members_by_role(ctx, name="ToT")
         role = get_members_by_role(ctx, name=' '.join(role_name))
         group = set(role.members)
-        if role.role != "Рекрут":
+        if role.role.lower() != "рекрут":
             group = group & set(tot.members)
 
         message = ''
@@ -54,36 +54,6 @@ class GuildCommands(commands.Cog, name='Гильдия'):
         embed.add_field(name=f'**{role.role}**:', value=message)
 
         await ctx.send(embed=embed)
-
-    @commands.command(pass_context=True, name='алхимик', help="Список алхимиков ToT")
-    @commands.has_any_role("Совет ги", "ToT")
-    async def alchemist(self, ctx):
-        message = get_guild_members(ctx, name='💉')
-        await ctx.send(box(message))
-
-    @commands.command(pass_context=True, name='маг', help="Список чародеев ToT")
-    @commands.has_any_role("Совет ги", "ToT")
-    async def mage(self, ctx):
-        message = get_guild_members(ctx, name='🔮')
-        await ctx.send(box(message))
-
-    @commands.command(pass_context=True, name='охотник', help="Список охотников ToT")
-    @commands.has_any_role("Совет ги", "ToT")
-    async def hunter(self, ctx):
-        message = get_guild_members(ctx, name='🏹')
-        await ctx.send(box(message))
-
-    @commands.command(pass_context=True, name='страж', help="Список стражей ToT")
-    @commands.has_any_role("Совет ги", "ToT")
-    async def guard(self, ctx):
-        message = get_guild_members(ctx, name='🛡️')
-        await ctx.send(box(message))
-
-    @commands.command(pass_context=True, name='тень', help="Список теней ToT")
-    @commands.has_any_role("Совет ги", "ToT")
-    async def rouge(self, ctx):
-        message = get_guild_members(ctx, name='🗡️')
-        await ctx.send(box(message))
 
 
 bot.add_cog(GuildCommands())
