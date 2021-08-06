@@ -10,3 +10,5 @@ user_permissions = defaultdict(dict)
 voice_owners = dict()
 
 table_turn_over = defaultdict(bool)
+
+drunk_status = defaultdict(lambda: tuple([False, False]))

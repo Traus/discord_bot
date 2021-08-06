@@ -52,12 +52,18 @@ class ReactionHandler:
 
     async def on_rules_channel_reaction(self):
         if self.payload.message_id == messages.RULES:
-            if self.emoji.name == '✅':
-                guest = get(self.guild.roles, name='Гость')
-                if len(self.member.roles) == 1 or (len(self.member.roles) == 2 and get(self.guild.roles, name='Muted') in self.member.roles):
+            guest = get(self.guild.roles, name='Гость')
+            pecheneg = get(self.guild.roles, name='Pecheneg')
+            if guest not in self.member.roles and pecheneg not in self.member.roles:
+                if self.emoji.name == '✅':
                     await self.member.add_roles(guest)
                     emoji = await self.member.guild.fetch_emoji(811516186453082133)
                     guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
+                    await guest_channel.send(f'{self.member.mention} {emoji}')
+                if self.emoji.name == '🇬🇧':
+                    await self.member.add_roles(pecheneg)
+                    emoji = await self.member.guild.fetch_emoji(811516186453082133)
+                    guest_channel: discord.TextChannel = bot.get_channel(channels.ENGLISH)
                     await guest_channel.send(f'{self.member.mention} {emoji}')
 
     async def on_class_channels_reaction(self):

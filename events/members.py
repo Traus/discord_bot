@@ -10,6 +10,7 @@ async def on_member_join(member: discord.Member):
     welcome = bot.get_channel(channels.WELCOME)
     text = f"""
 Для доступа к каналам ознакомься с {bot.get_channel(channels.RULES).mention} и поставь под ними ✅.
+If you are english speaking, go to {bot.get_channel(channels.RULES).mention} and press 🇬🇧.
 
 -Информация о гильдии Tavern of Tales - {bot.get_channel(channels.INFO).mention}
 -Заявка для вступления в гильдию (заполняется одним сообщением прямо на канале) - {bot.get_channel(channels.JOIN).mention}

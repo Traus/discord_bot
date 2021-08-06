@@ -9,7 +9,7 @@ from constants import channels, roles
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, get_role_by_name
-from utils.states import immune_until, user_permissions, muted_queue
+from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
 
@@ -276,6 +276,29 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         afk_users = await get_afk_users(msg)
 
         await ctx.channel.send(box('\n'.join([user.display_name for user in afk_users])))
+
+    @commands.command(pass_context=True, name='пьянь', help='Ушел в запой? Посиди в муте')
+    @commands.has_role("Совет ги")
+    async def drunk(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        role = get_role_by_name(ctx, 'Совет ги')
+        drunk = get_role_by_name(ctx, 'В зюзю')
+
+        if not drunk_status[member][0]:
+            council = role in member.roles and not is_traus(ctx, member)
+            if council:
+                await member.remove_roles(role)
+            await member.add_roles(drunk)
+            await send_by_bot(ctx, member.mention+':', find_gif('drunk', 10))
+            drunk_status[member] = (True, council)
+        else:
+            await member.remove_roles(drunk)
+            if drunk_status[member][1]:
+                await member.add_roles(role)
+            await send_by_bot(ctx, f'{member.mention} с возвращением! <:pepe_beer:828026991361261619>')
+            del drunk_status[member]
 
 
 bot.add_cog(CouncilsCommands())

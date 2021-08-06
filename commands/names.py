@@ -67,11 +67,6 @@ class NamedCommands(commands.Cog, name='Имена'):
         limit = 10
         await ctx.send(find_gif(search_term, limit))
 
-    @commands.command(name='арт', help='танцули Арта')
-    async def art(self, ctx):
-        await ctx.message.delete()
-        await ctx.send(file=discord.File('files/media/no_anime.jpg'))
-
     @commands.command(help='для walidor')
     async def walidor(self, ctx):
         await ctx.message.delete()
@@ -80,11 +75,6 @@ class NamedCommands(commands.Cog, name='Имена'):
     @commands.command(help='для dommag')
     async def dommag(self, ctx):
         await ctx.send(file=discord.File('files/media/dommag.jpg'))
-
-    @commands.command(name='мыша', help='для domino')
-    async def domino(self, ctx):
-        domino = ctx.guild.get_member(members.DOMINO)
-        await ctx.send(domino.avatar_url)
 
     @commands.command(name='кибермедведь', help='для соуса')
     async def bear(self, ctx):
@@ -101,12 +91,6 @@ class NamedCommands(commands.Cog, name='Имена'):
         search_term = 'sexy girls'
         limit = 10
         await ctx.send(find_gif(search_term, limit))
-
-    @commands.command(name='мери', help='для Мери')
-    async def mery(self, ctx):
-        msg = await ctx.send(tavern_emoji)
-        for emoji in ('🇴', '<:pepe_f:811746753081638952>', '🇲', '🇪', '🇷', '🇾', '<:wat:811251952825794660>'):
-            await msg.add_reaction(emoji)
 
     @commands.command(name='миз', help='для Миза')
     async def miz(self, ctx):
