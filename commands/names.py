@@ -104,5 +104,11 @@ class NamedCommands(commands.Cog, name='Имена'):
         limit = 10
         await ctx.send(find_gif(search_term, limit))
 
+    @commands.command(name='лимон', help='для Лимона')
+    async def lemon(self, ctx):
+        search_term = 'lemon dance'
+        limit = 5
+        await ctx.send(find_gif(search_term, limit))
+
 
 bot.add_cog(NamedCommands())
