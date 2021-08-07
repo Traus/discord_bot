@@ -280,6 +280,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(pass_context=True, name='пьянь', help='Ушел в запой? Посиди в муте')
     @commands.has_role("Совет ги")
     async def drunk(self, ctx, member: discord.Member = None):
+        await ctx.message.delete()
+
         if member is None:
             member = ctx.author
 
@@ -297,7 +299,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             await member.remove_roles(drunk)
             if drunk_status[member][1]:
                 await member.add_roles(role)
-            await send_by_bot(ctx, f'{member.mention} с возвращением! <:pepe_beer:828026991361261619>')
+            await send_by_bot(ctx, f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
             del drunk_status[member]
 
 
