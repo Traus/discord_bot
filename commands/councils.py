@@ -101,7 +101,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         await channel.send(box(message))
 
     @commands.command(help='ник [время] [причина]. Время в формате число[smhd]')
-    @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
+    @commands.has_role("Совет ги")
     async def mute(self, ctx, user: discord.Member, time: str = '30s', *reason):
         await ctx.message.delete()
 
