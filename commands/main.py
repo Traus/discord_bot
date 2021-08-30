@@ -10,6 +10,7 @@ from discord.utils import get
 from constants import channels, vote_reactions, number_emoji
 from init_bot import bot
 from utils.format import box, send_by_bot
+from utils.guild_utils import get_members_by_role
 
 
 class MainCommands(commands.Cog, name='Основное'):
@@ -106,6 +107,14 @@ class MainCommands(commands.Cog, name='Основное'):
 
         for reaction in reactions:
             await msg.add_reaction(reaction)
+
+    @commands.command(pass_context=True, help="Кто в муте?")
+    async def muted(self, ctx):
+        group = get_members_by_role(ctx, name="Muted")
+        message = 'В муте:\n'
+        for count, member in enumerate(group.members, 1):
+            message += f'{count}. {member.display_name}\n'
+        await ctx.send(box(message))
 
 
 def _get_paragraph(par, text):
