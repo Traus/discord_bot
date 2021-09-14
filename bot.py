@@ -5,6 +5,7 @@ from init_bot import bot
 
 # commands and events
 import commands
+import music
 import events
 
 try:

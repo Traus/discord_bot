@@ -5,3 +5,6 @@ Pillow
 async-contextlib
 psycopg2-binary
 imageio
+youtube_dl
+pynacl
+ffmpeg
