@@ -195,5 +195,45 @@ class FunCommands(commands.Cog, name='Веселье'):
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[ctx.channel.id] = True
 
+    @commands.command(pass_context=True, name='победитель', help='Для решения споров. Случайное число от 1 до 100')
+    @commands.has_role("Глава ги")
+    async def winner(self, ctx):
+        from time import sleep
+        from constants import roles
+
+        all_roles = ctx.guild.roles
+        tot = get(all_roles, id=roles.TOT)
+        winners = dict(
+            Траус=1,
+            Xelliana=2,
+            Oblomingo=3,
+            Uchiha=4,
+            Kefir4ik=5,
+            Полночь=6,
+            Warlock=7,
+            Brodyaga=8,
+            S_smok=9,
+            Noxmare=10,
+            Litovo=11,
+            Rendal=12,
+            Iceberg=13,
+        )
+        w = random.randint(1, len(winners.values()))
+        await ctx.send(box(f"Начало рассчета..."))
+        sleep(10)
+        await ctx.send(box(f"Ожидание ответа спутника..."))
+        sleep(10)
+        await ctx.send(box(f"Эники беники ели вареники...."))
+        sleep(10)
+        await ctx.send(box(f"раз два три четыре пять, победитель:"))
+        sleep(10)
+        await ctx.send(box(f"хммммм..."))
+        sleep(10)
+        for k in winners:
+            if winners[k] == w:
+                await ctx.send(f"{tot.mention} Друзья!")
+                await ctx.send(box(f"{k} поздравляем с победой в конкурсе!!!! Твой приз-скайпасс или его эквивалент."
+                                   f" При желании, можешь передать приз любому другому участнику гильдии! "
+                                   f"В скором времени с тобой свяжется совет и обсудят возможность передачи награды =)"))
 
 bot.add_cog(FunCommands())
