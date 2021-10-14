@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import discord
 
 from init_bot import bot
@@ -12,6 +14,8 @@ try:
     from local_settings import TOKEN
 except ImportError:
     TOKEN = os.environ.get("TOKEN")
+
+os.environ['PATH'] += str(Path(__file__).parent.joinpath('ff_source').absolute())
 
 
 @bot.command(pass_context=True, help='Траус ломает бота')
