@@ -13,6 +13,7 @@ from discord.utils import get
 from collections import namedtuple
 
 from constants import GUILD_ID, beer_emoji
+from database.participants_table import participants
 from database.stat import add_value
 from init_bot import bot
 from utils.format import send_by_bot
@@ -203,3 +204,7 @@ def random_emoji(ctx, animated=True) -> discord.Emoji:
     if animated:
         emojis = list(filter(lambda x: x.animated, emojis))
     return random.choice(emojis)
+
+
+def get_reputation_income() -> dict:
+    return {player.name: player.finish - player.start for player in participants}

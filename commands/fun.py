@@ -1,18 +1,19 @@
 import random
 import re
 from datetime import datetime, timedelta
+from time import sleep
 
 import discord
 import requests
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, tavern_emoji
+from constants import channels, tavern_emoji, roles
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message
+    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income
 from utils.states import table_turn_over
 from utils.tenor_gifs import find_gif
 
@@ -195,30 +196,25 @@ class FunCommands(commands.Cog, name='Веселье'):
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[ctx.channel.id] = True
 
-    @commands.command(pass_context=True, name='победитель', help='Для решения споров. Случайное число от 1 до 100')
+    @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
     @commands.has_role("Глава ги")
-    async def winner(self, ctx):
-        from time import sleep
-        from constants import roles
+    async def income(self, ctx):
+        all_income = get_reputation_income()
+        msg = 'Вклад в гильдию за последнее время:\n'
+        for name in sorted(all_income, key=all_income.get, reverse=True):
+            msg += f'\n{name} {all_income[name]}'
+        await ctx.send(box(msg))
 
+    @commands.command(pass_context=True, name='победитель', help='Определить победителя конкурса')
+    @commands.has_role("Глава ги")
+    async def winner(self, ctx, necessary_points: int = 500):
         all_roles = ctx.guild.roles
         tot = get(all_roles, id=roles.TOT)
-        winners = dict(
-            Траус=1,
-            Xelliana=2,
-            Oblomingo=3,
-            Uchiha=4,
-            Kefir4ik=5,
-            Полночь=6,
-            Warlock=7,
-            Brodyaga=8,
-            S_smok=9,
-            Noxmare=10,
-            Litovo=11,
-            Rendal=12,
-            Iceberg=13,
-        )
-        w = random.randint(1, len(winners.values()))
+
+        all_income = get_reputation_income()
+        winners = [name for name in all_income if all_income[name] > necessary_points]
+        winner = winners[random.randint(0, len(winners)-1)]
+
         await ctx.send(box(f"Начало рассчета..."))
         sleep(10)
         await ctx.send(box(f"Ожидание ответа спутника..."))
@@ -229,11 +225,10 @@ class FunCommands(commands.Cog, name='Веселье'):
         sleep(10)
         await ctx.send(box(f"хммммм..."))
         sleep(10)
-        for k in winners:
-            if winners[k] == w:
-                await ctx.send(f"{tot.mention} Друзья!")
-                await ctx.send(box(f"{k} поздравляем с победой в конкурсе!!!! Твой приз-скайпасс или его эквивалент."
-                                   f" При желании, можешь передать приз любому другому участнику гильдии! "
-                                   f"В скором времени с тобой свяжется совет и обсудят возможность передачи награды =)"))
+        await ctx.send(f"{tot.mention} Друзья!")
+        await ctx.send(box(f"{winner} поздравляем с победой в конкурсе!!!! Твой приз-скайпасс или его эквивалент. "
+                           f"При желании, можешь передать приз любому другому участнику гильдии! "
+                           f"В скором времени с тобой свяжется совет и обсудят возможность передачи награды =)"))
+
 
 bot.add_cog(FunCommands())

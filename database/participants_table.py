@@ -1,0 +1,30 @@
+from collections import namedtuple
+
+Player = namedtuple("Player", ['name', 'start', 'finish'])
+participants = [
+    Player('Траус', 7411, 10371),
+    Player('Xelliana', 6376, 8516),
+    Player('Oblomingo', 5204, 7584),
+    Player('Uchiha', 4276, 4656),
+    Player('Полночь', 1531, 1551),
+    Player('Warlock', 2822, 3362),
+    Player('S_smok', 3016, 4176),
+    Player('Noxmare', 1604, 2134),
+    Player('Aramis', 504, 1364),
+    Player('Deadhead', 972, 2841),
+    Player('Litovo', 2382, 2762),
+    Player('Snaart', 464, 1044),
+    Player('Rdhedym', 264, 664),
+    Player('Highwayman', 406, 956),
+    Player('Rendal', 128, 658),
+    Player('Deleted', 0, 100),
+    Player('Compote', 914, 1474),
+    Player('Sereia', 485, 1365),
+    Player('Instasamka', 984, 1034),
+    Player('Cozyq', 318, 438),
+    Player('Besenok', 2416, 3006),
+    Player('Iceberg', 1554, 1724),
+    Player('Oku_Shok', 514, 594),
+    Player('Moon_Sugar', 482, 482),
+    Player('Dikyts', 270, 330),
+]
