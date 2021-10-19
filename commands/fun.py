@@ -133,6 +133,17 @@ class FunCommands(commands.Cog, name='Веселье'):
             embed.set_image(url=find_gif(search_term='highfive', limit=50))
             await ctx.send(embed=embed, reference=ctx.message.reference)
 
+    @commands.command(name='чок', help='Чокнуться')
+    async def chin(self, ctx, member: discord.Member = None):
+        await ctx.message.delete()
+        author = await get_renferenced_author(ctx)
+        member = member or author
+        if member:
+            text = f"{ctx.author.mention} чокается с {member.mention}!"
+            embed = discord.Embed(description=text)
+            embed.set_image(url=find_gif(search_term='cheers', limit=10))
+            await ctx.send(embed=embed, reference=ctx.message.reference)
+
     @commands.command(name='факт', help='рандомный факт')
     async def fact(self, ctx):
         url = 'https://randstuff.ru/fact/'
