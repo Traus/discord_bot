@@ -207,23 +207,14 @@ class FunCommands(commands.Cog, name='Веселье'):
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[ctx.channel.id] = True
 
-    @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
-    @commands.has_role("Глава ги")
-    async def income(self, ctx):
-        all_income = get_reputation_income()
-        msg = 'Вклад в гильдию за последнее время:\n'
-        for name in sorted(all_income, key=all_income.get, reverse=True):
-            msg += f'\n{name} {all_income[name]}'
-        await ctx.send(box(msg))
-
     @commands.command(pass_context=True, name='победитель', help='Определить победителя конкурса')
     @commands.has_role("Глава ги")
-    async def winner(self, ctx, necessary_points: int = 500):
+    async def winner(self, ctx, necessary_points: str = '500'):
         all_roles = ctx.guild.roles
         tot = get(all_roles, id=roles.TOT)
 
         all_income = get_reputation_income()
-        winners = [name for name in all_income if all_income[name] > necessary_points]
+        winners = [name for name in all_income if all_income[name] > int(necessary_points)]
         winner = winners[random.randint(0, len(winners)-1)]
 
         await ctx.send(box(f"Начало рассчета..."))

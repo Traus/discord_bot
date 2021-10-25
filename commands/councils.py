@@ -8,7 +8,8 @@ from commands.mute_control import _add_mute
 from constants import channels, roles
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, get_role_by_name
+from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
+    get_role_by_name, get_reputation_income
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
@@ -301,6 +302,16 @@ class CouncilsCommands(commands.Cog, name='Совет'):
                 await member.add_roles(role)
             await send_by_bot(ctx, f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
             del drunk_status[member]
+
+    @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
+    @commands.has_role("Глава ги")
+    async def income(self, ctx, tax=None):
+        # todo может tax в цифрах?
+        all_income = get_reputation_income(bool(tax))
+        msg = 'Вклад в гильдию за последнее время:\n'
+        for name in sorted(all_income, key=all_income.get, reverse=True):
+            msg += f'\n{name} {all_income[name]}'
+        await ctx.send(box(msg))
 
 
 bot.add_cog(CouncilsCommands())
