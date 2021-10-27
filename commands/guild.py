@@ -31,7 +31,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
             msg = f'{councils.mention} {tot.mention} {recruit.mention}\n'
 
             if message:
-                msg += ' '.join(message)
+                msg += ' '.join(message).replace('\\n', '\n')
             else:
                 msg += box("Общий сбор!")
 
