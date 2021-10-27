@@ -13,40 +13,43 @@ from utils.states import muted_queue, user_permissions
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
 
-async def _add_mute(user: discord.Member, time: int):
-    if muted_queue[user]:
-        muted_queue[user].append(time)
+async def _add_mute(member: discord.Member, time: int):
+    mute_role = member.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
+
+    if muted_queue[member]:
+        muted_queue[member].append(time)
+        if mute_role not in member.roles:
+            await member.add_roles(mute_role)
         return
 
-    role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
     channels_with_perms = [channels.SEKTA, channels.KEFIR]
-    user_permissions[user]['manage_roles'] = user.guild_permissions.manage_roles
-    user.guild_permissions.manage_roles = False
+    user_permissions[member]['manage_roles'] = member.guild_permissions.manage_roles
+    member.guild_permissions.manage_roles = False
     for channel_id in channels_with_perms:
-        user_permissions[user][channel_id] = (
-            user.permissions_in(user.guild.get_channel(channel_id)).read_messages,
-            user.permissions_in(user.guild.get_channel(channel_id)).send_messages
+        user_permissions[member][channel_id] = (
+            member.permissions_in(member.guild.get_channel(channel_id)).read_messages,
+            member.permissions_in(member.guild.get_channel(channel_id)).send_messages
         )
-    await user.add_roles(role)
+    await member.add_roles(mute_role)
     for channel_id in channels_with_perms:
-        await set_permissions(channel_id, user, send_messages=False)
+        await set_permissions(channel_id, member, send_messages=False)
 
-    muted_queue[user].append(time)
+    muted_queue[member].append(time)
     while True:
-        if muted_queue[user]:
-            await asyncio.sleep(muted_queue[user][0])
+        if muted_queue[member]:
+            await asyncio.sleep(muted_queue[member][0])
             try:
-                muted_queue[user].pop(0)
+                muted_queue[member].pop(0)
             except IndexError:
                 # unmute before mute ends
                 pass
         else:
             break
 
-    await user.remove_roles(role)
-    user.guild_permissions.manage_roles = user_permissions[user]['manage_roles']
+    await member.remove_roles(mute_role)
+    member.guild_permissions.manage_roles = user_permissions[member]['manage_roles']
     for channel_id in channels_with_perms:
-        await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0], send_messages=user_permissions[user][channel_id][1])
+        await set_permissions(channel_id, member, read_messages=user_permissions[member][channel_id][0], send_messages=user_permissions[member][channel_id][1])
 
 
 async def automoderation(message: discord.Message):
