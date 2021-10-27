@@ -81,11 +81,11 @@ tavern_emoji = f':regional_indicator_t: ' \
 
 
 beer_emoji = {
-    "<:pepe_beer:828026991361261619>": "beer",
-    "<:tavern_beer:822536261079662672>": "ale",
-    "<:pepe_celebrate:811749316313350144>": "wine",
-    "<:pepe_vodka:811737381551079425>": "vodka",
-    "<:honey:847010009874432040>": "honey",
+    "beer": "<:pepe_beer:828026991361261619>",
+    "ale": "<:tavern_beer:822536261079662672>",
+    "wine": "<:pepe_celebrate:811749316313350144>",
+    "vodka": "<:pepe_vodka:811737381551079425>",
+    "honey": "<:honey:847010009874432040>",
 }
 
 

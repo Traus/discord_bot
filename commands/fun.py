@@ -8,7 +8,7 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, tavern_emoji, roles
+from constants import channels, tavern_emoji, roles, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
@@ -173,28 +173,59 @@ class FunCommands(commands.Cog, name='Веселье'):
         message = await quote_renferenced_message(ctx)
         await send_by_bot(ctx, message, file=discord.File('files/media/gc.png'), delete=True)
 
-    @commands.command(name='стат', help='статистика по таверне')
-    async def stat(self, ctx):
+    @commands.command(name='стат', help='статистика по Таверне')
+    async def stat(self, ctx, target: str = 'таверна'):
         await ctx.message.delete()
         start_time = datetime.strptime("26.04.2021", "%d.%m.%Y")
         current_time = datetime.utcnow() + timedelta(hours=3)
 
-        beer = get_value('beer')
-        ale = get_value('ale')
-        wine = get_value('wine')
-        vodka = get_value('vodka')
-        honey = get_value('honey')
-        slap = get_value('slap')
+        beer = dict(
+            names=['пиво', 'beer', beer_emoji['beer']],
+            stat_on='пиву',
+            value=f"{get_value('beer')} кружек пива",
+        )
+        ale = dict(
+            names=['эль', 'ale', beer_emoji['ale']],
+            stat_on='элю',
+            value=f"{get_value('ale')} литров эля",
+        )
+        honey = dict(
+            names=['медовуха', 'honey', beer_emoji['honey']],
+            stat_on='медовухе',
+            value=f"{get_value('honey')} бочек медовухи",
+        )
+        wine = dict(
+            names=['вино', 'wine', beer_emoji['wine']],
+            stat_on='вину',
+            value=f"{get_value('wine')} бокалов вина",
+        )
+        vodka = dict(
+            names=['водка', 'самогон', 'vodka', beer_emoji['vodka']],
+            stat_on='водке',
+            value=f"{get_value('vodka')} бутылок водки",
+        )
+        slap = dict(
+            names=['шапалах', 'slap'],
+            stat_on='шапалахам',
+            value=f"Выдано {get_value('slap')} шапалахов.",
+        )
+        tavern = dict(
+            names=['таверна'],
+            stat_on='таверне',
+            value=f"Выпито:\n"
+                  f"{beer['value']}\n"
+                  f"{ale['value']}\n"
+                  f"{honey['value']}\n"
+                  f"{wine['value']}\n"
+                  f"{vodka['value']}\n\n"
+                  f"{slap['value']}"
+        )
 
-        msg = f"Статистика по таверне за {(current_time - start_time).days} дней.\n" \
-              f"Выпито:\n" \
-              f"{beer} кружек пива\n" \
-              f"{ale} литров эля\n" \
-              f"{honey} бочек медовухи\n" \
-              f"{wine} бокалов вина\n" \
-              f"{vodka} бутылок водки\n\n" \
-              f"Выдано {slap} шапалахов."
-        await ctx.send(box(msg))
+        for choice in [beer, ale, honey, wine, vodka, slap, tavern]:
+            if target in choice['names']:
+                msg = f"Статистика по {choice['stat_on']} за {(current_time - start_time).days} дней.\n" \
+                      f"{choice['value']}"
+                await ctx.send(box(msg))
 
     @commands.command(name='стол', help='перевернуть стол')
     async def table(self, ctx):

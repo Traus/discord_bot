@@ -156,10 +156,10 @@ def is_spam(author, memory, sec):
 
 
 def check_for_beer(content: Union[discord.Message, discord.Emoji]):
-    for smile in beer_emoji:
+    for name, smile in beer_emoji.items():
         if smile in str(content):
             count_smiles = len(re.findall(smile, str(content)))
-            add_value(beer_emoji[smile], count_smiles)
+            add_value(name, count_smiles)
 
 
 def find_animated_emoji(word: str) -> Optional[str]:
