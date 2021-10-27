@@ -71,12 +71,10 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(name='секта', help='список участников секты кровавой Мери')
     async def sekta(self, ctx):
-        main = get_members_by_role(ctx, name='Верховная жрица')
-        zam = get_members_by_role(ctx, name='Верховный жрец')
         sekta = get_members_by_role(ctx, name='Сектант')
 
         msg = ''
-        for role in [main, zam, sekta]:
+        for role in [sekta]:
             members = role.members
             if members:
                 m = '\n'.join([role.members[i].display_name for i in range(len(role.members))])

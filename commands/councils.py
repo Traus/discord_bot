@@ -310,19 +310,19 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         role = get_role_by_name(ctx, 'Совет ги')
         drunk = get_role_by_name(ctx, 'В зюзю')
 
-        if not drunk_status[member][0]:
+        if drunk_status[member][0] or drunk in member.roles:
+            await member.remove_roles(drunk)
+            if drunk_status[member][1]:
+                await member.add_roles(role)
+            await ctx.send(f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
+            del drunk_status[member]
+        else:
             council = role in member.roles and not is_traus(ctx, member)
             if council:
                 await member.remove_roles(role)
             await member.add_roles(drunk)
             await send_by_bot(ctx, member.mention+':', find_gif('drunk', 10))
             drunk_status[member] = (True, council)
-        else:
-            await member.remove_roles(drunk)
-            if drunk_status[member][1]:
-                await member.add_roles(role)
-            await send_by_bot(ctx, f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
-            del drunk_status[member]
 
     @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
     @commands.has_role("Глава ги")
