@@ -1,4 +1,5 @@
 import discord
+from discord.utils import get
 
 from constants import channels, roles
 from init_bot import bot
@@ -30,5 +31,12 @@ If you are english speaking, go to {bot.get_channel(channels.RULES).mention} and
 
 @bot.event
 async def on_member_remove(member: discord.Member):
-    channel = bot.get_channel(channels.GUEST)
+    guest_channel = bot.get_channel(channels.GUEST)
+    english_channel = bot.get_channel(channels.ENGLISH)
+    guild_channel = bot.get_channel(channels.GUILD)
+    channel = guest_channel
+    if get(member.guild.roles, name="Pecheneg") in member.roles:
+        channel = english_channel
+    if get(member.guild.roles, name="ToT") in member.roles:
+        channel = guild_channel
     await channel.send(f'{member.display_name} :regional_indicator_f:')
