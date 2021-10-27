@@ -9,7 +9,7 @@ from constants import channels, roles
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
-    get_role_by_name, get_reputation_income
+    get_role_by_name, get_reputation_income, get_renferenced_author
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
@@ -194,15 +194,36 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             await member.send(msg)  # в лс
             await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
 
-    @commands.command(name='домик', help='временный иммунитет от шапалаха')
+    @commands.command(name='домик', help='Временный иммунитет от шапалаха')
     @commands.has_any_role("Совет ги")
-    async def home(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.author
+    async def home(self, ctx, members: commands.Greedy[discord.Member], immune: str = ''):
+        minutes = 10
+        if not members:
+            author = await get_renferenced_author(ctx)
+            if author is not None:
+                members = [author]
+            else:
+                members = [ctx.author]
 
-        stamp = datetime.timestamp(datetime.now()) + 10*60
-        immune_until[member] = stamp
-        await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
+        if is_traus(ctx, ctx.author) and immune == 'нах':
+            members = [ctx.author]
+            minutes = 60
+
+        for member in set(members):
+            stamp = datetime.timestamp(datetime.now()) + minutes*60
+            immune_until[member] = stamp
+            await ctx.send(box(f'{member.display_name} получает иммунитет на {minutes} минут.'))
+
+    @commands.command(name='бафф', help='Бафф гильдии от шапалаха')
+    @commands.has_any_role("Глава ги")
+    async def buff(self, ctx):
+        tot = get_members_by_role(ctx, name="ToT")
+        recruit = get_members_by_role(ctx, name="Рекрут")
+
+        for member in set(tot.members + recruit.members):
+            stamp = datetime.timestamp(datetime.now()) + 60*60
+            immune_until[member] = stamp
+        await ctx.send(box(f'Таверна получает иммунитет на 60 минут. Перерыв на пиво!'))
 
     @commands.command(name='наковер', help='вызвать человека на ковер для разговора')
     @commands.has_any_role("Совет ги")
@@ -305,9 +326,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
 
     @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
     @commands.has_role("Глава ги")
-    async def income(self, ctx, tax=None):
-        # todo может tax в цифрах?
-        all_income = get_reputation_income(bool(tax))
+    async def income(self, ctx, tax: str = '0'):
+        all_income = get_reputation_income(int(tax))
         msg = 'Вклад в гильдию за последнее время:\n'
         for name in sorted(all_income, key=all_income.get, reverse=True):
             msg += f'\n{name} {all_income[name]}'

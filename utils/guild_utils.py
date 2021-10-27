@@ -206,9 +206,7 @@ def random_emoji(ctx, animated=True) -> discord.Emoji:
     return random.choice(emojis)
 
 
-def get_reputation_income(tax: bool = False) -> dict:
+def get_reputation_income(tax: int = 0) -> dict:
     def start_time_with_tax(num) -> int:
-        if tax:
-            return num - num//100*20
-        return num
+        return num - num//100*tax
     return {player.name: player.finish - start_time_with_tax(player.start) for player in participants}
