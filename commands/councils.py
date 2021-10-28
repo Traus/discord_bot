@@ -196,7 +196,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
 
     @commands.command(name='домик', help='Временный иммунитет от шапалаха')
     @commands.has_any_role("Совет ги")
-    async def home(self, ctx, members: commands.Greedy[discord.Member], immune: str = ''):
+    async def home(self, ctx, members: commands.Greedy[discord.Member], immune: str = '10'):
         minutes = 10
         if not members:
             author = await get_renferenced_author(ctx)
@@ -205,9 +205,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             else:
                 members = [ctx.author]
 
-        if is_traus(ctx, ctx.author) and immune == 'нах':
-            members = [ctx.author]
-            minutes = 60
+        if is_traus(ctx, ctx.author):
+            minutes = int(immune)
 
         for member in set(members):
             stamp = datetime.timestamp(datetime.now()) + minutes*60
