@@ -1,5 +1,4 @@
 import discord
-from discord.utils import get
 
 from commands.mute_control import _add_mute
 from constants import members, messages, channels, vote_reactions
@@ -50,22 +49,6 @@ class ReactionHandler:
             else:
                 await self.message.clear_reaction(self.emoji)
 
-    async def on_rules_channel_reaction(self):
-        if self.payload.message_id == messages.RULES:
-            guest = get(self.guild.roles, name='Гость')
-            pecheneg = get(self.guild.roles, name='Pecheneg')
-            if guest not in self.member.roles and pecheneg not in self.member.roles:
-                if self.emoji.name == '✅':
-                    await self.member.add_roles(guest)
-                    emoji = await self.member.guild.fetch_emoji(811516186453082133)
-                    guest_channel: discord.TextChannel = bot.get_channel(channels.GUEST)
-                    await guest_channel.send(f'{self.member.mention} {emoji}')
-                if self.emoji.name == '🇬🇧':
-                    await self.member.add_roles(pecheneg)
-                    emoji = await self.member.guild.fetch_emoji(811516186453082133)
-                    guest_channel: discord.TextChannel = bot.get_channel(channels.ENGLISH)
-                    await guest_channel.send(f'{self.member.mention} {emoji}')
-
     async def on_class_channels_reaction(self):
         if self.payload.message_id == messages.CHOOSE_CLASS:
             roles_dict = get_class_roles(self.guild)
@@ -105,7 +88,6 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     await handler.on_traus_reaction()
     await handler.on_samka_reaction()
     await handler.on_private_room_reaction()
-    await handler.on_rules_channel_reaction()
     await handler.on_class_channels_reaction()
     await handler.on_vote_reaction()
 
