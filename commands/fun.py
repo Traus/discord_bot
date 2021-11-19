@@ -14,7 +14,7 @@ from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income
-from utils.states import table_turn_over
+from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 
 
@@ -52,7 +52,9 @@ class FunCommands(commands.Cog, name='Веселье'):
             avatar_to = member.avatar_url
 
             if has_immune(member) and not from_bot:
-                await ctx.send(box(f'У {member.display_name} иммунитет!'))
+                stamp = immune_until[member]
+                imune = stamp - datetime.timestamp(datetime.now())
+                await ctx.send(box(f'У {member.display_name} иммунитет на {int(imune//60) + 1} минут!'))
                 continue
 
             if from_bot:
