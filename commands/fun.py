@@ -240,13 +240,21 @@ class FunCommands(commands.Cog, name='Веселье'):
 
     @commands.command(pass_context=True, name='победитель', help='Определить победителя конкурса')
     @commands.has_role("Глава ги")
-    async def winner(self, ctx, necessary_points: str = '500'):
+    async def winner(self, ctx, necessary_points: str = '500', tax: str = '0', bonus: str = '0'):
         all_roles = ctx.guild.roles
         tot = get(all_roles, id=roles.TOT)
+        pass_members = ['Траус', 'Xelliana', 'Moon']
 
-        all_income = get_reputation_income()
+        all_income = get_reputation_income(int(tax))
         winners = [name for name in all_income if all_income[name] > int(necessary_points)]
-        winner = winners[random.randint(0, len(winners)-1)]
+
+        # new rules
+        if int(bonus) > 0:
+            for member, income in all_income.items():
+                bonus_income = (income - 500) // int(bonus)
+                winners.extend([member for _ in range(bonus_income)])
+
+        winner = random.choice([w for w in winners if w not in pass_members])
 
         await ctx.send(box(f"Начало рассчета..."))
         sleep(10)
