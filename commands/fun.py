@@ -271,10 +271,10 @@ class FunCommands(commands.Cog, name='Веселье'):
                            f"При желании, можешь передать приз любому другому участнику гильдии! "
                            f"В скором времени с тобой свяжется совет и обсудят возможность передачи награды =)"))
 
-    @commands.command(name='поздравляю', help='Поздравить Ирочку')
-    async def birthday(self, ctx):
-        await ctx.send(f'Поздравляем нашу <@{693210152127692920}> с Днём Рождения!')
-        await ctx.send(find_gif('Поздравляю', 10))
+    # @commands.command(name='поздравляю', help='Поздравить Ирочку')
+    # async def birthday(self, ctx):
+    #     await ctx.send(f'Поздравляем нашу <@{693210152127692920}> с Днём Рождения!')
+    #     await ctx.send(find_gif('Поздравляю', 10))
 
 
 bot.add_cog(FunCommands())
