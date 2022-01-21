@@ -110,6 +110,14 @@ class FunCommands(commands.Cog, name='Веселье'):
         for emoji in ('🇴', '🇫', '🇹', '🇦', '🇱', '🇪', '🇸'):
             await msg.add_reaction(emoji)
 
+    @commands.command(name='токсик', help='фу, токсик')
+    async def toxic(self, ctx):
+        message = await quote_renferenced_message(ctx)
+        toxic_emoji = f"{tavern_emoji}    :regional_indicator_o: :regional_indicator_f:"
+        msg = await send_by_bot(ctx, message, toxic_emoji, delete=True)
+        for emoji in ('🇹', '🇴', '🇽', 'ℹ', '🇨', '🇸', '<:emoji_99:866240571759788073>'):
+            await msg.add_reaction(emoji)
+
     @commands.command(name='переиграл', help='Переиграл и уничтожил')
     async def meme_win(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
