@@ -22,7 +22,7 @@ class MainCommands(commands.Cog, name='Основное'):
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
         if par == '100500':
-            text = f"{await mention_member_by_id(ctx, members.HELLMAN)} зануда!"
+            text = f"{await mention_member_by_id(ctx, members.HELLMAN)} \nЗ\nА\nН\nУ\nД\nА\n!!!"
             embed = discord.Embed(description=text)
             await ctx.send(embed=embed)
         else:
