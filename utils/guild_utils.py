@@ -28,7 +28,9 @@ def get_role_by_name(ctx, name: str) -> discord.Role:
 
 
 async def mention_member_by_id(ctx, member_id: int) -> str:
-    return (await ctx.guild.fetch_member(member_id)).mention
+    guild: discord.Guild = ctx.guild
+    member = await guild.fetch_member(member_id)
+    return member.mention
 
 
 def get_members_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:

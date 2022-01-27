@@ -60,7 +60,7 @@ class FunCommands(commands.Cog, name='Веселье'):
             dodge = random.randint(0, 100) >= 95
             if dodge:
                 await ctx.send(box(f'Суперуклон у {member.display_name}!'))
-                stamp = datetime.timestamp(datetime.now()) + 5
+                stamp = datetime.timestamp(datetime.now()) + 5*60
                 immune_until[member] = stamp
                 continue
 
