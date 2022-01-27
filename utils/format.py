@@ -3,7 +3,7 @@ from discord import utils
 
 
 def box(msg: str) -> str:
-    return f"```css\n{msg}```"
+    return f"```css\n{msg}```" if msg else '<a:no:845581984277069865>'
 
 
 async def send_by_bot(ctx, *args, delete=False, **kwargs) -> discord.WebhookMessage:

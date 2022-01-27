@@ -27,6 +27,10 @@ def get_role_by_name(ctx, name: str) -> discord.Role:
     return get(all_roles, name=name)
 
 
+async def mention_member_by_id(ctx, member_id: int) -> str:
+    return (await ctx.guild.fetch_member(member_id)).mention
+
+
 def get_members_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
     obj = ctx or user
     name = name.replace(' ', '').lower()

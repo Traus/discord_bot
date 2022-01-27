@@ -7,10 +7,10 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, vote_reactions, number_emoji
+from constants import channels, vote_reactions, number_emoji, members
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import get_members_by_role
+from utils.guild_utils import get_members_by_role, mention_member_by_id
 
 
 class MainCommands(commands.Cog, name='Основное'):
@@ -21,7 +21,12 @@ class MainCommands(commands.Cog, name='Основное'):
         channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.CHARTER)
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
-        await ctx.send(box(_get_paragraph(par, text)))
+        if par == '100500':
+            text = f"{await mention_member_by_id(ctx, members.HELLMAN)} зануда!"
+            embed = discord.Embed(description=text)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(box(_get_paragraph(par, text)))
 
     @commands.command(pass_context=True, help='Номер правила. Вывод правил')
     async def rule(self, ctx, par):

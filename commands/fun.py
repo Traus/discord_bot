@@ -45,22 +45,38 @@ class FunCommands(commands.Cog, name='Веселье'):
             else:
                 members = [ctx.author]
 
-        add_value('slap', number=len(members))
-
         for member in set(members):
             avatar_from = ctx.author.avatar_url
             avatar_to = member.avatar_url
 
+            # check immune
             if has_immune(member) and not from_bot:
                 stamp = immune_until[member]
                 imune = stamp - datetime.timestamp(datetime.now())
                 await ctx.send(box(f'У {member.display_name} иммунитет на {int(imune//60) + 1} минут!'))
                 continue
 
+            # chance to dodge
+            dodge = random.randint(0, 100) >= 95
+            if dodge:
+                await ctx.send(box(f'Суперуклон у {member.display_name}!'))
+                stamp = datetime.timestamp(datetime.now()) + 5
+                immune_until[member] = stamp
+                continue
+
             if from_bot:
                 avatar_from = get_bot_avatar(ctx)
 
             gif = is_traus(ctx, ctx.author) or random.randint(0, 100) >= 95
+            add_value('slap')
+
+            # check every 100 slap
+            if not (get_value('slap') % 100):
+                text = f"{ctx.author.mention} ультует по {member.mention}!"
+                embed = discord.Embed(description=text)
+                embed.set_image(url=find_gif(search_term='super slap', limit=1))
+                await ctx.send(embed=embed, reference=ctx.message.reference)
+                continue
             await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif, from_bot=from_bot)
 
     @commands.command(name='аватар', help='посмотреть аватарку')
