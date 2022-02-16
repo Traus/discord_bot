@@ -42,6 +42,10 @@ class MessageHandler:
             await inv_gi_channel.send(f"<@{self.message.author.id}>", embed=embed)
             await self.message.delete()
 
+    async def for_hellman(self):
+        if self.message.author.id == members.HELLMAN:
+            await self.message.add_reaction('🍆')
+
     async def replace_animated_emoji(self) -> list:
         animated_emojis = []
 
@@ -113,6 +117,7 @@ async def on_message(message: discord.Message):
     await handler.swear_moderation()
     await handler.on_mems_channel()
     await handler.on_join_to_guild_channel()
+    await handler.for_hellman()
 
     await handler.send_vacation_message()
     await handler.send_message(animated_emojis)
