@@ -42,34 +42,39 @@ class GuildCommands(commands.Cog, name='Гильдия'):
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
     async def decayra(self, ctx, *time):
         channel: discord.TextChannel = ctx.channel
-        decayra_channel = get(ctx.guild.channels, id=channels.DECAYRA)
-        if channel != decayra_channel:
-            return
+        decayra_chat = get(ctx.guild.channels, id=channels.DECAYRA)
+        decayra_announce = get(ctx.guild.channels, id=channels.ANNOUNCE)
 
-        all_roles = ctx.guild.roles
-        councils = get(all_roles, id=roles.COUNCILS)
-        tot = get(all_roles, id=roles.TOT)
-        recruit = get(all_roles, id=roles.RECRUIT)
-        pings = f'{councils.mention} {tot.mention} {recruit.mention}'
+        pings = f'@everyone'
         pattern = f"Кто идёт, ставим ✅ под сообщением!\n" \
                   f"Группы собираем в пещерах, но не перед входом в 3.1. Бежим тихо."
         msg = f"Тлевра в {' '.join(time)}. {pattern}\n" \
-              f"Тактику всем знать наизусть: <#{channels.GUIDES}>"
+              f"Тактику всем знать наизусть: <#{channels.GUIDES}>. Или сообщения выше."
+
+        async def search_for_decayra_message():
+            for message in await decayra_announce.history().flatten():
+                if pattern in message.content:
+                    return message
 
         if time:
+            if channel != decayra_announce:
+                return
+
+            message = await search_for_decayra_message()
+            await message.delete()
+
             new_message: discord.Message = await send_by_bot(ctx, f"{pings}\n{msg}", delete=True)
             await new_message.add_reaction('✅')
-            for message in await channel.pins():
-                if pattern in message.content:
-                    await message.unpin()
-            await new_message.pin()
+
         else:
+            if channel != decayra_chat:
+                return
             await ctx.message.delete()
             found = ''
-            for message in await channel.pins():
-                if pattern in message.content:
-                    found = ''.join(re.findall('Тлевра в .*(?=\.)', message.content))
-                    break
+
+            message = await search_for_decayra_message()
+            if message:
+                found = ''.join(re.findall('Тлевра в .*(?=\.)', message.content))
             await ctx.send(box(found))
 
     @commands.command(pass_context=True, name='роль', help="Список членов ги с определенной ролью")
