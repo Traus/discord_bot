@@ -170,7 +170,7 @@ def check_for_beer(content: Union[discord.Message, discord.Emoji]):
 
 def find_animated_emoji(word: str) -> Optional[str]:
     for emoji in bot.get_guild(GUILD_ID).emojis:
-        if word == emoji.name and emoji.animated:
+        if word.lower() == emoji.name.lower() and emoji.animated:
             return f"<a:{emoji.name}:{emoji.id}>"
 
 

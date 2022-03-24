@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, vote_reactions, number_emoji, members
+from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, mention_member_by_id
@@ -18,11 +18,11 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, name='устав', help='Глава устава. Вывод глав устава')
     async def charter(self, ctx, par):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.CHARTER)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.CHARTER)
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
         if par == '100500':
-            hellman = await mention_member_by_id(ctx, members.HELLMAN)
+            hellman = await mention_member_by_id(ctx, Members.HELLMAN)
             text = f"{hellman} \nЗ\nА\nН\nУ\nД\nА\n!!!"
             embed = discord.Embed(description=text)
             await ctx.send(embed=embed)
@@ -31,7 +31,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, help='Номер правила. Вывод правил')
     async def rule(self, ctx, par):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.RULES)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
         text = '\n'.join(message.content for message in messages)
         if par == '34':
@@ -42,7 +42,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, help='Основные принципы гильдии')
     async def main(self, ctx):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.INFO)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.INFO)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
         text = '\n'.join(message.content for message in messages)
         await ctx.send(box(_get_principle(text)))
@@ -124,7 +124,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
 
 def _get_paragraph(par, text):
-    pattern = f'(?<![.\d<]){par}.*'
+    pattern = f'(?<![.\d<]){par}\..*'
     res = re.findall(pattern, text)
     return '\n\t'.join(res)
 

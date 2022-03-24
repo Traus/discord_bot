@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.utils import get
 
 from commands.mute_control import _add_mute
-from constants import channels, roles
+from constants import Channels, Roles
 from init_bot import bot
 from utils.format import box, send_by_bot
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
@@ -44,7 +44,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
         await send_by_bot(ctx, box(msg))
-        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        council_channel = get(ctx.guild.channels, id=Channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
 
@@ -71,7 +71,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         else:
             msg = f"{member.display_name} и так молодец!"
         await send_by_bot(ctx, msg)
-        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        council_channel = get(ctx.guild.channels, id=Channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
 
@@ -86,7 +86,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         tot = get_members_by_role(ctx, name="ToT")
         recruit = get_members_by_role(ctx, name="Рекрут")
         reserve = get_members_by_role(ctx, name="Запас")
-        channel = bot.get_channel(channels.LIST)
+        channel = bot.get_channel(Channels.LIST)
 
         count = 0
         for group in (leader, council, active, tot, recruit, reserve):
@@ -121,12 +121,12 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def unmute(self, ctx, user: discord.Member):
         await ctx.message.delete()
-        role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
+        role = user.guild.get_role(Roles.MUTED)  # айди роли которую будет получать юзер
         await ctx.send(box(f'Мут снят с {user.display_name}'))
         await user.remove_roles(role)
         muted_queue.clear()
 
-        channels_with_perms = [channels.SEKTA, channels.KEFIR]
+        channels_with_perms = [Channels.SEKTA, Channels.KEFIR]
         try:
             for channel_id in channels_with_perms:
                 await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0],
@@ -145,10 +145,10 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
-              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(channels.CHOOSE_CLASS).mention}' \
+              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(Channels.CHOOSE_CLASS).mention}' \
               f'\n\n' \
-              f'**Очень важно**: зайди, пожалуйста, на {bot.get_channel(channels.PING).mention} и поставь ✅ под первым сообщением.'
-        await bot.get_channel(channels.GUILD).send(msg)
+              f'**Очень важно**: зайди, пожалуйста, на {bot.get_channel(Channels.PING).mention} и поставь ✅ под первым сообщением.'
+        await bot.get_channel(Channels.GUILD).send(msg)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
     @commands.has_permissions(kick_members=True)
@@ -192,7 +192,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии. Причина: {reason}')
             await ctx.send(msg)
             await member.send(msg)  # в лс
-            await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+            await get(ctx.guild.channels, id=Channels.COUNCILS).send(msg)  # совет-гильдии
 
     @commands.command(name='домик', help='Временный иммунитет от шапалаха')
     @commands.has_any_role("Совет ги")
@@ -229,7 +229,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def on_carpet(self, ctx, member: discord.Member):
         carpet = get(ctx.guild.roles, name='Разговор')
         await member.add_roles(carpet)
-        await bot.get_channel(channels.CARPET).send(member.mention)
+        await bot.get_channel(Channels.CARPET).send(member.mention)
 
     @commands.command(pass_context=True, help='Совет чистит каналы')
     @commands.has_role("Совет ги")
@@ -255,11 +255,11 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def ping(self, ctx, start=None):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
         all_roles = ctx.guild.roles
-        councils = get(all_roles, id=roles.COUNCILS)
-        tot = get(all_roles, id=roles.TOT)
-        recruit = get(all_roles, id=roles.RECRUIT)
+        councils = get(all_roles, id=Roles.COUNCILS)
+        tot = get(all_roles, id=Roles.TOT)
+        recruit = get(all_roles, id=Roles.RECRUIT)
         guild_ping = f'{councils.mention} {tot.mention} {recruit.mention}'
 
         embed_first = discord.Embed(
@@ -291,7 +291,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def check_afk(self, ctx):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
         history = channel.history(oldest_first=True)
         msg: discord.Message = await history.next()
         afk_users = await get_afk_users(msg)

@@ -5,7 +5,7 @@ from re import split
 
 import discord
 
-from constants import roles, channels
+from constants import Roles, Channels
 from utils.format import box
 from utils.guild_utils import set_permissions
 from utils.states import muted_queue, user_permissions
@@ -14,7 +14,7 @@ BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
 
 
 async def _add_mute(member: discord.Member, time: int):
-    mute_role = member.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
+    mute_role = member.guild.get_role(Roles.MUTED)  # айди роли которую будет получать юзер
 
     if muted_queue[member]:
         muted_queue[member].append(time)
@@ -22,7 +22,7 @@ async def _add_mute(member: discord.Member, time: int):
             await member.add_roles(mute_role)
         return
 
-    channels_with_perms = [channels.SEKTA, channels.KEFIR]
+    channels_with_perms = [Channels.SEKTA, Channels.KEFIR]
     user_permissions[member]['manage_roles'] = member.guild_permissions.manage_roles
     member.guild_permissions.manage_roles = False
     for channel_id in channels_with_perms:

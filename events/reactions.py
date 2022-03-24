@@ -1,7 +1,7 @@
 import discord
 
 from commands.mute_control import _add_mute
-from constants import members, messages, channels, vote_reactions
+from constants import Members, Messages, Channels, vote_reactions
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
@@ -24,11 +24,11 @@ class ReactionHandler:
         self.message = message
 
     async def on_traus_reaction(self):
-        if self.emoji.name == 'approved' and self.payload.user_id != members.TRAUS:
+        if self.emoji.name == 'approved' and self.payload.user_id != Members.TRAUS:
             await self.message.remove_reaction(self.emoji, self.member)
 
     async def on_samka_reaction(self):
-        if self.emoji.name == 'delete' and self.payload.user_id in [members.TRAUS, members.SAMKA]:
+        if self.emoji.name == 'delete' and self.payload.user_id in [Members.TRAUS, Members.SAMKA]:
             await self.message.delete()
             await self.message.channel.send(
                 box('Аниме на сервере осуждается и удаляется.'),
@@ -37,20 +37,20 @@ class ReactionHandler:
             await _add_mute(self.message.author, time=30)
 
     async def on_private_room_reaction(self):
-        if self.payload.message_id == messages.ROOMS:
+        if self.payload.message_id == Messages.ROOMS:
             if self.emoji.name == '🇩':
                 perms_flag = False
                 for role in self.payload.member.roles:
                     if role.name in ['Совет ги', 'ToT', 'Верховная жрица', 'Верховный жрец', 'Сектант']:
                         perms_flag = True
-                await set_permissions(channels.SEKTA, self.member, read_messages=True, send_messages=perms_flag)
+                await set_permissions(Channels.SEKTA, self.member, read_messages=True, send_messages=perms_flag)
             elif self.emoji.name == '🇰':
-                await set_permissions(channels.KEFIR, self.member, read_messages=True, send_messages=True)
+                await set_permissions(Channels.KEFIR, self.member, read_messages=True, send_messages=True)
             else:
                 await self.message.clear_reaction(self.emoji)
 
     async def on_class_channels_reaction(self):
-        if self.payload.message_id == messages.CHOOSE_CLASS:
+        if self.payload.message_id == Messages.CHOOSE_CLASS:
             roles_dict = get_class_roles(self.guild)
             if self.emoji.name in roles_dict:
                 await self.member.add_roles(roles_dict[self.emoji.name])
@@ -61,7 +61,7 @@ class ReactionHandler:
         # can be lag of quick click
         if self.message.embeds:
             if all([
-                self.member != self.guild.get_member(members.BOT),
+                self.member != self.guild.get_member(Members.BOT),
                 'Опрос от' in str(self.message.embeds[0].footer.text),
                 str(self.emoji) in vote_reactions
             ]):
@@ -98,12 +98,12 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
     guild = bot.get_guild(payload.guild_id)
     member: discord.Member = await guild.fetch_member(payload.user_id)
 
-    if payload.message_id == messages.ROOMS:
+    if payload.message_id == Messages.ROOMS:
         if emoji.name == '🇩':
-            await set_permissions(channels.SEKTA, member, read_messages=False, send_messages=False)
+            await set_permissions(Channels.SEKTA, member, read_messages=False, send_messages=False)
         if emoji.name == '🇰':
-            await set_permissions(channels.KEFIR, member, read_messages=False, send_messages=False)
+            await set_permissions(Channels.KEFIR, member, read_messages=False, send_messages=False)
 
-    if payload.message_id == messages.CHOOSE_CLASS:
+    if payload.message_id == Messages.CHOOSE_CLASS:
         roles_dict = get_class_roles(guild)
         await member.remove_roles(roles_dict[emoji.name])

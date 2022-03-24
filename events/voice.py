@@ -1,7 +1,7 @@
 import discord
 from discord.utils import get
 
-from constants import categories, channels
+from constants import Categories, Channels
 from init_bot import bot
 from utils.states import voice_owners
 
@@ -9,7 +9,7 @@ from utils.states import voice_owners
 @bot.event
 async def on_voice_state_update(member: discord.Member, before, after):
     role = discord.utils.get(member.guild.roles, name='У микрофона')
-    new_voice: discord.VoiceChannel = get(member.guild.channels, id=channels.NEWVOICE)
+    new_voice: discord.VoiceChannel = get(member.guild.channels, id=Channels.NEWVOICE)
 
     if not before.channel and after.channel:
         await member.add_roles(role)
@@ -21,6 +21,6 @@ async def on_voice_state_update(member: discord.Member, before, after):
         voice_owners[new_voc] = member
         await member.move_to(new_voc)
     if before.channel is not None:
-        if all([before.channel.category_id == categories.PRIVATE, before.channel != new_voice, not before.channel.members]):
+        if all([before.channel.category_id == Categories.PRIVATE, before.channel != new_voice, not before.channel.members]):
             await before.channel.delete()
             del voice_owners[before.channel]

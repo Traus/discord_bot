@@ -8,7 +8,7 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, tavern_emoji, roles, beer_emoji
+from constants import Channels, tavern_emoji, Roles, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot
@@ -108,7 +108,7 @@ class FunCommands(commands.Cog, name='Веселье'):
         if is_traus(ctx, member):
             return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
-        await set_permissions(channels.SEKTA, member, read_messages=True, send_messages=True)
+        await set_permissions(Channels.SEKTA, member, read_messages=True, send_messages=True)
         await member.add_roles(sekta)
 
     @commands.command(name='изсекты', help='выйти из этой криповой секты')
@@ -118,7 +118,7 @@ class FunCommands(commands.Cog, name='Веселье'):
         if sekta in ctx.author.roles:
             await ctx.author.remove_roles(sekta)
             await send_by_bot(ctx, file=discord.File('files/media/sekta.jpg'), delete=True)
-            await set_permissions(channels.SEKTA, ctx.author, send_messages=False)
+            await set_permissions(Channels.SEKTA, ctx.author, send_messages=False)
 
     @commands.command(help='ToT')
     async def tavern(self, ctx):
@@ -266,7 +266,7 @@ class FunCommands(commands.Cog, name='Веселье'):
     @commands.has_role("Глава ги")
     async def winner(self, ctx, necessary_points: str = '500', tax: str = '0', bonus: str = '0'):
         all_roles = ctx.guild.roles
-        tot = get(all_roles, id=roles.TOT)
+        tot = get(all_roles, id=Roles.TOT)
         pass_members = ['Траус', 'Xelliana', 'Moon']
 
         all_income = get_reputation_income(int(tax))

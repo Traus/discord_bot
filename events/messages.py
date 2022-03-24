@@ -4,7 +4,7 @@ import discord
 from discord.utils import get
 
 from commands import automoderation, send_by_bot
-from constants import channels, members
+from constants import Channels, Members
 from init_bot import bot
 from utils.guild_utils import check_for_beer, find_animated_emoji, get_renferenced_author, get_members_by_role, \
     is_traus, quote_renferenced_message, random_emoji
@@ -15,26 +15,26 @@ class MessageHandler:
         self.message = message
 
     async def if_todo(self):
-        todo_pattern = f'<#{channels.TODO}> '
-        if self.message.content.startswith(todo_pattern) and self.message.author.id == members.TRAUS:
-            todo_channel: discord.TextChannel = get(self.message.channel.guild.channels, id=channels.TODO)
+        todo_pattern = f'<#{Channels.TODO}> '
+        if self.message.content.startswith(todo_pattern) and self.message.author.id == Members.TRAUS:
+            todo_channel: discord.TextChannel = get(self.message.channel.guild.channels, id=Channels.TODO)
             await todo_channel.send(self.message.content.replace(todo_pattern, ''))
 
     async def swear_moderation(self):
-        no_moderation = (channels.REQUEST, channels.JOIN, channels.MEMES, channels.SEKTA, channels.FIRE)
+        no_moderation = (Channels.REQUEST, Channels.JOIN, Channels.MEMES, Channels.SEKTA, Channels.FIRE)
 
         if self.message.channel.id not in no_moderation:
             await automoderation(self.message)
 
     async def on_mems_channel(self):
-        if self.message.channel.id == channels.MEMES:
+        if self.message.channel.id == Channels.MEMES:
             if self.message.content:
                 await self.message.delete()
 
     async def on_join_to_guild_channel(self):
-        if self.message.channel.id == channels.JOIN:  # вступление-в-гильдию
+        if self.message.channel.id == Channels.JOIN:  # вступление-в-гильдию
             inv_gi_channel: discord.TextChannel = get(self.message.channel.guild.channels,
-                                                      id=channels.REQUEST)  # заявки-в-ги
+                                                      id=Channels.REQUEST)  # заявки-в-ги
 
             embed = discord.Embed(description=f"{date.today()}\n{self.message.content}")
             embed.set_thumbnail(url=self.message.author.avatar_url)

@@ -2,14 +2,15 @@ import re
 from random import randint
 
 import discord
+from discord import Reaction
 from discord.ext import commands
 from discord.utils import get
 
 from commands.mute_control import _add_mute
-from constants import roles, channels
+from constants import Roles, Channels
 from init_bot import bot
 from utils.format import box, send_by_bot
-from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus
+from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus, get_afk_users
 from utils.states import when_all_called
 
 
@@ -26,9 +27,9 @@ class GuildCommands(commands.Cog, name='Гильдия'):
             await _add_mute(ctx.author, 5*60)
         else:
             all_roles = ctx.guild.roles
-            councils = get(all_roles, id=roles.COUNCILS)
-            tot = get(all_roles, id=roles.TOT)
-            recruit = get(all_roles, id=roles.RECRUIT)
+            councils = get(all_roles, id=Roles.COUNCILS)
+            tot = get(all_roles, id=Roles.TOT)
+            recruit = get(all_roles, id=Roles.RECRUIT)
             msg = f'{councils.mention} {tot.mention} {recruit.mention}\n'
 
             if message:
@@ -42,14 +43,14 @@ class GuildCommands(commands.Cog, name='Гильдия'):
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
     async def decayra(self, ctx, *time):
         channel: discord.TextChannel = ctx.channel
-        decayra_chat = get(ctx.guild.channels, id=channels.DECAYRA)
-        decayra_announce = get(ctx.guild.channels, id=channels.ANNOUNCE)
+        decayra_chat = get(ctx.guild.channels, id=Channels.DECAYRA)
+        decayra_announce = get(ctx.guild.channels, id=Channels.ANNOUNCE)
 
         pings = f'@everyone'
         pattern = f"Кто идёт, ставим ✅ под сообщением!\n" \
                   f"Группы собираем в пещерах, но не перед входом в 3.1. Бежим тихо."
         msg = f"Тлевра в {' '.join(time)}. {pattern}\n" \
-              f"Тактику всем знать наизусть: <#{channels.GUIDES}>. Или сообщения выше."
+              f"Тактику всем знать наизусть: <#{Channels.GUIDES}>. Или сообщения выше."
 
         async def search_for_decayra_message():
             for message in await decayra_announce.history().flatten():
