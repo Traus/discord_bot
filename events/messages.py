@@ -125,3 +125,15 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
+
+@bot.event
+async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
+    message = payload.cached_message
+    if message is None:
+        return
+    content = message.content
+    author: discord.Member = message.author
+    channel: discord.TextChannel = message.channel
+    deleted: discord.TextChannel = bot.get_channel(Channels.DELETED)
+
+    await deleted.send(f"{author.display_name} в {channel.mention}:\n{content}")

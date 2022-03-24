@@ -174,6 +174,12 @@ def find_animated_emoji(word: str) -> Optional[str]:
             return f"<a:{emoji.name}:{emoji.id}>"
 
 
+def get_emoji_by_id(emoji_id: Union[str, int]) -> Optional[discord.Emoji]:
+    for emoji in bot.get_guild(GUILD_ID).emojis:
+        if emoji.id == int(emoji_id):
+            return emoji
+
+
 async def get_renferenced_message(ctx) -> Optional[discord.Message]:
     if ctx.message.reference is not None:
         message_id = ctx.message.reference.message_id
