@@ -11,7 +11,7 @@ from discord.utils import get
 from constants import Channels, tavern_emoji, Roles, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
-from utils.format import box, send_by_bot
+from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income
 from utils.states import table_turn_over, immune_until
@@ -73,8 +73,8 @@ class FunCommands(commands.Cog, name='Веселье'):
             # check every 100 slap
             if not (get_value('slap') % 100):
                 text = f"{ctx.author.mention} ультует по {member.mention}!"
-                embed = discord.Embed(description=text)
-                embed.set_image(url=find_gif(search_term='super slap', limit=1))
+                embed = create_embed(description=text,
+                                     image=find_gif(search_term='super slap', limit=1))
                 await ctx.send(embed=embed, reference=ctx.message.reference)
                 continue
             await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif, from_bot=from_bot)
@@ -141,9 +141,8 @@ class FunCommands(commands.Cog, name='Веселье'):
         member = member or author
         if member:
             text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
-            embed = discord.Embed()
-            embed.set_image(url=find_gif(search_term='переиграл', limit=1))
-            embed.add_field(name=f"Думали я вас не переиграю?", value=text)
+            embed = create_embed(image=find_gif(search_term='переиграл', limit=1),
+                                 fields=[("Думали я вас не переиграю?", text)])
             await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='пять', help='Дать пять')
@@ -153,8 +152,8 @@ class FunCommands(commands.Cog, name='Веселье'):
         member = member or author
         if member:
             text = f"{ctx.author.mention} даёт пять {member.mention}!"
-            embed = discord.Embed(description=text)
-            embed.set_image(url=find_gif(search_term='highfive', limit=50))
+            embed = create_embed(description=text,
+                                 image=find_gif(search_term='highfive', limit=50))
             await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='чок', help='Чокнуться')
@@ -164,8 +163,8 @@ class FunCommands(commands.Cog, name='Веселье'):
         member = member or author
         if member:
             text = f"{ctx.author.mention} чокается с {member.mention}!"
-            embed = discord.Embed(description=text)
-            embed.set_image(url=find_gif(search_term='cheers', limit=10))
+            embed = create_embed(description=text,
+                                 image=find_gif(search_term='cheers', limit=10))
             await ctx.send(embed=embed, reference=ctx.message.reference)
 
     @commands.command(name='факт', help='рандомный факт')

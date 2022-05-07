@@ -7,7 +7,7 @@ from discord.utils import get
 from commands.mute_control import _add_mute
 from constants import Channels, Roles
 from init_bot import bot
-from utils.format import box, send_by_bot
+from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
     get_role_by_name, get_reputation_income, get_renferenced_author
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
@@ -262,7 +262,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         recruit = get(all_roles, id=Roles.RECRUIT)
         guild_ping = f'{councils.mention} {tot.mention} {recruit.mention}'
 
-        embed_first = discord.Embed(
+        embed_first = create_embed(
             description="Проверка активности гильдии.\n"
                         "Статья Устава 4.3.5 предусматривает выдачу страйка за отсутствие более 7 дней без уважительной причины.\n"
                         "Обязательно поставьте реакцию на данное сообщение - ✅"
@@ -280,7 +280,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
                 to_delete.append(m)
             await channel.delete_messages(to_delete)
             afk_users = await get_afk_users(msg)
-            embed_repeat = discord.Embed(
+            embed_repeat = create_embed(
                 description=f"{' '.join([user.mention for user in afk_users])}\n"
                             f"Обязательно отреагируйте на первое сообщение на этом канале!"
             )

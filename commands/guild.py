@@ -9,7 +9,7 @@ from discord.utils import get
 from commands.mute_control import _add_mute
 from constants import Roles, Channels
 from init_bot import bot
-from utils.format import box, send_by_bot
+from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus, get_afk_users
 from utils.states import when_all_called
 
@@ -91,8 +91,7 @@ class GuildCommands(commands.Cog, name='Гильдия'):
         for count, member in enumerate(group, 1):
             message += f'{count}. {strip_tot(name=member.display_name)}\n'
 
-        embed = discord.Embed(colour=discord.Color.from_rgb(randint(0, 255), randint(0, 255), randint(0, 255)))
-        embed.add_field(name=f'**{role.role}**:', value=message)
+        embed = create_embed(fields=[(f'**{role.role}**:', message)])
 
         await ctx.send(embed=embed)
 

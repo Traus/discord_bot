@@ -9,7 +9,7 @@ from discord.utils import get
 
 from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
-from utils.format import box, send_by_bot
+from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, mention_member_by_id
 
 
@@ -24,7 +24,7 @@ class MainCommands(commands.Cog, name='Основное'):
         if par == '100500':
             hellman = await mention_member_by_id(ctx, Members.HELLMAN)
             text = f"{hellman} \nЗ\nА\nН\nУ\nД\nА\n!!!"
-            embed = discord.Embed(description=text)
+            embed = create_embed(description=text)
             await ctx.send(embed=embed)
         else:
             await ctx.send(box(_get_paragraph(par, text)))
@@ -105,10 +105,10 @@ class MainCommands(commands.Cog, name='Основное'):
                 text = text[1:]
                 reactions = [number_emoji[i+1] for i in range(int(number))]
         text = ' '.join(text).replace('\\n', '\n')
-        embed = discord.Embed(description=f"{ctx.author.mention}:\n{text}")
-        embed.set_thumbnail(url=ctx.author.avatar_url)
         now = datetime.timestamp(datetime.utcnow())
-        embed.set_footer(text=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
+        embed = create_embed(description=f"{ctx.author.mention}:\n{text}",
+                             thumbnail=ctx.author.avatar_url,
+                             footer=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
         msg: discord.Message = await ctx.send(embed=embed)
 
         for reaction in reactions:

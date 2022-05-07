@@ -6,6 +6,7 @@ from discord.utils import get
 from commands import automoderation, send_by_bot
 from constants import Channels, Members
 from init_bot import bot
+from utils.format import create_embed
 from utils.guild_utils import check_for_beer, find_animated_emoji, get_renferenced_author, get_members_by_role, \
     is_traus, quote_renferenced_message, random_emoji
 
@@ -21,7 +22,7 @@ class MessageHandler:
             await todo_channel.send(self.message.content.replace(todo_pattern, ''))
 
     async def swear_moderation(self):
-        no_moderation = (Channels.REQUEST, Channels.JOIN, Channels.MEMES, Channels.SEKTA, Channels.FIRE)
+        no_moderation = (Channels.REQUEST, Channels.JOIN, Channels.MEMES, Channels.SEKTA, Channels.FIRE, Channels.DELETED)
 
         if self.message.channel.id not in no_moderation:
             await automoderation(self.message)
@@ -36,8 +37,8 @@ class MessageHandler:
             inv_gi_channel: discord.TextChannel = get(self.message.channel.guild.channels,
                                                       id=Channels.REQUEST)  # заявки-в-ги
 
-            embed = discord.Embed(description=f"{date.today()}\n{self.message.content}")
-            embed.set_thumbnail(url=self.message.author.avatar_url)
+            embed = create_embed(description=f"{date.today()}\n{self.message.content}",
+                                 thumbnail=self.message.author.avatar_url)
 
             await inv_gi_channel.send(f"<@{self.message.author.id}>", embed=embed)
             await self.message.delete()
@@ -132,8 +133,14 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
     if message is None:
         return
     content = message.content
+    files = [await attachment.to_file() for attachment in message.attachments]
     author: discord.Member = message.author
     channel: discord.TextChannel = message.channel
     deleted: discord.TextChannel = bot.get_channel(Channels.DELETED)
 
-    await deleted.send(f"{author.display_name} в {channel.mention}:\n{content}")
+    embed = create_embed(description=content,
+                         fields=[
+                             ('автор', author.display_name),
+                             ('канал', channel.mention),
+                         ])
+    await deleted.send(embed=embed, files=files)

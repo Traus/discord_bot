@@ -3,6 +3,7 @@ from discord.utils import get
 
 from constants import Channels, Roles
 from init_bot import bot
+from utils.format import create_embed
 from utils.states import muted_queue
 
 
@@ -23,8 +24,8 @@ async def on_member_join(member: discord.Member):
 -На сервере доступна система приватных комнат - {bot.get_channel(Channels.PRIVATE_CHANNELS).mention}
 {bot.get_emoji(828026991361261619)}
 """
-    embed = discord.Embed(description=f"Добро пожаловать в Таверну Сказаний {member.mention}!")
-    embed.set_thumbnail(url=member.avatar_url)
+    embed = create_embed(description=f"Добро пожаловать в Таверну Сказаний {member.mention}!",
+                         thumbnail=member.avatar_url)
 
     welcome = bot.get_channel(Channels.WELCOME)
     await welcome.send(embed=embed)

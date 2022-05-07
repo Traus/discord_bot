@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import MinimalHelpCommand
 
+from utils.format import create_embed
+
 intents = discord.Intents.default()
 intents.members = True
 
@@ -21,9 +23,8 @@ class ShortHelp(MinimalHelpCommand):
         )
 
     async def send_pages(self):
-        color = discord.Color.from_rgb(randint(0, 255), randint(0, 255), randint(0, 255))
         destination = self.get_destination()
-        e = discord.Embed(color=color, description='')
+        e = create_embed(description='')
         for page in self.paginator.pages:
             e.description += page
         await destination.send(embed=e)
