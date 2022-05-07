@@ -124,7 +124,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
 
 def _get_paragraph(par, text):
-    pattern = f'(?<![.\d<]){par}\..*'
+    pattern = f'(?<![.\d<@#]){par}.*'
     res = re.findall(pattern, text)
     return '\n\t'.join(res)
 
