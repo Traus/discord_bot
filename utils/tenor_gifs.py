@@ -1,9 +1,13 @@
 import json
+import os
 from random import randint
 
 import requests
 
-from constants import TENOR_API
+try:
+    from local_settings import TENOR_API
+except ImportError:
+    TENOR_API = os.environ.get("TENOR_API")
 
 
 def find_gif(search_term, limit=10):

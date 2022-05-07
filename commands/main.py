@@ -7,9 +7,10 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from constants import channels, vote_reactions
+from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
-from utils.format import box
+from utils.format import box, send_by_bot, create_embed
+from utils.guild_utils import get_members_by_role, mention_member_by_id
 
 
 class MainCommands(commands.Cog, name='Основное'):
@@ -17,14 +18,20 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, name='устав', help='Глава устава. Вывод глав устава')
     async def charter(self, ctx, par):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.CHARTER)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.CHARTER)
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
-        await ctx.send(box(_get_paragraph(par, text)))
+        if par == '100500':
+            hellman = await mention_member_by_id(ctx, Members.HELLMAN)
+            text = f"{hellman} \nЗ\nА\nН\nУ\nД\nА\n!!!"
+            embed = create_embed(description=text)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(box(_get_paragraph(par, text)))
 
     @commands.command(pass_context=True, help='Номер правила. Вывод правил')
     async def rule(self, ctx, par):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.RULES)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.RULES)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
         text = '\n'.join(message.content for message in messages)
         if par == '34':
@@ -35,7 +42,7 @@ class MainCommands(commands.Cog, name='Основное'):
 
     @commands.command(pass_context=True, help='Основные принципы гильдии')
     async def main(self, ctx):
-        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=channels.INFO)
+        channel: discord.TextChannel = get(ctx.channel.guild.channels, id=Channels.INFO)
         messages = await channel.history(limit=1, oldest_first=True).flatten()
         text = '\n'.join(message.content for message in messages)
         await ctx.send(box(_get_principle(text)))
@@ -63,7 +70,7 @@ class MainCommands(commands.Cog, name='Основное'):
             first=starts_first[0].format((starts_first[1] + timedelta(hours=3)).strftime("%H:%M:%S")),  # msk time
             second=starts_next[0].format((starts_next[1] + timedelta(hours=3)).strftime("%H:%M:%S"))  # msk time
         )
-        await ctx.channel.send(box(msg))
+        await send_by_bot(ctx, box(msg), delete=True)
 
     @commands.command(name='магаз', help='игровой магазин, !магаз <число> для просмотра магазина на дни вперед')
     async def shop(self, ctx, days: str = ''):
@@ -81,21 +88,43 @@ class MainCommands(commands.Cog, name='Основное'):
             file=discord.File(f'files/media/shop/{(days + day_delta) % 12}.jpg')
         )
 
-    @commands.command(pass_context=True, help='Начать опрос')
+    @commands.command(
+        pass_context=True,
+        help='Начать опрос. Если начать текст с число:, то в голсосовании будет от 1 до число(10) вариантов'
+    )
     async def vote(self, ctx, *text):
         await ctx.message.delete()
-        embed = discord.Embed(description=f"{ctx.author.mention}:\n{' '.join(text)}")
-        embed.set_thumbnail(url=ctx.author.avatar_url)
+
+        reactions = vote_reactions
+        if text:
+            number = text[0].strip(':') if re.match(r'\d+:', text[0]) else []
+            if number:
+                if int(number) > 10:
+                    await ctx.send(box("Слишком много вариантов. Максимум 10."))
+                    return
+                text = text[1:]
+                reactions = [number_emoji[i+1] for i in range(int(number))]
+        text = ' '.join(text).replace('\\n', '\n')
         now = datetime.timestamp(datetime.utcnow())
-        embed.set_footer(text=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
+        embed = create_embed(description=f"{ctx.author.mention}:\n{text}",
+                             thumbnail=ctx.author.avatar_url,
+                             footer=f"Опрос от {datetime.fromtimestamp(now + 3*60*60).strftime('%d.%m.%Y - %H:%M')}")
         msg: discord.Message = await ctx.send(embed=embed)
 
-        for reaction in vote_reactions:
+        for reaction in reactions:
             await msg.add_reaction(reaction)
+
+    @commands.command(pass_context=True, help="Кто в муте?")
+    async def muted(self, ctx):
+        group = get_members_by_role(ctx, name="Muted")
+        message = 'В муте:\n'
+        for count, member in enumerate(group.members, 1):
+            message += f'{count}. {member.display_name}\n'
+        await ctx.send(box(message))
 
 
 def _get_paragraph(par, text):
-    pattern = f'(?<![.\d<]){par}.*'
+    pattern = f'(?<![.\d<@#]){par}.*'
     res = re.findall(pattern, text)
     return '\n\t'.join(res)
 

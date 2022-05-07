@@ -8,3 +8,8 @@ except ImportError:
 
 
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+
+def reconnect():
+    global conn
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')

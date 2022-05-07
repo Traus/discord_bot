@@ -5,11 +5,12 @@ from discord.ext import commands
 from discord.utils import get
 
 from commands.mute_control import _add_mute
-from constants import channels, roles
+from constants import Channels, Roles
 from init_bot import bot
-from utils.format import box
-from utils.guild_utils import get_member_by_role, strip_tot, set_permissions, get_afk_users
-from utils.states import immune_until, user_permissions, muted_queue
+from utils.format import box, send_by_bot, create_embed
+from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
+    get_role_by_name, get_reputation_income, get_renferenced_author
+from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
 
@@ -20,6 +21,9 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.has_role("Совет ги")
     async def strike(self, ctx, member: discord.Member, *reason):
         await ctx.message.delete()
+
+        if is_traus(ctx, member):
+            return
 
         reason = ' '.join(reason) or "заслужил"
         all_roles = ctx.guild.roles
@@ -35,12 +39,12 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             await member.add_roles(strike_3, reason=reason)
             msg = f"{member.display_name} получил {strike_3}. Причина: {reason}.\nСоветом Гильдии будет рассмотрен вопрос об изгнании {member}"
         elif strike_3 in member.roles:
-            msg = f"Вопрос об изннании {member.display_name} уже находится на расмотрении Совета Гильдии."
+            msg = f"Вопрос об изгнании {member.display_name} уже находится на расмотрении Совета Гильдии."
         else:
             await member.add_roles(strike_1, reason=reason)
             msg = f"{member.display_name} получил {strike_1}. Причина: {reason}."
-        await ctx.send(box(msg))
-        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        await send_by_bot(ctx, box(msg))
+        council_channel = get(ctx.guild.channels, id=Channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
 
@@ -66,8 +70,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             msg = f"{member.display_name} частично прощен за хорошее поведение."
         else:
             msg = f"{member.display_name} и так молодец!"
-        await ctx.send(box(msg))
-        council_channel = get(ctx.guild.channels, id=channels.COUNCILS)
+        await send_by_bot(ctx, msg)
+        council_channel = get(ctx.guild.channels, id=Channels.COUNCILS)
         if ctx.channel != council_channel:
             await council_channel.send(box(msg))  # совет-гильдии
 
@@ -76,13 +80,13 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def guild_list(self, ctx):
         message = ''
         uniq_users = set()
-        leader = get_member_by_role(ctx, name="Глава ги")
-        council = get_member_by_role(ctx, name="Совет ги")
-        active = get_member_by_role(ctx, name="Актив гильдии")
-        tot = get_member_by_role(ctx, name="ToT")
-        recruit = get_member_by_role(ctx, name="Рекрут")
-        reserve = get_member_by_role(ctx, name="Запас")
-        channel = bot.get_channel(channels.LIST)
+        leader = get_members_by_role(ctx, name="Глава ги")
+        council = get_members_by_role(ctx, name="Совет ги")
+        active = get_members_by_role(ctx, name="Актив гильдии")
+        tot = get_members_by_role(ctx, name="ToT")
+        recruit = get_members_by_role(ctx, name="Рекрут")
+        reserve = get_members_by_role(ctx, name="Запас")
+        channel = bot.get_channel(Channels.LIST)
 
         count = 0
         for group in (leader, council, active, tot, recruit, reserve):
@@ -98,23 +102,31 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         await channel.send(box(message))
 
     @commands.command(help='ник [время] [причина]. Время в формате число[smhd]')
-    @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
+    @commands.has_role("Совет ги")
     async def mute(self, ctx, user: discord.Member, time: str = '30s', *reason):
         await ctx.message.delete()
+
+        day = 60 * 60 * 24
+        times = {'s': 1, 'm': 60, 'h': 60 * 60, 'd': day}
+        time_1, time_2 = int(time[:-1]), time[-1]
+        mute_time = time_1 * times[time_2]
+        if mute_time > day:
+            mute_time = day
         reason = ' '.join(reason) or "заслужил"
-        await ctx.send(box(f'{user.display_name} получил мут на {time} по причине: {reason}'))
-        await _add_mute(user, time)
+
+        await ctx.send(box(f'{user.display_name} получил мут на {"24 часа" if mute_time == day else time} по причине: {reason}'))
+        await _add_mute(user, mute_time)
 
     @commands.command(help='Снять мут')
     @commands.has_permissions(manage_roles=True, ban_members=True, kick_members=True)
     async def unmute(self, ctx, user: discord.Member):
         await ctx.message.delete()
-        role = user.guild.get_role(roles.MUTED)  # айди роли которую будет получать юзер
+        role = user.guild.get_role(Roles.MUTED)  # айди роли которую будет получать юзер
         await ctx.send(box(f'Мут снят с {user.display_name}'))
         await user.remove_roles(role)
         muted_queue.clear()
 
-        channels_with_perms = [channels.MERY, channels.KEFIR]
+        channels_with_perms = [Channels.SEKTA, Channels.KEFIR]
         try:
             for channel_id in channels_with_perms:
                 await set_permissions(channel_id, user, read_messages=user_permissions[user][channel_id][0],
@@ -133,10 +145,10 @@ class CouncilsCommands(commands.Cog, name='Совет'):
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
-              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(channels.CHOOSE_CLASS).mention}' \
+              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(Channels.CHOOSE_CLASS).mention}' \
               f'\n\n' \
-              f'**Очень важно**: зайди, пожалуйста, на {bot.get_channel(channels.PING).mention} и поставь ✅ под первым сообщением.'
-        await bot.get_channel(channels.GUILD).send(msg)
+              f'**Очень важно**: зайди, пожалуйста, на {bot.get_channel(Channels.PING).mention} и поставь ✅ под первым сообщением.'
+        await bot.get_channel(Channels.GUILD).send(msg)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
     @commands.has_permissions(kick_members=True)
@@ -152,6 +164,8 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
     async def kick_from_guild(self, ctx, member: discord.Member, *reason):
+        if is_traus(ctx, member):
+            return
         reason = ' '.join(reason) or "не сложилось"
         await ctx.message.delete()
         kick = False
@@ -161,7 +175,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
                 'Совет ги',
                 'ToT',
                 'Наставник',
-                'Зазывала',
+                'Малый совет',
                 'Актив гильдии',
                 'Рекрут',
                 'Запас',
@@ -178,43 +192,77 @@ class CouncilsCommands(commands.Cog, name='Совет'):
             msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии. Причина: {reason}')
             await ctx.send(msg)
             await member.send(msg)  # в лс
-            await get(ctx.guild.channels, id=channels.COUNCILS).send(msg)  # совет-гильдии
+            await get(ctx.guild.channels, id=Channels.COUNCILS).send(msg)  # совет-гильдии
 
-    @commands.command(name='домик', help='временный иммунитет от шапалаха')
+    @commands.command(name='домик', help='Временный иммунитет от шапалаха')
     @commands.has_any_role("Совет ги")
-    async def home(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.author
+    async def home(self, ctx, members: commands.Greedy[discord.Member], immune: str = '10'):
+        minutes = 10
+        if not members:
+            author = await get_renferenced_author(ctx)
+            if author is not None:
+                members = [author]
+            else:
+                members = [ctx.author]
 
-        stamp = datetime.timestamp(datetime.now()) + 10*60
-        immune_until[member] = stamp
-        await ctx.send(box(f'{member.display_name} получает иммунитет на 10 минут.'))
+        if is_traus(ctx, ctx.author):
+            minutes = int(immune)
+
+        for member in set(members):
+            stamp = datetime.timestamp(datetime.now()) + minutes*60
+            immune_until[member] = stamp
+            await ctx.send(box(f'{member.display_name} получает иммунитет на {minutes} минут.'))
+
+    @commands.command(name='бафф', help='Бафф гильдии от шапалаха')
+    @commands.has_any_role("Глава ги")
+    async def buff(self, ctx):
+        tot = get_members_by_role(ctx, name="ToT")
+        recruit = get_members_by_role(ctx, name="Рекрут")
+
+        for member in set(tot.members + recruit.members):
+            stamp = datetime.timestamp(datetime.now()) + 60*60
+            immune_until[member] = stamp
+        await ctx.send(box(f'Таверна получает иммунитет на 60 минут. Перерыв на пиво!'))
 
     @commands.command(name='наковер', help='вызвать человека на ковер для разговора')
     @commands.has_any_role("Совет ги")
     async def on_carpet(self, ctx, member: discord.Member):
         carpet = get(ctx.guild.roles, name='Разговор')
         await member.add_roles(carpet)
-        await bot.get_channel(channels.CARPET).send(member.mention)
+        await bot.get_channel(Channels.CARPET).send(member.mention)
 
     @commands.command(pass_context=True, help='Совет чистит каналы')
     @commands.has_role("Совет ги")
     async def clean(self, ctx, limit=10):
         await ctx.channel.purge(limit=limit)
 
+    @commands.command(pass_context=True, name='отпуск', help='Уйти/вернуться с отпуска')
+    @commands.has_role("Совет ги")
+    async def vacation(self, ctx):
+        await ctx.message.delete()
+
+        member: discord.Member = ctx.author
+        role = get_role_by_name(ctx, 'Отпуск')
+        if role in member.roles:
+            await member.remove_roles(role)
+            await ctx.send(box(f'{member.display_name} вернулся с отпуска'))
+        else:
+            await member.add_roles(role)
+            await ctx.send(box(f'{member.display_name} ушёл в отпуск'))
+
     @commands.command(pass_context=True, name='пинг', help='Проверка активности гильдии')
     @commands.has_role("Совет ги")
     async def ping(self, ctx, start=None):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
         all_roles = ctx.guild.roles
-        councils = get(all_roles, id=roles.COUNCILS)
-        tot = get(all_roles, id=roles.TOT)
-        recruit = get(all_roles, id=roles.RECRUIT)
+        councils = get(all_roles, id=Roles.COUNCILS)
+        tot = get(all_roles, id=Roles.TOT)
+        recruit = get(all_roles, id=Roles.RECRUIT)
         guild_ping = f'{councils.mention} {tot.mention} {recruit.mention}'
 
-        embed_first = discord.Embed(
+        embed_first = create_embed(
             description="Проверка активности гильдии.\n"
                         "Статья Устава 4.3.5 предусматривает выдачу страйка за отсутствие более 7 дней без уважительной причины.\n"
                         "Обязательно поставьте реакцию на данное сообщение - ✅"
@@ -232,7 +280,7 @@ class CouncilsCommands(commands.Cog, name='Совет'):
                 to_delete.append(m)
             await channel.delete_messages(to_delete)
             afk_users = await get_afk_users(msg)
-            embed_repeat = discord.Embed(
+            embed_repeat = create_embed(
                 description=f"{' '.join([user.mention for user in afk_users])}\n"
                             f"Обязательно отреагируйте на первое сообщение на этом канале!"
             )
@@ -243,12 +291,46 @@ class CouncilsCommands(commands.Cog, name='Совет'):
     async def check_afk(self, ctx):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(channels.PING)
+        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
         history = channel.history(oldest_first=True)
         msg: discord.Message = await history.next()
         afk_users = await get_afk_users(msg)
 
         await ctx.channel.send(box('\n'.join([user.display_name for user in afk_users])))
+
+    @commands.command(pass_context=True, name='пьянь', help='Ушел в запой? Посиди в муте')
+    @commands.has_role("Совет ги")
+    async def drunk(self, ctx, member: discord.Member = None):
+        await ctx.message.delete()
+
+        if member is None:
+            member = ctx.author
+
+        role = get_role_by_name(ctx, 'Совет ги')
+        drunk = get_role_by_name(ctx, 'В зюзю')
+
+        if drunk_status[member][0] or drunk in member.roles:
+            await member.remove_roles(drunk)
+            if drunk_status[member][1]:
+                await member.add_roles(role)
+            await ctx.send(f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
+            del drunk_status[member]
+        else:
+            council = role in member.roles and not is_traus(ctx, member)
+            if council:
+                await member.remove_roles(role)
+            await member.add_roles(drunk)
+            await send_by_bot(ctx, member.mention+':', find_gif('drunk', 10))
+            drunk_status[member] = (True, council)
+
+    @commands.command(pass_context=True, name='вклад', help='Узнать активность членов гильдии')
+    @commands.has_role("Глава ги")
+    async def income(self, ctx, tax: str = '0'):
+        all_income = get_reputation_income(int(tax))
+        msg = 'Вклад в гильдию за последнее время:\n'
+        for name in sorted(all_income, key=all_income.get, reverse=True):
+            msg += f'\n{name} {all_income[name]}'
+        await ctx.send(box(msg))
 
 
 bot.add_cog(CouncilsCommands())
