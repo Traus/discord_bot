@@ -20,7 +20,7 @@ async def send_by_bot(ctx, *args, delete=False, **kwargs) -> discord.WebhookMess
 
 
 def create_embed(
-        title: str = None,
+        title: str = EmptyEmbed,
         description: str = '',
         color: discord.Color = None,
         fields: list = None,
