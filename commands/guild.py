@@ -62,7 +62,8 @@ class GuildCommands(commands.Cog, name='Гильдия'):
                 return
 
             message = await search_for_decayra_message()
-            await message.delete()
+            if message:
+                await message.delete()
 
             new_message: discord.Message = await send_by_bot(ctx, f"{pings}\n{msg}", delete=True)
             await new_message.add_reaction('✅')
