@@ -4,6 +4,7 @@ import discord
 from async_contextlib import asynccontextmanager
 from discord.ext import commands
 
+from commands.base_command import Command
 from init_bot import bot
 from utils.format import box
 from utils.guild_utils import set_permissions
@@ -41,7 +42,7 @@ async def join_channel(ctx):
     await ctx.channel.send(box("Сначала необходимо подключиться к приватному голосовому каналу!"))
 
 
-class NewVocCommands(commands.Cog, name='Голос', description="Управление приватными голосовыми каналами"):
+class NewVocCommands(Command, name='Голос', description="Управление приватными голосовыми каналами"):
     @commands.group(pass_context=True, help="Возможные команды после !nv - lock, unlock, invite @user/@role, remove @user/@role, rename [name], limit [number]")
     async def nv(self, ctx):
         if ctx.invoked_subcommand is None:

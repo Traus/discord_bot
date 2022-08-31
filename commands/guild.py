@@ -1,20 +1,19 @@
 import re
-from random import randint
 
 import discord
-from discord import Reaction
 from discord.ext import commands
 from discord.utils import get
 
+from commands.base_command import Command
 from commands.mute_control import _add_mute
 from constants import Roles, Channels
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
-from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus, get_afk_users
+from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus
 from utils.states import when_all_called
 
 
-class GuildCommands(commands.Cog, name='Гильдия'):
+class GuildCommands(Command, name='Гильдия'):
     """Команды, доступные участникам гильдии с ролью ToT"""
 
     @commands.command(pass_context=True, name='all',  help='Вызвать всю гильдию ТоТ. '

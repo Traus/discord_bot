@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
+from commands.base_command import Command
 from commands.mute_control import _add_mute
 from constants import Channels, Roles
 from init_bot import bot
@@ -14,7 +15,7 @@ from utils.states import immune_until, user_permissions, muted_queue, drunk_stat
 from utils.tenor_gifs import find_gif
 
 
-class CouncilsCommands(commands.Cog, name='Совет'):
+class CouncilsCommands(Command, name='Совет'):
     """Команды, доступные совету гильдии"""
 
     @commands.command(name='страйк', help='ник [причина]. Даёт +1 уровень страйка')

@@ -22,7 +22,11 @@ class MessageHandler:
             await todo_channel.send(self.message.content.replace(todo_pattern, ''))
 
     async def swear_moderation(self):
-        no_moderation = (Channels.REQUEST, Channels.JOIN, Channels.MEMES, Channels.SEKTA, Channels.FIRE, Channels.DELETED)
+        no_moderation = (
+            Channels.REQUEST, Channels.JOIN, Channels.MEMES,
+            Channels.SEKTA, Channels.FIRE, Channels.DELETED,
+            Channels.TODO
+        )
 
         if self.message.channel.id not in no_moderation:
             await automoderation(self.message)

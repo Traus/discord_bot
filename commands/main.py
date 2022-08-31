@@ -1,19 +1,19 @@
 import random
 import re
-import time
 from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
 from discord.utils import get
 
+from commands.base_command import Command
 from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, mention_member_by_id
 
 
-class MainCommands(commands.Cog, name='Основное'):
+class MainCommands(Command, name='Основное'):
     """Основные команды, доступные каждому"""
 
     @commands.command(pass_context=True, name='устав', help='Глава устава. Вывод глав устава')

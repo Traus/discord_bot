@@ -8,6 +8,7 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
+from commands.base_command import Command
 from constants import Channels, tavern_emoji, Roles, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
@@ -18,7 +19,7 @@ from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 
 
-class FunCommands(commands.Cog, name='Веселье'):
+class FunCommands(Command, name='Веселье'):
     """Рофлы и пасхалки"""
 
     @commands.command(name='осуждаю', help='Осудить!')
