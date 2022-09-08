@@ -85,15 +85,15 @@ tavern_emoji = f':regional_indicator_t: ' \
 
 
 beer_emoji = {
-    "beer": "<:pepe_beer:828026991361261619>",
-    "ale": "<:tavern_beer:822536261079662672>",
-    "wine": "<:pepe_celebrate:811749316313350144>",
-    "vodka": "<:pepe_vodka:811737381551079425>",
-    "honey": "<:honey:847010009874432040>",
+    "beer": "<:a_pepe_beer:828026991361261619>",
+    "ale": "<:a_tavern_beer:822536261079662672>",
+    "wine": "<:a_pepe_celebrate:811749316313350144>",
+    "vodka": "<:a_pepe_vodka:811737381551079425>",
+    "honey": "<:a_honey:847010009874432040>",
 }
 
 
-vote_reactions = ['<:pepe_yes:811753098867507210>', '<:pepe_no:811753121902362725>']
+vote_reactions = ['<:a_pepe_yes:811753098867507210>', '<:a_pepe_no:811753121902362725>']
 number_emoji = {
     1: '1️⃣',
     2: '2️⃣',
