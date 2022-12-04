@@ -14,7 +14,7 @@ from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income
+    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income, chance
 from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 
@@ -58,7 +58,7 @@ class FunCommands(Command, name='Веселье'):
                 continue
 
             # chance to dodge
-            dodge = random.randint(0, 100) >= 95
+            dodge = chance(5)
             if dodge:
                 await ctx.send(box(f'Суперуклон у {member.display_name}!'))
                 stamp = datetime.timestamp(datetime.now()) + 5*60
@@ -68,7 +68,7 @@ class FunCommands(Command, name='Веселье'):
             if from_bot:
                 avatar_from = get_bot_avatar(ctx)
 
-            gif = is_traus(ctx, ctx.author) or random.randint(0, 100) >= 95
+            gif = is_traus(ctx, ctx.author) or chance(5)
             add_value('slap')
 
             # check every 100 slap

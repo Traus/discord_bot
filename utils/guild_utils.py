@@ -222,3 +222,7 @@ def get_reputation_income(tax: int = 0) -> dict:
     def start_time_with_tax(num) -> int:
         return num - num//100*tax
     return {player.name: player.finish - start_time_with_tax(player.start) for player in participants}
+
+
+def chance(percentage: int) -> bool:
+    return random.randint(0, 100) <= percentage

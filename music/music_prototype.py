@@ -2,6 +2,7 @@ import asyncio
 import functools
 import itertools
 import math
+import os
 import random
 from pathlib import Path
 
@@ -470,16 +471,21 @@ class Music(commands.Cog):
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
-        async with ctx.typing():
-            try:
-                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-            except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
-            else:
-                song = Song(source)
+        try:
+            async with ctx.typing():
+                try:
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                except YTDLError as e:
+                    print(e)
+                    await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                else:
+                    song = Song(source)
 
-                await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                    await ctx.voice_state.songs.put(song)
+                    await ctx.send('Enqueued {}'.format(str(source)))
+        except Exception as e:
+            print(e)
+            print(os.environ["PATH"])
 
     @_join.before_invoke
     @_play.before_invoke
