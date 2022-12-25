@@ -21,7 +21,7 @@ class GuildCommands(Command, name='Гильдия'):
                                                            'Злоупотребление наказуемо!')
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
     async def _all(self, ctx, *message):
-        if is_spam(ctx.author, when_all_called, 60) and not is_traus(ctx, ctx.author):
+        if is_spam(ctx.author, when_all_called, 60) and not is_traus(ctx.author):
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: не злоупотреблять!'))
             await _add_mute(ctx.author, 5*60)
         else:
@@ -81,8 +81,8 @@ class GuildCommands(Command, name='Гильдия'):
     @commands.command(pass_context=True, name='роль', help="Список членов ги с определенной ролью")
     @commands.has_any_role("Совет ги", "ToT")
     async def roles(self, ctx, *role_name):
-        tot = get_members_by_role(ctx, name="ToT")
-        role = get_members_by_role(ctx, name=' '.join(role_name))
+        tot = get_members_by_role(name="ToT")
+        role = get_members_by_role(name=' '.join(role_name))
         group = set(role.members)
         if role.role.lower() != "рекрут" and "tavern" not in role.role.lower():
             group = group & set(tot.members)

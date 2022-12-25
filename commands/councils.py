@@ -10,7 +10,7 @@ from constants import Channels, Roles
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
-    get_role_by_name, get_reputation_income, get_renferenced_author
+    get_role_by_name, get_reputation_income, get_referenced_author
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
@@ -23,7 +23,7 @@ class CouncilsCommands(Command, name='Совет'):
     async def strike(self, ctx, member: discord.Member, *reason):
         await ctx.message.delete()
 
-        if is_traus(ctx, member):
+        if is_traus(member):
             return
 
         reason = ' '.join(reason) or "заслужил"
@@ -81,12 +81,12 @@ class CouncilsCommands(Command, name='Совет'):
     async def guild_list(self, ctx):
         message = ''
         uniq_users = set()
-        leader = get_members_by_role(ctx, name="Глава ги")
-        council = get_members_by_role(ctx, name="Совет ги")
-        active = get_members_by_role(ctx, name="Актив гильдии")
-        tot = get_members_by_role(ctx, name="ToT")
-        recruit = get_members_by_role(ctx, name="Рекрут")
-        reserve = get_members_by_role(ctx, name="Запас")
+        leader = get_members_by_role(name="Глава ги")
+        council = get_members_by_role(name="Совет ги")
+        active = get_members_by_role(name="Актив гильдии")
+        tot = get_members_by_role(name="ToT")
+        recruit = get_members_by_role(name="Рекрут")
+        reserve = get_members_by_role(name="Запас")
         channel = bot.get_channel(Channels.LIST)
 
         count = 0
@@ -163,7 +163,7 @@ class CouncilsCommands(Command, name='Совет'):
     @commands.command(pass_context=True, name='исключить', help='Исключить из гильдии')
     @commands.has_role("Совет ги")
     async def kick_from_guild(self, ctx, member: discord.Member, *reason):
-        if is_traus(ctx, member):
+        if is_traus(member):
             return
         reason = ' '.join(reason) or "не сложилось"
         await ctx.message.delete()
@@ -198,13 +198,13 @@ class CouncilsCommands(Command, name='Совет'):
     async def home(self, ctx, members: commands.Greedy[discord.Member], immune: str = '10'):
         minutes = 10
         if not members:
-            author = await get_renferenced_author(ctx)
+            author = await get_referenced_author(ctx)
             if author is not None:
                 members = [author]
             else:
                 members = [ctx.author]
 
-        if is_traus(ctx, ctx.author):
+        if is_traus(ctx.author):
             minutes = int(immune)
 
         for member in set(members):
@@ -215,8 +215,8 @@ class CouncilsCommands(Command, name='Совет'):
     @commands.command(name='бафф', help='Бафф гильдии от шапалаха')
     @commands.has_any_role("Глава ги")
     async def buff(self, ctx):
-        tot = get_members_by_role(ctx, name="ToT")
-        recruit = get_members_by_role(ctx, name="Рекрут")
+        tot = get_members_by_role(name="ToT")
+        recruit = get_members_by_role(name="Рекрут")
 
         for member in set(tot.members + recruit.members):
             stamp = datetime.timestamp(datetime.now()) + 60*60
@@ -241,7 +241,7 @@ class CouncilsCommands(Command, name='Совет'):
         await ctx.message.delete()
 
         member: discord.Member = ctx.author
-        role = get_role_by_name(ctx, 'Отпуск')
+        role = get_role_by_name('Отпуск')
         if role in member.roles:
             await member.remove_roles(role)
             await ctx.send(box(f'{member.display_name} вернулся с отпуска'))
@@ -305,8 +305,8 @@ class CouncilsCommands(Command, name='Совет'):
         if member is None:
             member = ctx.author
 
-        role = get_role_by_name(ctx, 'Совет ги')
-        drunk = get_role_by_name(ctx, 'В зюзю')
+        role = get_role_by_name('Совет ги')
+        drunk = get_role_by_name('В зюзю')
 
         if drunk_status[member][0] or drunk in member.roles:
             await member.remove_roles(drunk)
@@ -315,7 +315,7 @@ class CouncilsCommands(Command, name='Совет'):
             await ctx.send(f'{member.mention} с возвращением из запоя! <:pepe_beer:828026991361261619>')
             del drunk_status[member]
         else:
-            council = role in member.roles and not is_traus(ctx, member)
+            council = role in member.roles and not is_traus(member)
             if council:
                 await member.remove_roles(role)
             await member.add_roles(drunk)

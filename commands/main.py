@@ -22,7 +22,7 @@ class MainCommands(Command, name='Основное'):
         messages = await channel.history().flatten()
         text = '\n'.join(message.content for message in messages)
         if par == '100500':
-            hellman = await mention_member_by_id(ctx, Members.HELLMAN)
+            hellman = await mention_member_by_id(Members.HELLMAN)
             text = f"{hellman} \nЗ\nА\nН\nУ\nД\nА\n!!!"
             embed = create_embed(description=text)
             await ctx.send(embed=embed)
@@ -116,7 +116,7 @@ class MainCommands(Command, name='Основное'):
 
     @commands.command(pass_context=True, help="Кто в муте?")
     async def muted(self, ctx):
-        group = get_members_by_role(ctx, name="Muted")
+        group = get_members_by_role(name="Muted")
         message = 'В муте:\n'
         for count, member in enumerate(group.members, 1):
             message += f'{count}. {member.display_name}\n'

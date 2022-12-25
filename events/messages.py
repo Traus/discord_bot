@@ -7,8 +7,8 @@ from commands import automoderation, send_by_bot
 from constants import Channels, Members
 from init_bot import bot
 from utils.format import create_embed
-from utils.guild_utils import check_for_beer, find_animated_emoji, get_renferenced_author, get_members_by_role, \
-    is_traus, quote_renferenced_message, random_emoji
+from utils.guild_utils import check_for_beer, find_animated_emoji, get_referenced_author, get_members_by_role, \
+    is_traus, quote_referenced_message, random_emoji, get_channel
 
 
 class MessageHandler:
@@ -25,7 +25,7 @@ class MessageHandler:
         no_moderation = (
             Channels.REQUEST, Channels.JOIN, Channels.MEMES,
             Channels.SEKTA, Channels.FIRE, Channels.DELETED,
-            Channels.TODO
+            Channels.TODO, Channels.REQUEST_ALIANCE
         )
 
         if self.message.channel.id not in no_moderation:
@@ -38,13 +38,22 @@ class MessageHandler:
 
     async def on_join_to_guild_channel(self):
         if self.message.channel.id == Channels.JOIN:  # вступление-в-гильдию
-            inv_gi_channel: discord.TextChannel = get(self.message.channel.guild.channels,
-                                                      id=Channels.REQUEST)  # заявки-в-ги
+            inv_gi_channel: discord.TextChannel = get_channel(Channels.REQUEST)  # заявки-в-ги
 
             embed = create_embed(description=f"{date.today()}\n{self.message.content}",
                                  thumbnail=self.message.author.avatar_url)
 
             await inv_gi_channel.send(f"<@{self.message.author.id}>", embed=embed)
+            await self.message.delete()
+
+    async def on_join_to_aliance_channel(self):
+        if self.message.channel.id == Channels.JOIN_ALIANCE:
+            inv_channel: discord.TextChannel = get_channel(Channels.REQUEST_ALIANCE)
+
+            embed = create_embed(description=f"{date.today()}\n{self.message.content}",
+                                 thumbnail=self.message.author.avatar_url)
+
+            await inv_channel.send(f"<@{self.message.author.id}>", embed=embed)
             await self.message.delete()
 
     # async def for_hellman(self):
@@ -78,15 +87,14 @@ class MessageHandler:
         return not bool(content.strip())
 
     async def send_vacation_message(self):
-        ctx = await bot.get_context(self.message)
-        vaction_members = get_members_by_role(ctx, name="Отпуск")
-        for member in vaction_members.members:
+        vacation_members = get_members_by_role(name="Отпуск")
+        for member in vacation_members.members:
             if str(member.id) in self.message.content:
-                if is_traus(ctx, member):
+                if is_traus(member):
                     bot_msg = await self.message.channel.send(f"Траус не бухает, Траус отдыхает!")
                 else:
                     bot_msg = await self.message.channel.send(f"{member.display_name} отдыхает!")
-                await bot_msg.add_reaction(random_emoji(ctx))
+                await bot_msg.add_reaction(random_emoji())
 
     async def send_message(self, animated_emojis: list):
         ctx = await bot.get_context(self.message)
@@ -94,7 +102,7 @@ class MessageHandler:
         if animated_emojis:
             await ctx.message.delete()
             if not (self.is_only_emojis(animated_emojis) and self.message.reference):
-                message = await quote_renferenced_message(ctx)
+                message = await quote_referenced_message(ctx)
                 await send_by_bot(ctx, message, self.message.content)
 
     async def send_animated_reactions(self, animated_emojis):
@@ -122,6 +130,7 @@ async def on_message(message: discord.Message):
     await handler.swear_moderation()
     await handler.on_mems_channel()
     await handler.on_join_to_guild_channel()
+    await handler.on_join_to_aliance_channel()
     # await handler.for_hellman()
 
     await handler.send_vacation_message()

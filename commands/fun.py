@@ -14,7 +14,7 @@ from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_renferenced_author, is_traus, quote_renferenced_message, get_reputation_income, chance
+    set_permissions, get_referenced_author, is_traus, quote_referenced_message, get_reputation_income, chance
 from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 
@@ -24,12 +24,12 @@ class FunCommands(Command, name='Веселье'):
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
-        message = await quote_renferenced_message(ctx)
+        message = await quote_referenced_message(ctx)
         await send_by_bot(ctx, message, file=discord.File('files/media/tom.jpg'), delete=True)
 
     @commands.command(name='одобряю', help='Одобрить!')
     async def approve(self, ctx):
-        message = await quote_renferenced_message(ctx)
+        message = await quote_referenced_message(ctx)
         search_term = 'approve'
         limit = 10
         await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
@@ -40,7 +40,7 @@ class FunCommands(Command, name='Веселье'):
 
         from_bot = bot is not None and bot == 'bot'
         if not members:
-            author = await get_renferenced_author(ctx)
+            author = await get_referenced_author(ctx)
             if author is not None:
                 members = [author]
             else:
@@ -66,9 +66,9 @@ class FunCommands(Command, name='Веселье'):
                 continue
 
             if from_bot:
-                avatar_from = get_bot_avatar(ctx)
+                avatar_from = get_bot_avatar()
 
-            gif = is_traus(ctx, ctx.author) or chance(5)
+            gif = is_traus(ctx.author) or chance(5)
             add_value('slap')
 
             # check every 100 slap
@@ -90,7 +90,7 @@ class FunCommands(Command, name='Веселье'):
 
     @commands.command(name='секта', help='список участников секты кровавой Мери')
     async def sekta(self, ctx):
-        sekta = get_members_by_role(ctx, name='Сектант')
+        sekta = get_members_by_role(name='Сектант')
 
         msg = ''
         for role in [sekta]:
@@ -106,7 +106,7 @@ class FunCommands(Command, name='Веселье'):
             member = ctx.author
         all_roles = ctx.guild.roles
         sekta = get(all_roles, name='Сектант')
-        if is_traus(ctx, member):
+        if is_traus(member):
             return
         await ctx.send(box(f'Добро пожаловать в секту, {member.display_name}!'))
         await set_permissions(Channels.SEKTA, member, read_messages=True, send_messages=True)
@@ -129,7 +129,7 @@ class FunCommands(Command, name='Веселье'):
 
     @commands.command(name='токсик', help='фу, токсик')
     async def toxic(self, ctx):
-        message = await quote_renferenced_message(ctx)
+        message = await quote_referenced_message(ctx)
         toxic_emoji = f"{tavern_emoji}    :regional_indicator_o: :regional_indicator_f:"
         msg = await send_by_bot(ctx, message, toxic_emoji, delete=True)
         for emoji in ('🇹', '🇴', '🇽', 'ℹ', '🇨', '🇸', '<:emoji_99:866240571759788073>'):
@@ -138,7 +138,7 @@ class FunCommands(Command, name='Веселье'):
     @commands.command(name='переиграл', help='Переиграл и уничтожил')
     async def meme_win(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        author = await get_renferenced_author(ctx)
+        author = await get_referenced_author(ctx)
         member = member or author
         if member:
             text = f"{ctx.author.mention} переиграл и уничтожил {member.mention}"
@@ -149,7 +149,7 @@ class FunCommands(Command, name='Веселье'):
     @commands.command(name='пять', help='Дать пять')
     async def five(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        author = await get_renferenced_author(ctx)
+        author = await get_referenced_author(ctx)
         member = member or author
         if member:
             text = f"{ctx.author.mention} даёт пять {member.mention}!"
@@ -160,7 +160,7 @@ class FunCommands(Command, name='Веселье'):
     @commands.command(name='чок', help='Чокнуться')
     async def chin(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
-        author = await get_renferenced_author(ctx)
+        author = await get_referenced_author(ctx)
         member = member or author
         if member:
             text = f"{ctx.author.mention} чокается с {member.mention}!"
@@ -180,14 +180,14 @@ class FunCommands(Command, name='Веселье'):
     async def rockon(self, ctx):
         search_term = 'rockon'
         limit = 20
-        message = await quote_renferenced_message(ctx, limit=50)
+        message = await quote_referenced_message(ctx, limit=50)
         await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='горит', help='горииииит!')
     async def fire(self, ctx):
         search_term = 'ass on fire'
         limit = 5
-        message = await quote_renferenced_message(ctx, limit=50)
+        message = await quote_referenced_message(ctx, limit=50)
         await send_by_bot(ctx, message, find_gif(search_term, limit), delete=True)
 
     @commands.command(name='лого', help='лого гильдии')
@@ -196,7 +196,7 @@ class FunCommands(Command, name='Веселье'):
 
     @commands.command(name='гц', help='поздравить')
     async def gc(self, ctx):
-        message = await quote_renferenced_message(ctx)
+        message = await quote_referenced_message(ctx)
         await send_by_bot(ctx, message, file=discord.File('files/media/gc.png'), delete=True)
 
     @commands.command(name='стат', help='статистика по Таверне')

@@ -22,22 +22,21 @@ from utils.states import immune_until
 Members = namedtuple('Members', ['role', 'members'])
 
 
-def get_role_by_name(ctx, name: str) -> discord.Role:
-    all_roles = ctx.guild.roles
+def get_role_by_name(name: str) -> discord.Role:
+    all_roles = bot.get_guild(GUILD_ID).roles
     return get(all_roles, name=name)
 
 
-async def mention_member_by_id(ctx, member_id: int) -> str:
-    guild: discord.Guild = ctx.guild
+async def mention_member_by_id(member_id: int) -> str:
+    guild: discord.Guild = bot.get_guild(GUILD_ID)
     member = await guild.fetch_member(member_id)
     return member.mention
 
 
-def get_members_by_role(ctx=None, user: discord.Member = None, name: str = None) -> namedtuple:
-    obj = ctx or user
+def get_members_by_role(name: str = None) -> namedtuple:
     name = name.replace(' ', '').lower()
     all_members = bot.get_all_members()
-    all_roles = getattr(obj, 'guild').roles
+    all_roles = bot.get_guild(GUILD_ID).roles
     class_roles = dict(
         алхимик='💉',
         маг='🔮',
@@ -61,9 +60,9 @@ def get_class_roles(guild: discord.Guild) -> dict:
     return roles_dict
 
 
-def get_guild_members(ctx, name: str) -> str:
-    group_tot = get_members_by_role(ctx, name='ToT')
-    group = get_members_by_role(ctx, name=name)
+def get_guild_members(name: str) -> str:
+    group_tot = get_members_by_role(name='ToT')
+    group = get_members_by_role(name=name)
     members = set(group.members) & set(group_tot.members)
     message = ''
     for count, member in enumerate(members, 1):
@@ -71,8 +70,8 @@ def get_guild_members(ctx, name: str) -> str:
     return message
 
 
-def get_bot_avatar(ctx=None):
-    manager = get_members_by_role(ctx, name="Смотритель Таверны").members
+def get_bot_avatar():
+    manager = get_members_by_role(name="Смотритель Таверны").members
     return manager[0].avatar_url
 
 
@@ -135,7 +134,7 @@ async def create_and_send_slap(ctx, avatar_from, avatar_to, gif=False, from_bot=
         clean_list.append(tmp_gif_path)
 
     file_path = tmp_gif_path if gif else tmp_file_path
-    message = await quote_renferenced_message(ctx, limit=50)
+    message = await quote_referenced_message(ctx, limit=50)
 
     try:
         if from_bot:
@@ -180,21 +179,21 @@ def get_emoji_by_id(emoji_id: Union[str, int]) -> Optional[discord.Emoji]:
             return emoji
 
 
-async def get_renferenced_message(ctx) -> Optional[discord.Message]:
+async def get_referenced_message(ctx) -> Optional[discord.Message]:
     if ctx.message.reference is not None:
         message_id = ctx.message.reference.message_id
         return await ctx.fetch_message(message_id)
 
 
-async def get_renferenced_author(ctx) -> Optional[discord.Member]:
+async def get_referenced_author(ctx) -> Optional[discord.Member]:
     if ctx.message.reference is not None:
-        message = await get_renferenced_message(ctx)
+        message = await get_referenced_message(ctx)
         return message.author
 
 
-async def quote_renferenced_message(ctx, limit: int = 100) -> str:
+async def quote_referenced_message(ctx, limit: int = 100) -> str:
     if ctx.message.reference is not None:
-        message = await get_renferenced_message(ctx)
+        message = await get_referenced_message(ctx)
         content = message.content
         if len(content) > limit:
             content = content[:limit] + '**...**'
@@ -204,15 +203,16 @@ async def quote_renferenced_message(ctx, limit: int = 100) -> str:
     return ''
 
 
-def is_traus(ctx, member: discord.Member) -> bool:
-    traus = get(ctx.guild.roles, name='Глава ги')
+def is_traus(member: discord.Member) -> bool:
+    all_roles = bot.get_guild(GUILD_ID).roles
+    traus = get(all_roles, name='Глава ги')
     if traus in member.roles:
         return True
     return False
 
 
-def random_emoji(ctx, animated=True) -> discord.Emoji:
-    emojis = ctx.guild.emojis
+def random_emoji(animated=True) -> discord.Emoji:
+    emojis = bot.get_guild(GUILD_ID).emojis
     if animated:
         emojis = list(filter(lambda x: x.animated, emojis))
     return random.choice(emojis)
@@ -226,3 +226,8 @@ def get_reputation_income(tax: int = 0) -> dict:
 
 def chance(percentage: int) -> bool:
     return random.randint(0, 100) <= percentage
+
+
+def get_channel(channel_id: int) -> discord.TextChannel:
+    channel: discord.TextChannel = get(bot.get_guild(GUILD_ID).channels, id=channel_id)
+    return channel
