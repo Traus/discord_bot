@@ -97,8 +97,8 @@ class MainCommands(Command, name='Основное'):
 
         reactions = vote_reactions
         if text:
-            number = text[0].strip(':') if re.match(r'\d+:', text[0]) else []
-            if number:
+            number = text[0].strip(':') if re.match(r'\d+:', text[0]) else None
+            if number is not None:
                 if int(number) > 10:
                     await ctx.send(box("Слишком много вариантов. Максимум 10."))
                     return
@@ -124,7 +124,7 @@ class MainCommands(Command, name='Основное'):
 
     @commands.command(pass_context=True, name="арена", help="доступ к чату арены")
     async def arena(self, ctx):
-        member = ctx.member
+        member = ctx.author
         arena_role = get_role_by_name(name="арена")
         if arena_role not in member.roles:
             await member.add_roles(arena_role)
