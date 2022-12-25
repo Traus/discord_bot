@@ -30,4 +30,11 @@ async def test(ctx, *args):
     await ctx.send(embed=create_embed(title='test', description='12321321'))
     # await m.add_reaction(await ctx.guild.fetch_emoji(84542902x`2141186078))
 
+
+@bot.command(pass_context=True, help='ping')
+async def ping(ctx, *args):
+    msg: discord.Message = ctx.message
+    await msg.channel.send(f"Бот жив цел орёл. Ping={bot.latency}")
+
+
 bot.run(TOKEN)
