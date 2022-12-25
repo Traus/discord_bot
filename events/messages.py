@@ -149,7 +149,7 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
     files = [await attachment.to_file() for attachment in message.attachments]
     author: discord.Member = message.author
     channel: discord.TextChannel = message.channel
-    deleted: discord.TextChannel = bot.get_channel(Channels.DELETED)
+    deleted: discord.TextChannel = get_channel(Channels.DELETED)
 
     embed = create_embed(description=content,
                          fields=[

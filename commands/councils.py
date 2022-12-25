@@ -10,7 +10,7 @@ from constants import Channels, Roles
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
-    get_role_by_name, get_reputation_income, get_referenced_author
+    get_role_by_name, get_reputation_income, get_referenced_author, get_channel
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
@@ -87,7 +87,7 @@ class CouncilsCommands(Command, name='Совет'):
         tot = get_members_by_role(name="ToT")
         recruit = get_members_by_role(name="Рекрут")
         reserve = get_members_by_role(name="Запас")
-        channel = bot.get_channel(Channels.LIST)
+        channel = get_channel(Channels.LIST)
 
         count = 0
         for group in (leader, council, active, tot, recruit, reserve):
@@ -146,8 +146,8 @@ class CouncilsCommands(Command, name='Совет'):
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
-              f'А также выбрать себе роли классов, которыми вы играете в {bot.get_channel(Channels.CHOOSE_CLASS).mention}.'
-        await bot.get_channel(Channels.GUILD).send(msg)
+              f'А также выбрать себе роли классов, которыми вы играете в {get_channel(Channels.CHOOSE_CLASS).mention}.'
+        await get_channel(Channels.GUILD).send(msg)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
     @commands.has_permissions(kick_members=True)
@@ -228,7 +228,7 @@ class CouncilsCommands(Command, name='Совет'):
     async def on_carpet(self, ctx, member: discord.Member):
         carpet = get(ctx.guild.roles, name='Разговор')
         await member.add_roles(carpet)
-        await bot.get_channel(Channels.CARPET).send(member.mention)
+        await get_channel(Channels.CARPET).send(member.mention)
 
     @commands.command(pass_context=True, help='Совет чистит каналы')
     @commands.has_role("Совет ги")

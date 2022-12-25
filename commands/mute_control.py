@@ -7,7 +7,7 @@ import discord
 
 from constants import Roles, Channels
 from utils.format import box
-from utils.guild_utils import set_permissions
+from utils.guild_utils import set_permissions, get_channel
 from utils.states import muted_queue, user_permissions
 
 BAD_WORDS = Path('files/bad_words.txt').read_text(encoding='utf8').split('\n')
@@ -27,8 +27,8 @@ async def _add_mute(member: discord.Member, time: int):
     member.guild_permissions.manage_roles = False
     for channel_id in channels_with_perms:
         user_permissions[member][channel_id] = (
-            member.permissions_in(member.guild.get_channel(channel_id)).read_messages,
-            member.permissions_in(member.guild.get_channel(channel_id)).send_messages
+            member.permissions_in(get_channel(channel_id)).read_messages,
+            member.permissions_in(get_channel(channel_id)).send_messages
         )
     await member.add_roles(mute_role)
     for channel_id in channels_with_perms:

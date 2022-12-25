@@ -4,7 +4,7 @@ from commands.mute_control import _add_mute
 from constants import Members, Messages, Channels, vote_reactions
 from init_bot import bot
 from utils.format import box
-from utils.guild_utils import set_permissions, get_class_roles, check_for_beer
+from utils.guild_utils import set_permissions, get_class_roles, check_for_beer, get_channel
 
 
 class ReactionHandler:
@@ -78,7 +78,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     emoji: discord.Emoji = payload.emoji
     guild: discord.Guild = bot.get_guild(payload.guild_id)
     member: discord.Member = await guild.fetch_member(payload.user_id)
-    channel: discord.TextChannel = bot.get_channel(payload.channel_id)
+    channel: discord.TextChannel = get_channel(payload.channel_id)
     message: discord.Message = await channel.fetch_message(payload.message_id)
 
     handler = ReactionHandler(payload=payload, emoji=emoji, guild=guild, member=member, channel=channel, message=message)

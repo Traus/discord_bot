@@ -3,13 +3,13 @@ from discord.ext import commands
 from discord.ext.commands import CommandError
 
 from constants import Channels
-from init_bot import bot
 from utils.format import create_embed
+from utils.guild_utils import get_channel
 
 
 class Command(commands.Cog):
     async def cog_command_error(self, ctx, error: CommandError):
-        logs: discord.TextChannel = bot.get_channel(Channels.LOGS)
+        logs: discord.TextChannel = get_channel(Channels.LOGS)
 
         embed = create_embed(description=str(error)[:4096],
                              fields=[

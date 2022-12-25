@@ -122,6 +122,14 @@ class MainCommands(Command, name='Основное'):
             message += f'{count}. {member.display_name}\n'
         await ctx.send(box(message))
 
+    @commands.command(pass_context=True, name="арена", help="доступ к чату арены")
+    async def arena(self, ctx):
+        group = get_members_by_role(name="Muted")
+        message = 'В муте:\n'
+        for count, member in enumerate(group.members, 1):
+            message += f'{count}. {member.display_name}\n'
+        await ctx.send(box(message))
+
 
 def _get_paragraph(par, text):
     pattern = f'(?<![.\d<@#]){par}.*'

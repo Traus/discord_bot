@@ -5,4 +5,4 @@ from commands.main import *
 from commands.mute_control import *
 from commands.names import *
 from commands.new_voc import *
-from commands.misc import *
+from commands.db_commands import *

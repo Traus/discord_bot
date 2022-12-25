@@ -95,7 +95,7 @@ async def get_afk_users(msg: discord.Message) -> set:
 
 
 async def set_permissions(channel_id: int, target: Union[discord.Member, discord.Role], **permissions):
-    channel = bot.get_channel(channel_id)
+    channel = get_channel(channel_id)
     await channel.set_permissions(target, **permissions)
 
 
@@ -229,5 +229,4 @@ def chance(percentage: int) -> bool:
 
 
 def get_channel(channel_id: int) -> discord.TextChannel:
-    channel: discord.TextChannel = get(bot.get_guild(GUILD_ID).channels, id=channel_id)
-    return channel
+    return bot.get_channel(channel_id)
