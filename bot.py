@@ -35,6 +35,7 @@ async def test(ctx, *args):
 async def ping(ctx, *args):
     msg: discord.Message = ctx.message
     await msg.channel.send(f"Бот жив цел орёл. Ping={bot.latency}")
+    await commands.ping_db(ctx)
 
 
 bot.run(TOKEN)
