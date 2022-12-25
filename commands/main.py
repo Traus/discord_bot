@@ -10,7 +10,7 @@ from commands.base_command import Command
 from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
-from utils.guild_utils import get_members_by_role, mention_member_by_id
+from utils.guild_utils import get_members_by_role, mention_member_by_id, get_role_by_name
 
 
 class MainCommands(Command, name='Основное'):
@@ -124,11 +124,12 @@ class MainCommands(Command, name='Основное'):
 
     @commands.command(pass_context=True, name="арена", help="доступ к чату арены")
     async def arena(self, ctx):
-        group = get_members_by_role(name="Muted")
-        message = 'В муте:\n'
-        for count, member in enumerate(group.members, 1):
-            message += f'{count}. {member.display_name}\n'
-        await ctx.send(box(message))
+        member = ctx.member
+        arena_role = get_role_by_name(name="арена")
+        if arena_role not in member.roles:
+            await member.add_roles(arena_role)
+        else:
+            await member.remove_roles(arena_role)
 
 
 def _get_paragraph(par, text):
