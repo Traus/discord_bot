@@ -9,6 +9,7 @@ from discord.ext import commands
 from discord.utils import get
 
 from commands.base_command import Command
+from commands.mute_control import _add_mute
 from constants import Channels, tavern_emoji, Roles, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
@@ -77,6 +78,17 @@ class FunCommands(Command, name='Веселье'):
                 embed = create_embed(description=text,
                                      image=find_gif(search_term='super slap', limit=1))
                 await ctx.send(embed=embed, reference=ctx.message.reference)
+                continue
+
+            # check 10000 slap temp bullshit
+            if get_value('slap') == 10000:
+                text = f"{ctx.author.mention} выдает супер эпический шапалах по {member.mention} " \
+                       f"и вышибает {member.mention} из Таверны"
+                embed = create_embed(description=text,
+                                     image=find_gif(search_term='super punch', limit=1))
+                await ctx.send(embed=embed, reference=ctx.message.reference)
+                await ctx.send(f"{member.display_name} :regional_indicator_f:")
+                await _add_mute(member, 2*60)
                 continue
             await create_and_send_slap(ctx, avatar_from, avatar_to, gif=gif, from_bot=from_bot)
 
