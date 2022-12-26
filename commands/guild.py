@@ -8,7 +8,7 @@ from commands.base_command import Command
 from commands.mute_control import _add_mute
 from constants import Roles, Channels
 from init_bot import bot
-from utils.format import box, send_by_bot, create_embed
+from utils.format import box, send_by_bot, create_embed, edit_new_strings
 from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus
 from utils.states import when_all_called
 
@@ -20,7 +20,7 @@ class GuildCommands(Command, name='Гильдия'):
                                                            'Доступ к команде - Совет, Актив, Наставник. '
                                                            'Злоупотребление наказуемо!')
     @commands.has_any_role("Совет ги", "Актив гильдии", "Наставник")
-    async def _all(self, ctx, *message):
+    async def _all(self, ctx, *, text: str = ''):
         if is_spam(ctx.author, when_all_called, 60) and not is_traus(ctx.author):
             await ctx.send(box(f'{ctx.author.display_name} получил мут на 5 минут по причине: не злоупотреблять!'))
             await _add_mute(ctx.author, 5*60)
@@ -31,8 +31,8 @@ class GuildCommands(Command, name='Гильдия'):
             recruit = get(all_roles, id=Roles.RECRUIT)
             msg = f'{councils.mention} {tot.mention} {recruit.mention}\n'
 
-            if message:
-                msg += ' '.join(message).replace('\\n', '\n')
+            if text:
+                msg += edit_new_strings(text)
             else:
                 msg += box("Общий сбор!")
 

@@ -7,6 +7,10 @@ def box(msg: str) -> str:
     return f"```css\n{msg}```" if msg else '<a:no:845581984277069865>'
 
 
+def edit_new_strings(words: str) -> str:
+    return words.replace('\\n', '\n')
+
+
 async def send_by_bot(ctx, *args, delete=False, **kwargs) -> discord.WebhookMessage:
     webhooks = await ctx.message.channel.webhooks()
     webhook = utils.get(webhooks, name="Imposter NQN")

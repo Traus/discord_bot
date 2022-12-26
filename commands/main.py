@@ -9,7 +9,7 @@ from discord.utils import get
 from commands.base_command import Command
 from constants import Channels, vote_reactions, number_emoji, Members
 from init_bot import bot
-from utils.format import box, send_by_bot, create_embed
+from utils.format import box, send_by_bot, create_embed, edit_new_strings
 from utils.guild_utils import get_members_by_role, mention_member_by_id, get_role_by_name
 
 
@@ -92,19 +92,21 @@ class MainCommands(Command, name='Основное'):
         pass_context=True,
         help='Начать опрос. Если начать текст с число:, то в голсосовании будет от 1 до число(10) вариантов'
     )
-    async def vote(self, ctx, *text):
+    async def vote(self, ctx, *, text: str = ''):
         await ctx.message.delete()
 
         reactions = vote_reactions
-        if text:
-            number = text[0].strip(':') if re.match(r'\d+:', text[0]) else None
-            if number is not None:
-                if int(number) > 10:
-                    await ctx.send(box("Слишком много вариантов. Максимум 10."))
-                    return
-                text = text[1:]
-                reactions = [number_emoji[i+1] for i in range(int(number))]
-        text = ' '.join(text).replace('\\n', '\n')
+
+        separated_text = text.split(':')
+        number = separated_text[0].strip()
+
+        if re.match(r'\d+', number):
+            if int(number) > 10:
+                await ctx.send(box("Слишком много вариантов. Максимум 10."))
+                return
+            reactions = [number_emoji[i+1] for i in range(int(number))]
+            separated_text.pop(0)
+        text = edit_new_strings(' '.join(separated_text))
         now = datetime.timestamp(datetime.utcnow())
         embed = create_embed(description=f"{ctx.author.mention}:\n{text}",
                              thumbnail=ctx.author.avatar_url,
