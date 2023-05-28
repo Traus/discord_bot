@@ -109,5 +109,11 @@ class NamedCommands(Command, name='Имена'):
         limit = 5
         await ctx.send(find_gif(search_term, limit))
 
+    @commands.command(name='томат', help='для Томата')
+    async def tomato(self, ctx):
+        search_term = 'помидорка'
+        limit = 5
+        await ctx.send(find_gif(search_term, limit))
+
 
 bot.add_cog(NamedCommands())

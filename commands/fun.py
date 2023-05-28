@@ -1,7 +1,5 @@
-import random
 import re
 from datetime import datetime, timedelta
-from time import sleep
 
 import discord
 import requests
@@ -10,12 +8,12 @@ from discord.utils import get
 
 from commands.base_command import Command
 from commands.mute_control import _add_mute
-from constants import Channels, tavern_emoji, Roles, beer_emoji
+from constants import Channels, tavern_emoji, beer_emoji
 from database.stat import add_value, get_value
 from init_bot import bot
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_referenced_author, is_traus, quote_referenced_message, get_reputation_income, chance
+    set_permissions, get_referenced_author, is_traus, quote_referenced_message, chance
 from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 
@@ -273,44 +271,6 @@ class FunCommands(Command, name='Веселье'):
         else:
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[ctx.channel.id] = True
-
-    @commands.command(pass_context=True, name='победитель', help='Определить победителя конкурса')
-    @commands.has_role("Глава ги")
-    async def winner(self, ctx, necessary_points: str = '500', tax: str = '0', bonus: str = '0'):
-        all_roles = ctx.guild.roles
-        tot = get(all_roles, id=Roles.TOT)
-        pass_members = ['Траус', 'Xelliana', 'Moon']
-
-        all_income = get_reputation_income(int(tax))
-        winners = [name for name in all_income if all_income[name] > int(necessary_points)]
-
-        # new rules
-        if int(bonus) > 0:
-            for member, income in all_income.items():
-                bonus_income = (income - 500) // int(bonus)
-                winners.extend([member for _ in range(bonus_income)])
-
-        winner = random.choice([w for w in winners if w not in pass_members])
-
-        await ctx.send(box(f"Начало рассчета..."))
-        sleep(10)
-        await ctx.send(box(f"Ожидание ответа спутника..."))
-        sleep(10)
-        await ctx.send(box(f"Эники беники ели вареники...."))
-        sleep(10)
-        await ctx.send(box(f"раз два три четыре пять, победитель:"))
-        sleep(10)
-        await ctx.send(box(f"хммммм..."))
-        sleep(10)
-        await ctx.send(f"{tot.mention} Друзья!")
-        await ctx.send(box(f"{winner} поздравляем с победой в конкурсе!!!! Твой приз-скайпасс или его эквивалент. "
-                           f"При желании, можешь передать приз любому другому участнику гильдии! "
-                           f"В скором времени с тобой свяжется совет и обсудят возможность передачи награды =)"))
-
-    # @commands.command(name='поздравляю', help='Поздравить Ирочку')
-    # async def birthday(self, ctx):
-    #     await ctx.send(f'Поздравляем нашу <@{693210152127692920}> с Днём Рождения!')
-    #     await ctx.send(find_gif('Поздравляю', 10))
 
 
 bot.add_cog(FunCommands())

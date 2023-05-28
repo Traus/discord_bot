@@ -8,21 +8,21 @@ from init_bot import bot
 @bot.command(pass_context=True, help='Проверить доступность базы')
 async def ping_db(ctx, *args):
     closed = connection.closed
-    await ctx.send(f"База {'не ' if closed else ''}подключена")
+    await ctx.send(f"База данных {'не ' if closed else ''}подключена")
 
 
 @commands.has_role("Глава ги")
 @bot.command(pass_context=True, help='Переконектиться к базе данных')
 async def reconnect(ctx, *args):
     connection.reconnect()
-    await ctx.send('База перезагружена')
+    await ctx.send('База данных перезагружена')
 
 
 @commands.has_role("Глава ги")
 @bot.command(pass_context=True, help='Отключить базу данных')
 async def close_db(ctx, *args):
     connection.close()
-    await ctx.send('База отключена')
+    await ctx.send('База данных отключена')
 
 
 @bot.command(pass_context=True, help='Чекнуть таблицу стат')

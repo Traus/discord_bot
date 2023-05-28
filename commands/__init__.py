@@ -6,3 +6,4 @@ from commands.mute_control import *
 from commands.names import *
 from commands.new_voc import *
 from commands.db_commands import *
+from commands.events import *
