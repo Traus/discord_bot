@@ -20,7 +20,7 @@ class EventsCommands(Command, name='Ивенты'):
                      role: discord.Role,
                      necessary_points: str = '500',
                      tax: str = '0',
-                     prizes: str = 5):
+                     prizes: str = 3):
         pass_members = []
 
         all_income = get_reputation_income(int(tax))
