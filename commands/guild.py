@@ -84,7 +84,8 @@ class GuildCommands(Command, name='Гильдия'):
         tot = get_members_by_role(name="ToT")
         role = get_members_by_role(name=' '.join(role_name))
         group = set(role.members)
-        if role.role.lower() != "рекрут" and "tavern" not in role.role.lower():
+        templates = ('рекрут', 'запас', 'tavern', 'состав')
+        if re.compile('|'.join(templates), re.IGNORECASE).search(role.role.lower()):
             group = group & set(tot.members)
 
         message = ''
