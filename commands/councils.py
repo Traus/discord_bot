@@ -142,11 +142,15 @@ class CouncilsCommands(Command, name='Совет'):
         await ctx.message.delete()
         guest = get(ctx.guild.roles, name='Гость')
         recruit = get(ctx.guild.roles, name='Рекрут')
+        alliance = get(ctx.guild.roles, name='Орден')
         await member.add_roles(recruit)
+        await member.add_roles(alliance)
+        await member.edit(reason='Добро пожаловать', nick=f'[ToT] {member.display_name}')
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
-              f'А также выбрать себе роли классов, которыми вы играете в {get_channel(Channels.CHOOSE_CLASS).mention}.'
+              f'А также выбрать себе роли классов, которыми вы играете в {get_channel(Channels.CHOOSE_CLASS).mention}.\n ' \
+              f'Обязательно ознакомься с {get_channel(Channels.OTHER_GUILDS).mention}.'
         await get_channel(Channels.GUILD).send(msg)
 
     @commands.command(pass_context=True, help='Кикнуть с сервера')
@@ -179,15 +183,17 @@ class CouncilsCommands(Command, name='Совет'):
                 'Рекрут',
                 'Запас',
                 'Хай лвл'
-                'Разговор'
-                'Страйк 1-уровень'
-                'Страйк 2-уровень'
-                'Страйк 3-уровень'
+                'Орден',
+                'Разговор',
+                'Страйк 1-уровень',
+                'Страйк 2-уровень',
+                'Страйк 3-уровень',
             ]:
                 kick = True
                 await member.remove_roles(role)
                 await member.add_roles(guest)
         if kick:
+            await member.edit(nick=strip_tot(name=member.display_name))
             msg = box(f'{ctx.author.display_name} исключил {member.display_name} из гильдии. Причина: {reason}')
             await ctx.send(msg)
             await member.send(msg)  # в лс
