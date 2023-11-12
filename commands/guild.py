@@ -4,10 +4,10 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from commands.base_command import Command
-from commands.mute_control import _add_mute
+from commands._base_command import Command
+from commands._mute_control import _add_mute
 from constants import Roles, Channels
-from init_bot import bot
+
 from utils.format import box, send_by_bot, create_embed, edit_new_strings
 from utils.guild_utils import is_spam, get_members_by_role, strip_tot, is_traus
 from utils.states import when_all_called
@@ -97,4 +97,5 @@ class GuildCommands(Command, name='Гильдия'):
         await ctx.send(embed=embed)
 
 
-bot.add_cog(GuildCommands())
+def setup(bot):
+    bot.add_cog(GuildCommands(bot))

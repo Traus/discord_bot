@@ -3,6 +3,7 @@ from pathlib import Path
 
 import discord
 
+from commands.db_commands import ping_db
 from init_bot import bot
 
 # commands and events
@@ -10,6 +11,7 @@ import commands
 import music
 import events
 from utils.format import create_embed
+from utils.guild_utils import voting, get_role_by_name
 
 try:
     from local_settings import TOKEN
@@ -35,7 +37,14 @@ async def test(ctx, *args):
 async def ping(ctx, *args):
     msg: discord.Message = ctx.message
     await msg.channel.send(f"Бот жив цел орёл. Ping={bot.latency}")
-    await commands.ping_db(ctx)
+    await ping_db(ctx)
 
 
-bot.run(TOKEN)
+if __name__ == '__main__':
+    # Load extension
+    for filename in os.listdir('./commands'):
+        if filename.endswith('.py') and not filename.startswith('_'):
+            print(filename)
+            bot.load_extension(f'commands.{filename[: -3]}')
+
+    bot.run(TOKEN, reconnect=True)

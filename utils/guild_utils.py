@@ -12,7 +12,7 @@ from PIL import Image, ImageOps
 from discord.utils import get
 from collections import namedtuple
 
-from constants import GUILD_ID, beer_emoji
+from constants import GUILD_ID, beer_emoji, vote_reactions
 from database.participants_table import participants
 from database.stat import add_value
 from init_bot import bot
@@ -31,6 +31,13 @@ async def mention_member_by_id(member_id: int) -> str:
     guild: discord.Guild = bot.get_guild(GUILD_ID)
     member = await guild.fetch_member(member_id)
     return member.mention
+
+
+def get_leader() -> discord.Member:
+    members = get_members_by_role('Глава ги')
+    if len(members.members) != 1:
+        return bot.get_guild(GUILD_ID).owner
+    return members.members[0]
 
 
 def get_members_by_role(name: str = None) -> namedtuple:
@@ -230,3 +237,18 @@ def chance(percentage: int) -> bool:
 
 def get_channel(channel_id: int) -> discord.TextChannel:
     return bot.get_channel(channel_id)
+
+
+async def voting(*roles: discord.Role, message: discord.Message) -> bool:
+    leader = get_leader()
+    all_members = set()
+    for role in roles:
+        all_members.update(role.members)
+    print(len(all_members))
+    print(leader)
+    print(leader in all_members)
+
+    for reaction in vote_reactions:
+        await message.add_reaction(reaction)
+    return True
+

@@ -1,6 +1,6 @@
 import discord
 
-from commands.mute_control import _add_mute
+from commands._mute_control import _add_mute
 from constants import Members, Messages, Channels, vote_reactions
 from init_bot import bot
 from utils.format import box

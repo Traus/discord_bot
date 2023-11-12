@@ -5,8 +5,8 @@ from time import sleep
 import discord
 from discord.ext import commands
 
-from commands.base_command import Command
-from init_bot import bot
+from commands._base_command import Command
+
 from utils.format import box
 from utils.guild_utils import get_reputation_income
 
@@ -55,4 +55,5 @@ class EventsCommands(Command, name='Ивенты'):
     #     await ctx.send(find_gif('Поздравляю', 10))
 
 
-bot.add_cog(EventsCommands())
+def setup(bot):
+    bot.add_cog(EventsCommands(bot))

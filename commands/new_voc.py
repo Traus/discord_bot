@@ -4,8 +4,8 @@ import discord
 from async_contextlib import asynccontextmanager
 from discord.ext import commands
 
-from commands.base_command import Command
-from init_bot import bot
+from commands._base_command import Command
+
 from utils.format import box
 from utils.guild_utils import set_permissions
 from utils.states import voice_owners
@@ -123,4 +123,5 @@ class NewVocCommands(Command, name='Голос', description="Управлени
             await ctx.author.voice.channel.edit(user_limit=int(new_limit))
 
 
-bot.add_cog(NewVocCommands())
+def setup(bot):
+    bot.add_cog(NewVocCommands(bot))

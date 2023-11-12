@@ -9,7 +9,7 @@ from utils.format import create_embed
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(commands.when_mentioned_or('!'), intents=intents)
 ending_note = '`!help <команда> - для подробной информации о команде.`\n' \
           '`!help <категория> - для информации по категории.`'
 

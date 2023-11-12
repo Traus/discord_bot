@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 
-from commands.base_command import Command
+from commands._base_command import Command
 from constants import Members, tavern_emoji
-from init_bot import bot
+
 from utils.format import send_by_bot
 from utils.tenor_gifs import find_gif
 
@@ -116,4 +116,5 @@ class NamedCommands(Command, name='Имена'):
         await ctx.send(find_gif(search_term, limit))
 
 
-bot.add_cog(NamedCommands())
+def setup(bot):
+    bot.add_cog(NamedCommands(bot))

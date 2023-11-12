@@ -6,11 +6,11 @@ import requests
 from discord.ext import commands
 from discord.utils import get
 
-from commands.base_command import Command
-from commands.mute_control import _add_mute
+from commands._base_command import Command
+from commands._mute_control import _add_mute
 from constants import Channels, tavern_emoji, beer_emoji
 from database.stat import add_value, get_value
-from init_bot import bot
+
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
     set_permissions, get_referenced_author, is_traus, quote_referenced_message, chance
@@ -273,4 +273,5 @@ class FunCommands(Command, name='Веселье'):
             table_turn_over[ctx.channel.id] = True
 
 
-bot.add_cog(FunCommands())
+def setup(bot):
+    bot.add_cog(FunCommands(bot))

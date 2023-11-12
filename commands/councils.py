@@ -4,13 +4,13 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from commands.base_command import Command
-from commands.mute_control import _add_mute
+from commands._base_command import Command
+from commands._mute_control import _add_mute
 from constants import Channels, Roles
-from init_bot import bot
+
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
-    get_role_by_name, get_reputation_income, get_referenced_author, get_channel
+    get_role_by_name, get_reputation_income, get_referenced_author, get_channel, voting
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
@@ -147,7 +147,7 @@ class CouncilsCommands(Command, name='Совет'):
         await member.add_roles(alliance)
         await member.edit(reason='Добро пожаловать', nick=f'[ToT] {member.display_name}')
         await member.remove_roles(guest)
-        msg = f'{member.mention}, добро пожаловать в таверну! {bot.get_emoji(828026991361261619)}\n' \
+        msg = f'{member.mention}, добро пожаловать в таверну! {self.bot.get_emoji(828026991361261619)}\n' \
               f'Для удобства гильдии и бота, прошу поправить ник по формату: [ToT] Ник-в-игре (Ник дискорд или имя, по желанию).\n' \
               f'А также выбрать себе роли классов, которыми вы играете в {get_channel(Channels.CHOOSE_CLASS).mention}.\n ' \
               f'Обязательно ознакомься с {get_channel(Channels.OTHER_GUILDS).mention}.'
@@ -260,7 +260,7 @@ class CouncilsCommands(Command, name='Совет'):
     async def ping(self, ctx, start=None):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
+        channel: discord.TextChannel = await self.bot.fetch_channel(Channels.PING)
         all_roles = ctx.guild.roles
         councils = get(all_roles, id=Roles.COUNCILS)
         tot = get(all_roles, id=Roles.TOT)
@@ -296,7 +296,7 @@ class CouncilsCommands(Command, name='Совет'):
     async def check_afk(self, ctx):
         await ctx.message.delete()
 
-        channel: discord.TextChannel = await bot.fetch_channel(Channels.PING)
+        channel: discord.TextChannel = await self.bot.fetch_channel(Channels.PING)
         history = channel.history(oldest_first=True)
         msg: discord.Message = await history.next()
         afk_users = await get_afk_users(msg)
@@ -338,4 +338,5 @@ class CouncilsCommands(Command, name='Совет'):
         await ctx.send(box(msg))
 
 
-bot.add_cog(CouncilsCommands())
+def setup(bot):
+    bot.add_cog(CouncilsCommands(bot))

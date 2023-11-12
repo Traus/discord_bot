@@ -3,10 +3,10 @@ from datetime import date
 import discord
 from discord.utils import get
 
-from commands import automoderation, send_by_bot
+from commands._mute_control import automoderation
 from constants import Channels, Members
 from init_bot import bot
-from utils.format import create_embed
+from utils.format import create_embed, send_by_bot
 from utils.guild_utils import check_for_beer, find_animated_emoji, get_referenced_author, get_members_by_role, \
     is_traus, quote_referenced_message, random_emoji, get_channel
 

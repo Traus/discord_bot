@@ -6,9 +6,9 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-from commands.base_command import Command
+from commands._base_command import Command
 from constants import Channels, vote_reactions, number_emoji, Members
-from init_bot import bot
+
 from utils.format import box, send_by_bot, create_embed, edit_new_strings
 from utils.guild_utils import get_members_by_role, mention_member_by_id, get_role_by_name
 
@@ -146,4 +146,5 @@ def _get_principle(text):
     return res[0]
 
 
-bot.add_cog(MainCommands())
+def setup(bot):
+    bot.add_cog(MainCommands(bot))

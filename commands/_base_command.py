@@ -8,6 +8,9 @@ from utils.guild_utils import get_channel
 
 
 class Command(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     async def cog_command_error(self, ctx, error: CommandError):
         logs: discord.TextChannel = get_channel(Channels.LOGS)
 
