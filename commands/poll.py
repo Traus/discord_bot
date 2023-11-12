@@ -66,7 +66,7 @@ class Polls(Command, name='Голосования'):
                 await ctx.send(box(f"Увы, в другой раз."))
         self.remove_poll(message.id)
 
-    @commands.command(pass_context=True, name='совет-', help='Начать голосование за выдачу роли Совета')
+    @commands.command(pass_context=True, name='совет-', help='Начать голосование за исключение из Совета')
     @commands.has_role("Совет ги")
     async def delete_council(self, ctx, member: discord.Member):
         await ctx.message.delete()
