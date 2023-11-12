@@ -8,7 +8,7 @@ from discord.ext import commands
 from commands._base_command import Command
 from constants import vote_reactions
 from utils.format import box
-from utils.guild_utils import get_role_by_name, get_leader
+from utils.guild_utils import get_role_by_name, get_leader, get_members_by_role
 
 
 @dataclass
@@ -81,7 +81,7 @@ class Polls(Command, name='Голосования'):
             minutes=minutes,
         )
 
-        await asyncio.sleep(minutes*60)
+        await asyncio.sleep(minutes*1)
         if self.polls.get(message.id):
             success = await self.check_result(message)
             if success:
@@ -95,7 +95,7 @@ class Polls(Command, name='Голосования'):
         poll = self.polls[message.id]
         channel = self.bot.get_channel(poll.channel_id)
         message: discord.Message = await channel.fetch_message(poll.message_id)
-        councils_count: int = 6
+        councils_count: int = len(get_members_by_role(name="Совет ги").members)
         leader = get_leader()
         result = {'yes': 0, 'no': 0}
 
