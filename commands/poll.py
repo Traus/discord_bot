@@ -81,7 +81,7 @@ class Polls(Command, name='Голосования'):
             minutes=minutes,
         )
 
-        await asyncio.sleep(minutes*1)
+        await asyncio.sleep(minutes*60)
         if self.polls.get(message.id):
             success = await self.check_result(message)
             if success:
