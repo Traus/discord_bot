@@ -3,18 +3,19 @@ from dataclasses import dataclass
 from typing import List, Dict
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from commands._base_command import Command
 from constants import vote_reactions
 from utils.format import box
-from utils.guild_utils import get_role_by_name, get_leader, get_members_by_role
+from utils.guild_utils import get_role_by_name, get_leader, get_members_by_role, has_voice_permissions
 
 
 @dataclass
 class PollData:
     # message: discord.Message
     message_id: int
+    text: str
     channel_id: int
     reactions: List[str]
     minutes: int
@@ -43,14 +44,14 @@ class Polls(Command, name='Голосования'):
 
     @commands.command(pass_context=True, name='совет+', help='Начать голосование за выдачу роли Совета')
     @commands.has_role("Совет ги")
-    async def add_council(self, ctx, member: discord.Member):
+    async def add_council(self, ctx, member: discord.Member, minutes: int = 10):
         await ctx.message.delete()
         role = get_role_by_name('Совет ги')
-        minutes: int = 10
         msg = f"Голосование за выдачи роли Совета {member.nick}"
         message = await self.voting(ctx, msg, minutes)
         self.polls[message.id] = PollData(
             message_id=message.id,
+            text=msg,
             channel_id=message.channel.id,
             reactions=vote_reactions,
             minutes=minutes,
@@ -60,22 +61,22 @@ class Polls(Command, name='Голосования'):
         if self.polls.get(message.id):
             success = await self.check_result(message)
             if success:
-                await ctx.send(box(f"Успех! Поздравляем {member.nick} с повышением!"))
+                await message.reply(box(f"Успех! Поздравляем {member.nick} с повышением!"))
                 await member.add_roles(role, reason="Совет одобрил")
             else:
-                await ctx.send(box(f"Увы, в другой раз."))
+                await message.reply(box(f"Увы, в другой раз."))
         self.remove_poll(message.id)
 
     @commands.command(pass_context=True, name='совет-', help='Начать голосование за исключение из Совета')
     @commands.has_role("Совет ги")
-    async def delete_council(self, ctx, member: discord.Member):
+    async def delete_council(self, ctx, member: discord.Member, minutes: int = 10):
         await ctx.message.delete()
         role = get_role_by_name('Совет ги')
-        minutes: int = 10
         msg = f"Голосование за исключение {member.nick} из Совета"
         message = await self.voting(ctx, msg, minutes)
         self.polls[message.id] = PollData(
             message_id=message.id,
+            text=msg,
             channel_id=message.channel.id,
             reactions=vote_reactions,
             minutes=minutes,
@@ -85,10 +86,10 @@ class Polls(Command, name='Голосования'):
         if self.polls.get(message.id):
             success = await self.check_result(message)
             if success:
-                await ctx.send(box(f"{member.nick} исключен из Совета"))
+                await message.reply(box(f"{member.nick} исключен из Совета"))
                 await member.remove_roles(role, reason="Совет одобрил")
             else:
-                await ctx.send(box(f"Так просто не избавитесь!"))
+                await message.reply(box(f"Так просто не избавитесь!"))
         self.remove_poll(message.id)
 
     async def check_result(self, message: discord.Message) -> bool:
@@ -96,27 +97,29 @@ class Polls(Command, name='Голосования'):
         channel = self.bot.get_channel(poll.channel_id)
         message: discord.Message = await channel.fetch_message(poll.message_id)
         councils_count: int = len(get_members_by_role(name="Совет ги").members)
-        leader = get_leader()
-        result = {'yes': 0, 'no': 0}
-
-        for reaction in message.reactions:
-            if reaction.emoji.name == vote_reactions[0].split(':')[1]:
-                result['yes'] = reaction.count - int(reaction.me)
-                async for user in reaction.users():
-                    if leader == user:
-                        result['yes'] += 0.5
-            elif reaction.emoji.name == vote_reactions[1].split(':')[1]:
-                result['no'] = reaction.count - int(reaction.me)
-                async for user in reaction.users():
-                    if leader == user:
-                        result['no'] += 0.5
+        result = await self.get_council_results(message)
         if sum(result.values()) < councils_count:
             leader_point = sum(result.values()) % 1
             result['no'] += councils_count - sum(result.values()) + leader_point
         print(result)
         return result['yes'] > result['no']
 
+    @staticmethod
+    async def get_council_results(message: discord.Message) -> Dict[str, int]:
+        leader = get_leader()
+        result = {'yes': 0, 'no': 0}
+        for reaction in message.reactions:
+            async for user in reaction.users():
+                if await has_voice_permissions(user):
+                    for i, choice in enumerate(('yes', 'no')):
+                        if reaction.emoji.name == vote_reactions[i].split(':')[1]:
+                            result[choice] += 1
+                            if user == leader:
+                                result[choice] += 0.5
+        return result
+
     async def voting(self, ctx, message: str, minutes: int) -> discord.Message:
+        """Пока данный класс и методы только для Совета. Потом надо рефакторить"""
         embed = discord.Embed(
             title=message,
             description=f':stopwatch: Закончится через **{minutes} минут**!',
@@ -128,13 +131,9 @@ class Polls(Command, name='Голосования'):
         for name, reaction in zip(("Да", "Нет"), vote_reactions):
             embed.add_field(name=name, value=reaction, inline=False)
 
-        # polls = [('\u200b',
-        #           '\n'.join([f'{vote_reactions[index]} {option} \n' for index, option in enumerate(vote_reactions)]),
-        #           False)]
-        # for name, value, inline in polls:
-        #     embed.add_field(name=name, value=value, inline=inline)
-
         message = await ctx.send(embed=embed)
+        role = get_role_by_name('Совет ги')
+        await ctx.send(f"Началось голосование для {role.mention}!")
         for reaction in vote_reactions:
             await message.add_reaction(reaction)
         return message
@@ -797,8 +796,31 @@ class Polls(Command, name='Голосования'):
     #                     pass
 
     # @tasks.loop(minutes=1)
-    # async def poll_results(self):
-    #     pass
+    @tasks.loop(seconds=10)  # 1 минут
+    async def poll_results(self):
+        for message_id, poll in self.polls.items():
+            # вот тут словарь меняется пока итерируется. Попробовать очередь
+            message: discord.Message = await self.bot.get_channel(poll.channel_id).fetch_message(message_id)
+            councils_count: int = len(get_members_by_role(name="Совет ги").members)
+            result = await self.get_council_results(message)
+            if sum(result.values()) >= councils_count:
+                "status=finished"  # тут добавить статус в self.poll
+                # todo
+            poll.minutes -= 1
+            embed_old: discord.Embed = message.embeds[-1]  # crutch
+            embed_new: discord.Embed = discord.Embed(
+                title=embed_old.title,
+                description=f':stopwatch: Закончится через **{poll.minutes} минут**!',
+                colour=embed_old.colour,
+                fields=embed_old.fields,
+            ).set_thumbnail(  # картинка не подцепилась
+                url=f'https://cdn.discordapp.com/icons/{message.guild.id}/{message.guild.icon}.png')
+
+            await message.edit(embed=embed_new)
+
+
+
+
         # with open('.\\databases\\scheduler.json', 'r') as schedule_file:
         #     scheduler_data = json.load(schedule_file)
         #

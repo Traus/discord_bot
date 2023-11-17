@@ -12,7 +12,7 @@ from PIL import Image, ImageOps
 from discord.utils import get
 from collections import namedtuple
 
-from constants import GUILD_ID, beer_emoji, vote_reactions
+from constants import GUILD_ID, beer_emoji
 from database.participants_table import participants
 from database.stat import add_value
 from init_bot import bot
@@ -239,16 +239,6 @@ def get_channel(channel_id: int) -> discord.TextChannel:
     return bot.get_channel(channel_id)
 
 
-async def voting(*roles: discord.Role, message: discord.Message) -> bool:
-    leader = get_leader()
-    all_members = set()
-    for role in roles:
-        all_members.update(role.members)
-    print(len(all_members))
-    print(leader)
-    print(leader in all_members)
-
-    for reaction in vote_reactions:
-        await message.add_reaction(reaction)
-    return True
-
+async def has_voice_permissions(user: discord.Member) -> bool:
+    return get_role_by_name('Совет ги') in user.roles \
+           or get_role_by_name('Глава ги') in user.roles
