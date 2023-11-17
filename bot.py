@@ -11,7 +11,7 @@ import commands
 import music
 import events
 from utils.format import create_embed
-from utils.guild_utils import voting, get_role_by_name
+from utils.guild_utils import get_role_by_name
 
 try:
     from local_settings import TOKEN
