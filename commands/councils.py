@@ -10,7 +10,7 @@ from constants import Channels, Roles
 
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, strip_tot, set_permissions, get_afk_users, is_traus, \
-    get_role_by_name, get_reputation_income, get_referenced_author, get_channel, voting
+    get_role_by_name, get_reputation_income, get_referenced_author, get_channel
 from utils.states import immune_until, user_permissions, muted_queue, drunk_status
 from utils.tenor_gifs import find_gif
 
