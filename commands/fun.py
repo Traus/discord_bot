@@ -1,9 +1,9 @@
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone, time
 
 import discord
 import requests
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 
 from commands._base_command import Command
@@ -13,13 +13,23 @@ from database.stat import add_value, get_value
 
 from utils.format import box, send_by_bot, create_embed
 from utils.guild_utils import get_members_by_role, get_bot_avatar, create_and_send_slap, has_immune, \
-    set_permissions, get_referenced_author, is_traus, quote_referenced_message, chance
+    set_permissions, get_referenced_author, is_traus, quote_referenced_message, chance, get_channel, get_role_by_name
 from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
+from utils.toasts import find_toast
+
+utc = timezone.utc
+
+# If no tzinfo is given then UTC is assumed.
+schedule = time(hour=7, minute=0, tzinfo=utc)  # 10 Msk
 
 
 class FunCommands(Command, name='Веселье'):
     """Рофлы и пасхалки"""
+
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.send_daily_toast.start()
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
@@ -271,6 +281,22 @@ class FunCommands(Command, name='Веселье'):
         else:
             await send_by_bot(ctx, '( ╯°□°)╯┻┻', delete=True)
             table_turn_over[ctx.channel.id] = True
+
+    @commands.command(name='тост', help='Повод выпить')
+    async def toast(self, ctx):
+        toast = find_toast()
+        msg = f'{toast}\nЗамечательный повод выпить! Погнали!'
+        await ctx.send(box(msg))
+
+    @tasks.loop(time=schedule)
+    async def send_daily_toast(self):
+        await self.bot.wait_until_ready()  # Make sure your guild cache is ready so the channel can be found via get_channel
+
+        toast = find_toast()
+        channel = get_channel(channel_id=Channels.GUILD)
+        tot = get_role_by_name(name="ToT")
+        msg = f'{tot.mention}\n{toast}!\nДавайте же поднимем наши бокалы в этот прекрасный день!'
+        await channel.send(box(msg))
 
 
 def setup(bot):
