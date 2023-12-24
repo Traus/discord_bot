@@ -1,3 +1,4 @@
+import asyncio
 import re
 from datetime import datetime, timedelta, timezone, time
 
@@ -18,10 +19,17 @@ from utils.states import table_turn_over, immune_until
 from utils.tenor_gifs import find_gif
 from utils.toasts import find_toast
 
-utc = timezone.utc
 
 # If no tzinfo is given then UTC is assumed.
-schedule = time(hour=7, minute=0, tzinfo=utc)  # 10 Msk
+schedule = time(hour=7, minute=0)  # UTC, 10 Msk
+
+
+def get_next_day_in_seconds() -> int:
+    today = datetime.utcnow()
+    next_date = datetime.combine(today, schedule)
+    if today > next_date:
+        next_date += timedelta(days=1)
+    return (datetime.utcnow() - next_date).seconds
 
 
 class FunCommands(Command, name='Веселье'):
@@ -29,7 +37,20 @@ class FunCommands(Command, name='Веселье'):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self.send_daily_toast.start()
+        # self.send_daily_toast.start()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.bot.wait_until_ready()  # Make sure your guild cache is ready so the channel can be found via get_channel
+        while True:
+            next_iteration = get_next_day_in_seconds()
+            await asyncio.sleep(next_iteration)
+
+            toast = find_toast()
+            channel = get_channel(channel_id=Channels.GUILD)
+            tot = get_role_by_name(name="ToT")
+            msg = f'{tot.mention}\n{toast}!\nДавайте же поднимем наши бокалы в этот прекрасный день!'
+            await channel.send(box(msg))
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
