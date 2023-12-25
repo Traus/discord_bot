@@ -309,6 +309,12 @@ class FunCommands(Command, name='Веселье'):
         msg = f'{toast}\nЗамечательный повод выпить! Погнали!'
         await ctx.send(box(msg))
 
+    @commands.command(name='next', help='Время до следующего тоста', hidden=True)
+    async def next_toast(self, ctx):
+        seconds = get_next_day_in_seconds()
+        next_iteration = datetime.utcnow() + timedelta(seconds=seconds, hours=3)
+        await ctx.send(box(f"Next toast at {datetime.isoformat(next_iteration)}"))
+
     # @tasks.loop(time=schedule)
     # async def send_daily_toast(self):
     #     await self.bot.wait_until_ready()  # Make sure your guild cache is ready so the channel can be found via get_channel
