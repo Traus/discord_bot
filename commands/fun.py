@@ -29,7 +29,7 @@ def get_next_day_in_seconds() -> int:
     next_date = datetime.combine(today, schedule)
     if today > next_date:
         next_date += timedelta(days=1)
-    return (datetime.utcnow() - next_date).seconds
+    return (next_date - datetime.utcnow()).seconds
 
 
 class FunCommands(Command, name='Веселье'):
@@ -50,7 +50,7 @@ class FunCommands(Command, name='Веселье'):
             channel = get_channel(channel_id=Channels.GUILD)
             tot = get_role_by_name(name="ToT")
             msg = f'{tot.mention}\n{toast}!\nДавайте же поднимем наши бокалы в этот прекрасный день!'
-            await channel.send(box(msg))
+            await channel.send(msg)
 
     @commands.command(name='осуждаю', help='Осудить!')
     async def blame(self, ctx):
