@@ -48,8 +48,7 @@ class FunCommands(Command, name='Веселье'):
 
             toast = find_toast()
             channel = get_channel(channel_id=Channels.GUILD)
-            tot = get_role_by_name(name="ToT")
-            msg = f'{tot.mention}\n{toast}!\nДавайте же поднимем наши бокалы в этот прекрасный день!'
+            msg = f'@here\n{toast}!\nДавайте же поднимем наши бокалы в этот прекрасный день!'
             await channel.send(msg)
 
     @commands.command(name='осуждаю', help='Осудить!')
