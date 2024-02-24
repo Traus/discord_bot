@@ -8,3 +8,5 @@ imageio
 youtube_dl
 pynacl
 ffmpeg
+openai==1.6.1
+openai_proxy==0.2.5

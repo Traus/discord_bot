@@ -142,9 +142,7 @@ class CouncilsCommands(Command, name='Совет'):
         await ctx.message.delete()
         guest = get(ctx.guild.roles, name='Гость')
         recruit = get(ctx.guild.roles, name='Рекрут')
-        alliance = get(ctx.guild.roles, name='Орден')
         await member.add_roles(recruit)
-        await member.add_roles(alliance)
         await member.edit(reason='Добро пожаловать', nick=f'[ToT] {member.display_name}')
         await member.remove_roles(guest)
         msg = f'{member.mention}, добро пожаловать в таверну! {self.bot.get_emoji(828026991361261619)}\n' \
